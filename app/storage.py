@@ -85,6 +85,19 @@ def initialize():
             created_at timestamptz NOT NULL DEFAULT now()
         )""")
         db.execute("""CREATE INDEX IF NOT EXISTS wos_activity_workspace_idx ON activity(workspace_id,id DESC)""")
+        db.execute("""CREATE TABLE IF NOT EXISTS knowledge_documents (
+            id text PRIMARY KEY, workspace_id text NOT NULL REFERENCES workspaces(id) ON DELETE CASCADE,
+            title text NOT NULL, content text NOT NULL, created_at timestamptz NOT NULL DEFAULT now(),
+            updated_at timestamptz NOT NULL DEFAULT now()
+        )""")
+        db.execute("""CREATE INDEX IF NOT EXISTS wos_knowledge_workspace_idx
+                      ON knowledge_documents(workspace_id,created_at DESC)""")
+        db.execute("""CREATE TABLE IF NOT EXISTS task_knowledge (
+            ticket_id text NOT NULL REFERENCES tickets(id) ON DELETE CASCADE,
+            document_id text NOT NULL REFERENCES knowledge_documents(id) ON DELETE CASCADE,
+            workspace_id text NOT NULL REFERENCES workspaces(id) ON DELETE CASCADE,
+            PRIMARY KEY(ticket_id,document_id)
+        )""")
         db.execute("""CREATE TABLE IF NOT EXISTS auth_limits (
             bucket text PRIMARY KEY, count integer NOT NULL, window_start timestamptz NOT NULL
         )""")
