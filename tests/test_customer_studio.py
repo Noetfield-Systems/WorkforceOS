@@ -73,7 +73,7 @@ class CustomerE2ETests(unittest.TestCase):
         self.assertTrue(r.json()["ok"])
         session=self.root.get("/api/session").json()
         self.assertFalse(session["authenticated"])
-        self.assertEqual(len(self.root.get("/api/templates").json()["templates"]),4)
+        self.assertEqual(len(self.root.get("/api/templates").json()["templates"]),7)
 
     def test_signup_private_workspace_and_real_team_creation(self):
         client,auth=self.signup()
