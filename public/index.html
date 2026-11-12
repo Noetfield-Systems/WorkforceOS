@@ -190,6 +190,7 @@
   <h2 id="knowledge-title">Give your team<br><em>real context.</em></h2>
   <p>Save the information your teammates should know. Nothing is published or shared with other workspaces.</p>
   <form id="knowledge-form">
+    <label class="file-import-label">Import a text file <input type="file" id="knowledge-import" accept=".txt,.md,.csv,.json,text/plain,text/markdown,text/csv,application/json"><small>TXT · Markdown · CSV · JSON · max 14 KB</small></label>
     <label>Reference title<input id="knowledge-name" required minlength="2" maxlength="120" placeholder="e.g. Our brand voice and customers"></label>
     <label>Knowledge text<textarea id="knowledge-content" required minlength="20" maxlength="14000" rows="9" placeholder="Paste a document, policy, product brief or detailed customer context."></textarea></label>
     <div class="modal-bottom"><span class="small-helper">Text references · 14,000 characters max · 30 per workspace</span><button type="submit" id="knowledge-submit" class="button button-primary">Save reference ↗</button></div>
