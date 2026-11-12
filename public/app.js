@@ -141,7 +141,7 @@ function setView(view){
  if(!VALID_VIEWS.includes(view))return;
  S.view=view;
  if(view==="teams")clearTeamFilter();
- $(".workspace-view").forEach(node=>node.hidden=node.id!=="view-"+view);
+ $$(".workspace-view").forEach(node=>node.hidden=node.id!=="view-"+view);
  $$(".side-link[data-view]").forEach(node=>node.classList.toggle("active",node.dataset.view===view));
  $("view-breadcrumb").textContent=({overview:"Overview",teams:"My teams",work:"Workboard",knowledge:"Knowledge vault",billing:"Plans & billing",activity:"Activity"})[view];
  $("studio").querySelector(".sidebar").classList.remove("mobile-open");
@@ -206,7 +206,7 @@ function renderKnowledge(){
   Number(k.characters||0).toLocaleString()+' characters · '+fmtDate(k.created_at)+'</small></div>'+
   '<button type="button" class="knowledge-remove" data-remove-knowledge="'+escapeHtml(k.id)+'" aria-label="Delete reference '+escapeHtml(k.title)+'">Remove</button></article>'
  ).join(""):empty("Your private reference library","Save your product brief, brand voice, project requirements or customer context here.","knowledge");
- $("[data-remove-knowledge]").forEach(b=>b.addEventListener("click",async()=>{
+ $$("[data-remove-knowledge]").forEach(b=>b.addEventListener("click",async()=>{
   if(!confirm("Delete this reference? Tasks already submitted to the model will retain their original source-owned output."))return;
   try{await api("/api/knowledge/"+encodeURIComponent(b.dataset.removeKnowledge),"DELETE",{});await refresh();notice("Reference deleted.");}
   catch(err){notice(errorText(err))}
@@ -266,7 +266,7 @@ async function renderBilling(){
  manage.hidden=!info.has_customer;
  let config={checkout_ready:false,plans:[]};
  try{config=await api("/api/billing/plans")}catch{}
- $("[data-checkout-plan]").forEach(b=>{
+ $$("[data-checkout-plan]").forEach(b=>{
   b.disabled=!config.checkout_ready||info.active;
   b.title=info.active?"Manage your subscription through Stripe":config.checkout_ready?
     "Continue to secure Stripe Checkout":"Checkout is being connected. No payments can be collected yet.";
@@ -324,7 +324,7 @@ function renderActivation(){
   '<b>'+escapeHtml(step.label)+'</b><small>'+escapeHtml(step.hint)+'</small>'+
   '<span class="step-cta">'+(step.done?'COMPLETE':i===first?'DO THIS NEXT →':'EXPLORE →')+'</span></button>'
  ).join("");
- $("[data-activation-action]").forEach(b=>b.addEventListener("click",()=>{
+ $$("[data-activation-action]").forEach(b=>b.addEventListener("click",()=>{
   const action=b.dataset.activationAction;
   if(action==="team")openTeamBuilder();
   if(action==="work")openTicketCreator();
@@ -568,7 +568,7 @@ async function initialize(){
  $("knowledge-form").addEventListener("submit",submitKnowledge);
  $("knowledge-import").addEventListener("change",importKnowledgeFile);
  $("knowledge-new").addEventListener("click",openKnowledgeCreator);
- $("[data-checkout-plan]").forEach(b=>b.addEventListener("click",()=>beginCheckout(b.dataset.checkoutPlan,b)));
+ $$("[data-checkout-plan]").forEach(b=>b.addEventListener("click",()=>beginCheckout(b.dataset.checkoutPlan,b)));
  $("billing-portal").addEventListener("click",manageBilling);
  $("ticket-add-knowledge").addEventListener("click",openKnowledgeCreator);
  $("revision-form").addEventListener("submit",submitRevision);
