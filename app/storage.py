@@ -98,6 +98,18 @@ def initialize():
             workspace_id text NOT NULL REFERENCES workspaces(id) ON DELETE CASCADE,
             PRIMARY KEY(ticket_id,document_id)
         )""")
+        db.execute("""CREATE TABLE IF NOT EXISTS billing_subscriptions (
+            workspace_id text PRIMARY KEY REFERENCES workspaces(id) ON DELETE CASCADE,
+            stripe_customer_id text UNIQUE, stripe_subscription_id text UNIQUE,
+            stripe_price_id text, plan text NOT NULL DEFAULT 'free',
+            status text NOT NULL DEFAULT 'inactive',
+            current_period_end timestamptz,
+            updated_at timestamptz NOT NULL DEFAULT now()
+        )""")
+        db.execute("""CREATE TABLE IF NOT EXISTS billing_webhook_events (
+            event_id text PRIMARY KEY, event_type text NOT NULL,
+            processed_at timestamptz NOT NULL DEFAULT now()
+        )""")
         db.execute("""CREATE TABLE IF NOT EXISTS auth_limits (
             bucket text PRIMARY KEY, count integer NOT NULL, window_start timestamptz NOT NULL
         )""")
