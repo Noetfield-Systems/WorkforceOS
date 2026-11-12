@@ -38,9 +38,23 @@ TEAM_FIELDS=("id","name","mission","template","created_at")
 CLIENT_ID=re.compile(r"^[a-zA-Z0-9_-]{16,100}$")
 
 
+RUNTIME_BOOT_PROBE={"state":"NOT_CONFIGURED"}
+
 @asynccontextmanager
 async def lifetime(application):
     initialize()
+    if fabric.connected():
+        # A read-only authenticated source probe uses an empty namespace;
+        # it does NOT register a fictitious customer or create test work.
+        try:
+            result=await fabric.health("wos_"+"0"*24)
+            RUNTIME_BOOT_PROBE.update({"state":result.get("state","UNKNOWN"),
+                "provider_configured":result.get("model_provider_configured",False)})
+        except fabric.RuntimeUnavailable as err:
+            RUNTIME_BOOT_PROBE.update({"state":err.code})
+    print("WORKFORCE_FABRIC_GATEWAY_BOOT="+
+          str({"state":RUNTIME_BOOT_PROBE["state"],
+               "provider_configured":RUNTIME_BOOT_PROBE.get("provider_configured",False)}),flush=True)
     yield
 
 app=FastAPI(title="WorkforceOS Agent Studio", version=APP_VERSION,
@@ -151,7 +165,8 @@ def health():
         with database() as db:
             db.execute("SELECT 1").fetchone()
         return {"ok":True,"service":"workforce-os","version":APP_VERSION,
-                "database":"connected","fabric_gateway_configured":fabric.connected()}
+                "database":"connected","fabric_gateway_configured":fabric.connected(),
+                "fabric_gateway_boot_probe":RUNTIME_BOOT_PROBE["state"]}
     except (psycopg.Error,RuntimeError):
         return JSONResponse(status_code=503,content={"ok":False,"service":"workforce-os",
                            "database":"unavailable"})
@@ -292,9 +307,13 @@ async def state(account=Depends(_authentication)):
     if fabric.connected():
         try:
             source=await fabric.tasks(tenant)
-            if isinstance(source,list):
+            status=await fabric.health(tenant)
+            if isinstance(source,list) and isinstance(status,dict):
                 live_tasks={t["id"]:t for t in source if isinstance(t,dict) and isinstance(t.get("id"),str)}
-                runtime={"state":"CONNECTED","agent_count":sum(bool(x["fabric_id"]) for x in agents)}
+                configured=status.get("model_provider_configured") is True
+                runtime={"state":"CONNECTED" if configured else "MODEL_PROVIDER_UNAVAILABLE",
+                         "agent_count":sum(bool(x["fabric_id"]) for x in agents),
+                         "model_provider_configured":configured}
         except fabric.RuntimeUnavailable as err:
             runtime={"state":err.code,"agent_count":0}
     all_tickets=[]
@@ -303,7 +322,7 @@ async def state(account=Depends(_authentication)):
         upstream=live_tasks.get(item["fabric_id"])
         if upstream:
             val["state"]=upstream.get("status",val["state"])
-            val["model_output_ready"]=bool(upstream.get("output"))
+            val["model_output_ready"]=bool(upstream.get("output_ready"))
         else:val["model_output_ready"]=False
         all_tickets.append(val)
     return {"workspace":{"id":tenant,"name":account["workspace_name"],"mission":account["workspace_mission"]},
@@ -398,7 +417,9 @@ async def _dispatch_ticket(account,ticket_id,run_now=True):
         return {"id":ticket_id,"state":"RUNTIME_NOT_CONNECTED","executed":False}
     try:
         if ticket["fabric_id"]:
-            remote_id=ticket["fabric_id"];state=ticket["state"]
+            remote_id=ticket["fabric_id"]
+            detail=await fabric.task_detail(tenant,remote_id)
+            state=detail["task"]["status"]
         else:
             remote=await fabric.create_task(tenant,{
                 "client_ref":ticket_id,"request_id":ticket["request_id"],
