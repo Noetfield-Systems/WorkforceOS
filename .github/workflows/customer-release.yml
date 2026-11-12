@@ -1,0 +1,47 @@
+name: WorkforceOS customer release
+on:
+  pull_request:
+    paths:
+      - "app/**"
+      - "public/**"
+      - "tests/**"
+      - "requirements.txt"
+      - "Dockerfile"
+      - ".github/workflows/customer-release.yml"
+  push:
+    branches: ["main"]
+jobs:
+  customer-e2e:
+    runs-on: ubuntu-latest
+    services:
+      postgres:
+        image: postgres:16
+        env:
+          POSTGRES_USER: wos
+          POSTGRES_PASSWORD: test
+          POSTGRES_DB: workforce_test
+        ports: ["5432:5432"]
+        options: >-
+          --health-cmd "pg_isready -U wos -d workforce_test"
+          --health-interval 5s --health-timeout 5s --health-retries 10
+    env:
+      DATABASE_URL: postgresql://wos:test@localhost:5432/workforce_test
+      ENVIRONMENT: development
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+      - name: Install API dependencies
+        run: pip install -r requirements.txt
+      - name: Python static checks
+        run: python -m compileall -q app tests
+      - name: Frontend JS syntax
+        run: node --check public/app.js
+      - name: Customer no-code and security E2E tests
+        run: python -m unittest discover -s tests -p 'test_*.py' -v
+      - name: Container image Dockerfile is present
+        run: test -f Dockerfile && test -s public/index.html && test -s public/style.css
