@@ -15,7 +15,7 @@ from urllib.parse import urlparse
 
 import psycopg
 from fastapi import FastAPI, HTTPException, Request, Depends
-from fastapi.responses import FileResponse, JSONResponse
+from fastapi.responses import FileResponse, JSONResponse, Response
 from fastapi.staticfiles import StaticFiles
 from pydantic import BaseModel, Field
 from contextlib import asynccontextmanager
@@ -670,6 +670,30 @@ async def ticket_detail(ticket_id:str,account=Depends(_authentication)):
     result["knowledge"]=[public_row(x,("id","title")) for x in refs]
     return result
 
+
+@app.get("/api/tickets/{ticket_id}/artifact.md")
+async def export_ticket_artifact(ticket_id:str,account=Depends(_authentication)):
+    ticket=_get_ticket(account,ticket_id)
+    if not ticket["fabric_id"] or not fabric.connected():
+        raise HTTPException(status_code=409,detail="MODEL_OUTPUT_REQUIRED")
+    try:
+        source=(await fabric.task_detail(account["workspace_id"],ticket["fabric_id"]))["task"]
+    except fabric.RuntimeUnavailable as err:
+        raise HTTPException(status_code=err.status,detail=err.code)
+    output=source.get("output")
+    if not output or source.get("status") not in ("NEEDS_REVIEW","VERIFIED"):
+        raise HTTPException(status_code=409,detail="MODEL_OUTPUT_REQUIRED")
+    import hashlib as _hashlib
+    digest=_hashlib.sha256(str(output).encode("utf-8")).hexdigest()
+    md=("\n\n".join(["# "+ticket["title"].replace("\n"," ").replace("\r"," "),
+        "**Origin:** WorkforceOS / Agent Fabric",
+        "**Task ID:** "+ticket["id"],"**Source task:** "+ticket["fabric_id"],
+        "**Created:** "+ticket["created_at"].isoformat(),
+        "**Status:** "+source["status"]+" (model draft; not independently verified)",
+        "**SHA-256:** "+digest,"---",str(output)])+"\n")
+    return Response(md,media_type="text/markdown; charset=utf-8",
+                    headers={"Content-Disposition":'attachment; filename="workforce-artifact-'+ticket_id+'.md"',
+                             "Cache-Control":"private, no-store"})
 
 @app.post("/api/tickets/{ticket_id}/feedback")
 async def submit_feedback(ticket_id:str,body:FeedbackInput,account=Depends(_write)):
