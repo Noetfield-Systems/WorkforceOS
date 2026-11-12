@@ -1,0 +1,22 @@
+name: Live synthetic customer and real-business challenge
+on:
+  push:
+    branches: [test/live-customer-journey-20261112]
+  workflow_dispatch:
+jobs:
+  live-customer:
+    runs-on: ubuntu-latest
+    timeout-minutes: 12
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Public live journey (synthetic tester, real backend and model)
+        run: python qa/live_customer_journey.py
+      - name: Preserve verified QA evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: live-synthetic-customer-results
+          path: artifacts/live-qa.json
