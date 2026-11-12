@@ -104,6 +104,7 @@
       <button type="button" class="side-link" data-view="teams"><span class="side-icon">♧</span><span>My teams</span></button>
       <button type="button" class="side-link" data-view="work"><span class="side-icon">☷</span><span>Workboard</span></button>
       <button type="button" class="side-link" data-view="knowledge"><span class="side-icon">▤</span><span>Knowledge vault</span></button>
+      <button type="button" class="side-link" data-view="billing"><span class="side-icon">◇</span><span>Plans & billing</span></button>
       <button type="button" class="side-link" data-view="activity"><span class="side-icon">◷</span><span>Activity</span></button>
     </nav>
     <div class="side-section-label">CREATE & IMPROVE</div>
@@ -162,6 +163,18 @@
         <div class="page-heading"><div><span class="studio-overline">PRIVATE CONTEXT, BETTER OUTPUTS</span><h1>Your <em>knowledge.</em></h1><p>Save your briefs, voice, policies or reference text. Choose exactly what each task can use.</p></div><button type="button" class="button button-primary" id="knowledge-new">+ Add knowledge</button></div>
         <div class="work-intro"><span>✦</span><div><b>Private to your workspace.</b><p>Reference text is only included in tasks you explicitly select. Maximum four sources per task. Never a shared public library.</p></div></div>
         <div id="knowledge-grid" class="knowledge-grid"></div>
+      </section>
+      <section id="view-billing" class="workspace-view" hidden>
+        <div class="page-heading"><div><span class="studio-overline">GROW WITH YOUR TEAM</span><h1>Choose your <em>momentum.</em></h1><p>Start free. Move up when you need more capacity and premium tools.</p></div></div>
+        <div class="billing-status" id="billing-status">Loading your actual subscription…</div>
+        <div class="billing-grid">
+          <article class="billing-card"><span class="panel-eyebrow">START HERE</span><h3>Explore</h3><div class="billing-price">$0 <small>/ month</small></div><p>Build your first team and learn what AI teammates can do.</p><span class="billing-plan-foot">Current starter access</span></article>
+          <article class="billing-card"><span class="panel-eyebrow">FOR SOLO FOUNDERS</span><h3>Solo</h3><div class="billing-price">$29 <small>/ month</small></div><p>A personal AI workspace for focused execution.</p><button type="button" class="button button-secondary" data-checkout-plan="solo">Choose Solo ↗</button></article>
+          <article class="billing-card highlighted"><span class="panel-eyebrow">MOST FLEXIBLE</span><h3>Builder</h3><div class="billing-price">$79 <small>/ month</small></div><p>More room to experiment, customize and operate teams.</p><button type="button" class="button button-primary" data-checkout-plan="builder">Choose Builder ↗</button></article>
+          <article class="billing-card"><span class="panel-eyebrow">GROWING TEAMS</span><h3>Team</h3><div class="billing-price">$199 <small>/ month</small></div><p>Build a stronger operational rhythm across teams.</p><button type="button" class="button button-secondary" data-checkout-plan="team">Choose Team ↗</button></article>
+        </div>
+        <p class="small-helper billing-disclosure">USD pricing proposals. Paid access and plan-specific allowances are activated only after Stripe Checkout and verified subscription events. No charge occurs unless you explicitly complete checkout.</p>
+        <button type="button" id="billing-portal" class="button button-secondary" hidden>Manage billing in Stripe ↗</button>
       </section>
       <section id="view-activity" class="workspace-view" hidden>
         <div class="page-heading"><div><span class="studio-overline">YOUR TRAIL</span><h1>Actual <em>activity.</em></h1><p>Workspace changes, created work, submitted feedback. Only real recorded events.</p></div></div>
