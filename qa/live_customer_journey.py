@@ -79,7 +79,27 @@ def run():
           "request_id":uuid.uuid4().hex})
         record("source-backed revision request",st,r)
         if st==200:
-            print(json.dumps({"revision_id":r.get("revision_id"),"revision_state":r.get("state")}))
+            revision_id=r.get("revision_id")
+            print(json.dumps({"revision_id":revision_id,"revision_state":r.get("state")}))
+            verified_revision=False
+            for attempt in range(12):
+                time.sleep(5)
+                ds,detail=call("GET","/api/tickets/"+conversion_ticket)
+                notes=detail.get("feedback",[]) if ds==200 else []
+                note=next((n for n in notes if n.get("fabric_revision_id")==revision_id),{})
+                revision=note.get("revision") or {}
+                output=revision.get("output") or ""
+                status=revision.get("status")
+                print(json.dumps({"step":"revision inspect","http":ds,"status":status,
+                                  "output_ready":bool(output),"output_excerpt":str(output)[:400],
+                                  "error":revision.get("error")}))
+                if output:
+                    verified_revision=True
+                    break
+                if status in ("FAILED","CANCELLED","RECOVERY_NEEDED"):break
+            record("actual revised model deliverable",200 if verified_revision else 424,
+                   {"detail":"revision_output_ready="+str(verified_revision)})
+
     st,r=call("GET","/api/state")
     if st==200:print(json.dumps({"final_task_states":[{"title":t.get("title"),"state":t.get("state"),"model_output_ready":t.get("model_output_ready")} for t in r.get("tickets",[])]}))
     record("all three real model outputs",200 if observed_outputs==3 else 424,{"detail":"actual_outputs="+str(observed_outputs)})
