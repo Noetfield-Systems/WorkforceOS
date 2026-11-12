@@ -241,16 +241,10 @@ async function autoContinueMissions(){
  try{
   for(const m of active){
    const result=await api("/api/missions/"+encodeURIComponent(m.id)+"/advance","POST",{});
-   if(result.state==="OUTPUT_READY_REVIEW_REQUIRED"||result.state==="BLOCKED"){
-    await loadMissionsAfterAdvance();
-   }
+   if(result.state==="BLOCKED")notice("Mission blocked: "+result.reason);
   }
  }catch(err){notice("Mission continuation: "+errorText(err))}
- finally{missionBusy=false}
-}
-async function loadMissionsAfterAdvance(){
- const rows=await api("/api/missions");
- missionList=rows;
+ finally{missionBusy=false;await loadMissions()}
 }
 async function submitMission(e){
  e.preventDefault();
