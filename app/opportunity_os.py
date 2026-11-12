@@ -54,7 +54,7 @@ def initialize_opportunities():
             relevant_url text NOT NULL DEFAULT '',
             proposed_route text NOT NULL, suggested_specialist text NOT NULL,
             integration_lane text NOT NULL, route_basis text NOT NULL,
-            owner text NOT NULL DEFAULT '',
+            owner text NOT NULL DEFAULT 'intake_queue',
             status text NOT NULL DEFAULT 'new',
             stage text NOT NULL DEFAULT 'received',
             collaboration text NOT NULL DEFAULT 'not_started',
@@ -169,29 +169,35 @@ def intake(request: Request, body: Intake):
     ip = request.client.host if request.client else "unknown"
     bucket = hashlib.sha256(("opportunity|"+ip+"|"+email).encode()).hexdigest()
     with database() as db:
-        if not auth_rate_limit(db,"opp:"+bucket,threshold=5):
-            raise HTTPException(status_code=429,detail="TOO_MANY_REQUESTS")
+        permitted=auth_rate_limit(db,"opp:"+bucket,threshold=5)
+    if not permitted:
+        raise HTTPException(status_code=429,detail="TOO_MANY_REQUESTS")
     label, specialist, lane = KINDS[body.kind]
     case_id = "opp_" + secrets.token_hex(12)
     tracking_token = secrets.token_urlsafe(32)
     route_basis = "پیشنهاد مبتنی بر نوع فرصت اعلام‌شده؛ هنوز ارزیابی و انتساب واقعی انجام نشده است."
     # An intake is never auto-assigned to a real human or AI agent.
     next_action = "ارزیابی شواهد و تناسب فرصت توسط مسئول ورودی"
+    next_date = datetime.now(timezone.utc).date()+timedelta(days=1)
+    while next_date.weekday() >= 5:
+        next_date += timedelta(days=1)
     with database() as db:
         db.execute("""INSERT INTO opportunity_cases
             (id,tracking_hash,full_name,email,organization,source,source_url,
              source_context,kind,intent,venture,participant,relevant_url,proposed_route,
-             suggested_specialist,integration_lane,route_basis,next_action)
-            VALUES (%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s)""",
+             suggested_specialist,integration_lane,route_basis,next_action,owner,next_date)
+            VALUES (%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s)""", 
             (case_id,hashlib.sha256(tracking_token.encode()).hexdigest(),
              body.full_name.strip(),email,body.organization.strip(),body.source,
              body.source_url.strip(),body.source_context.strip(),body.kind,
              body.intent.strip(),body.venture.strip(),body.participant,
-             body.relevant_url.strip(),label,specialist,lane,route_basis,next_action))
+             body.relevant_url.strip(),label,specialist,lane,route_basis,next_action,
+             'intake_queue',next_date))
         record_event(db,case_id,"intake.received","applicant","دریافت واقعی درخواست؛ بدون انتساب یا اجرای خودکار")
     return {"received":True,"case": {"id":case_id,"kind":body.kind,
             "route":label,"specialist":specialist,"integration_lane":lane,
-            "status":"new","stage":"received","next_action":next_action,
+            "status":"new","stage":"received","owner":"intake_queue",
+            "next_action":next_action,"next_date":next_date.isoformat(),
             "verification_state":"NOT_INDEPENDENTLY_VERIFIED"},
             "tracking_token":tracking_token}
 
@@ -213,18 +219,34 @@ def tracking(case_id: str, request: Request):
 
 @router.get("/api/opportunity-os/operator/cases",dependencies=[Depends(operator)])
 def cases(status: str="",kind: str="",source: str="",owner: str="",
-          q: str="",limit: int=100):
-    if status and status not in STATUSES or kind and kind not in KINDS or source and source not in SOURCES:
-        raise HTTPException(status_code=422,detail="INVALID_FILTER")
+          stage: str="",match_quality: str="",collaboration: str="",
+          outcome: str="",due: str="",q: str="",limit: int=100):
+    for val,allowed in ((status,STATUSES),(kind,KINDS),(source,SOURCES),
+                        (stage,STAGES),(match_quality,MATCH),(collaboration,COLLAB),
+                        (outcome,OUTCOMES)):
+        if val and val not in allowed:
+            raise HTTPException(status_code=422,detail="INVALID_FILTER")
+    if due not in ("","overdue","today","week","scheduled","none"):
+        raise HTTPException(status_code=422,detail="INVALID_DUE_FILTER")
     if limit<1 or limit>200 or len(q)>100 or len(owner)>140:
         raise HTTPException(status_code=422,detail="INVALID_FILTER")
     conditions=["TRUE"];values=[]
-    for key,val in (("status",status),("kind",kind),("source",source),("owner",owner)):
+    for key,val in (("status",status),("kind",kind),("source",source),
+                    ("stage",stage),("match_quality",match_quality),
+                    ("collaboration",collaboration),("outcome",outcome)):
         if val:
             conditions.append(key+"=%s"); values.append(val)
+    if owner:
+        conditions.append("owner ILIKE %s");values.append("%"+owner+"%")
+    if due:
+        conditions.append({"overdue":"next_date < CURRENT_DATE",
+                           "today":"next_date = CURRENT_DATE",
+                           "week":"next_date BETWEEN CURRENT_DATE AND CURRENT_DATE + 7",
+                           "scheduled":"next_date IS NOT NULL",
+                           "none":"next_date IS NULL"}[due])
     if q:
-        conditions.append("(full_name ILIKE %s OR organization ILIKE %s OR intent ILIKE %s OR id ILIKE %s)")
-        values.extend(["%"+q+"%"]*4)
+        conditions.append("(full_name ILIKE %s OR organization ILIKE %s OR intent ILIKE %s OR id ILIKE %s OR next_action ILIKE %s)")
+        values.extend(["%"+q+"%"]*5)
     with database() as db:
         rows=db.execute("SELECT * FROM opportunity_cases WHERE "+" AND ".join(conditions)+
                         " ORDER BY created_at DESC LIMIT %s",(*values,limit)).fetchall()
@@ -276,10 +298,13 @@ def update_case(case_id: str, body: UpdateCase):
         if not new:return {"case":serialize(existing),"changed":[]}
         target_outcome=new.get("outcome",existing["outcome"])
         target_evidence=new.get("outcome_evidence",existing["outcome_evidence"])
+        target_status=new.get("status",existing["status"])
         if target_outcome!="none" and not target_evidence:
             raise HTTPException(status_code=422,detail="OUTCOME_EVIDENCE_REQUIRED")
         if new.get("collaboration") in ("handoff_recorded","in_progress","completed") and not (new.get("assignment_reference") or existing["assignment_reference"]):
             raise HTTPException(status_code=422,detail="EXTERNAL_HANDOFF_REFERENCE_REQUIRED")
+        if target_status=="won" and target_outcome=="none":
+            raise HTTPException(status_code=422,detail="WON_REQUIRES_RECORDED_OUTCOME")
         if new.get("stage")=="converted" and target_outcome=="none":
             raise HTTPException(status_code=422,detail="CONVERSION_OUTCOME_REQUIRED")
         sql="UPDATE opportunity_cases SET "+",".join(k+"=%s" for k in new)+",updated_at=now() WHERE id=%s RETURNING *"
