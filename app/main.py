@@ -425,7 +425,7 @@ async def create_team(body:TeamInput,account=Depends(_write)):
         event(db,tenant,"team.created",tid,body.template)
     outcomes=[]
     for aid in ids:outcomes.append(await _sync_agent(account,aid))
-    return {"id":tid,"agent_ids":ids,"runtime_connected":all(x=="READY" for x in outcomes),
+    return {"id":tid,"agent_ids":ids,"runtime_connected":bool(outcomes) and all(x=="READY" for x in outcomes),
             "agent_states":outcomes}
 
 
