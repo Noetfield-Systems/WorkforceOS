@@ -58,6 +58,8 @@ class OpportunitySystemTests(unittest.TestCase):
         case_id=created["case"]["id"]
         token=created["tracking_token"]
         self.assertEqual(created["case"]["status"],"new")
+        self.assertEqual(created["case"]["owner"],"intake_queue")
+        self.assertTrue(created["case"]["next_date"])
         self.assertEqual(created["case"]["route"],"مسیر شراکت")
         self.assertEqual(created["case"]["verification_state"],"NOT_INDEPENDENTLY_VERIFIED")
         unauth=self.client.get("/api/opportunity-os/operator/cases")
@@ -85,6 +87,13 @@ class OpportunitySystemTests(unittest.TestCase):
         self.assertEqual(updated.status_code,200,updated.text)
         self.assertEqual(updated.json()["case"]["owner"],"Human owner QA")
         self.assertEqual(updated.json()["case"]["verification_state"],"NOT_INDEPENDENTLY_VERIFIED")
+        filtered=self.client.get("/api/opportunity-os/operator/cases?stage=qualifying&match_quality=medium&owner=Human%20owner%20QA&due=scheduled",
+                                 headers=authorized)
+        self.assertEqual(filtered.status_code,200,filtered.text)
+        self.assertTrue(any(x["id"]==case_id for x in filtered.json()["cases"]))
+        premature_win=self.client.patch("/api/opportunity-os/operator/cases/"+case_id,
+                                        headers={**authorized,**HEADERS},json={"status":"won"})
+        self.assertEqual(premature_win.status_code,422,premature_win.text)
         record=self.client.post("/api/opportunity-os/operator/cases/"+case_id+"/events",
                                 headers={**authorized,**HEADERS},
                                 json={"event_type":"feedback","body":"Test review logged with actual API event."})
@@ -100,6 +109,28 @@ class OpportunitySystemTests(unittest.TestCase):
         self.assertFalse(with_link.json()["independently_verified"])
         self.assertEqual(with_link.json()["case"]["verification_state"],
                          "NOT_INDEPENDENTLY_VERIFIED")
+        won=self.client.patch("/api/opportunity-os/operator/cases/"+case_id,
+                              headers={**authorized,**HEADERS},json={"status":"won"})
+        self.assertEqual(won.status_code,200,won.text)
+        self.assertEqual(won.json()["case"]["verification_state"],
+                         "NOT_INDEPENDENTLY_VERIFIED")
+
+    def test_rate_limit_rejection_survives_transaction(self):
+        # The sixth submission for one identity is blocked on the disposable CI database.
+        email="ratelimit_"+uuid.uuid4().hex[:12]+"@example.org"
+        payload={
+            "full_name":"QA Repeated Intake","email":email,"source":"direct",
+            "source_context":"Automated rate limit contract validation, test data only.",
+            "kind":"customer",
+            "intent":"Test repeated submissions for the same identity to reject a sixth request."
+        }
+        for _ in range(5):
+            response=self.client.post("/api/opportunity-os/cases",json=payload,headers=HEADERS)
+            self.assertEqual(response.status_code,201,response.text)
+        denied=self.client.post("/api/opportunity-os/cases",json=payload,headers=HEADERS)
+        self.assertEqual(denied.status_code,429,denied.text)
+        denied_again=self.client.post("/api/opportunity-os/cases",json=payload,headers=HEADERS)
+        self.assertEqual(denied_again.status_code,429,denied_again.text)
 
     def test_invalid_source_and_fake_handoff_rejected(self):
         payload={
