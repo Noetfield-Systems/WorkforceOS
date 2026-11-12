@@ -53,6 +53,7 @@ def run():
       ("Pricing Analyst","CAD 30 job profitability","For a CAD 30 Vancouver pickup job, calculate revenue minus assumed 25 minutes travel+service, 12 km driving, vehicle costs at CAD 0.30/km and founder time at CAD 25/hour; identify whether this is profitable and the minimum sensible price."),
       ("Conversion Specialist","Launch-ready copy","Draft a concise truthful landing-page headline, subheading, booking CTA, five FAQ entries and three low-cost customer acquisition experiments for Vancouver errand service. No invented results.")
     ]
+    observed_outputs=0
     for (name,title,instructions) in tasks:
         match=next((a for a in agents if a[0]==name),None)
         if not match:continue
@@ -60,17 +61,22 @@ def run():
         record("dispatch "+name,st,r)
         if st==200 and r.get("id"):
             tid=r["id"]
-            for attempt in range(3):
+            for attempt in range(5):
                 time.sleep(5)
                 ds,detail=call("GET","/api/tickets/"+tid)
                 source=((detail.get("runtime") or {}).get("task") or {}) if ds==200 else {}
                 output=source.get("output") or ""
                 print(json.dumps({"step":"source task inspect","agent":name,"http":ds,"status":source.get("status"),"output_ready":bool(output),"output_excerpt":str(output)[:900],"error":source.get("error")}))
-                if output or source.get("status") in ("FAILED","NEEDS_REVIEW","VERIFIED"):break
+                if output:
+                    observed_outputs+=1
+                    break
+                if source.get("status") in ("FAILED","NEEDS_REVIEW","VERIFIED"):break
     st,r=call("GET","/api/state")
     if st==200:print(json.dumps({"final_task_states":[{"title":t.get("title"),"state":t.get("state"),"model_output_ready":t.get("model_output_ready")} for t in r.get("tickets",[])]}))
+    record("at least one actual model output",200 if observed_outputs else 424,{"detail":"actual_outputs="+str(observed_outputs)})
 try:run()
 finally:
     os.makedirs("artifacts",exist_ok=True)
     with open("artifacts/live-qa.json","w") as f:json.dump(results,f,indent=2)
     print("SYNTHETIC_TEST_NOT_A_CUSTOMER_NOT_REVENUE")
+    assert all(item["pass"] for item in results), "Live business journey did not produce verified output"
