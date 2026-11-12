@@ -77,8 +77,8 @@ def _status(workspace_id):
         row=db.execute("""SELECT plan,status,current_period_end,stripe_customer_id
                 FROM billing_subscriptions WHERE workspace_id=%s""",(workspace_id,)).fetchone()
     if not row:return {"plan":"free","status":"inactive","active":False,"has_customer":False}
-    return {"plan":row["plan"] if row["status"] in ACTIVE else "free",
-            "status":row["status"],"active":row["status"] in ACTIVE,
+    return {"plan":row["plan"] if row["status"] in ACTIVE and row["plan"] in PLANS else "free",
+            "status":row["status"],"active":row["status"] in ACTIVE and row["plan"] in PLANS,
             "has_customer":bool(row["stripe_customer_id"]),
             "current_period_end":row["current_period_end"].isoformat() if row["current_period_end"] else None}
 
