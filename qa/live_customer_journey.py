@@ -6,7 +6,7 @@ opener=urllib.request.build_opener(urllib.request.HTTPCookieProcessor(cookie))
 csrf=""
 results=[]
 def call(method,path,data=None,auth=True):
-    headers={"Content-Type":"application/json","Origin":BASE,"User-Agent":"WorkforceOS-QA-Synthetic/1.0"}
+    headers={"Content-Type":"application/json","X-Workforce-Request":"workspace","Origin":BASE,"User-Agent":"WorkforceOS-QA-Synthetic/1.0"}
     if auth and csrf: headers["X-CSRF-Token"]=csrf
     req=urllib.request.Request(BASE+path,data=json.dumps(data).encode() if data is not None else None,headers=headers,method=method)
     try:
