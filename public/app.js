@@ -188,7 +188,87 @@ function renderRecent(){
  ).join(""):'<div class="empty-state"><strong>No tasks yet</strong><p>Give your first task to a teammate to start a real work history.</p>'+
  '<button class="button button-secondary button-small" data-empty-action="work">Create a task ↗</button></div>';
 }
+let missionBusy=false;
+let missionList=[];
+async function loadMissions(){
+ if(!S.authenticated||missionBusy)return;
+ try{
+  missionList=await api("/api/missions");
+  const target=$("mission-list");
+  if(!target)return;
+  const details=await Promise.all(missionList.slice(0,8).map(m=>api("/api/missions/"+encodeURIComponent(m.id))));
+  target.innerHTML=details.map(m=>'<article class="mission-card"><div class="mission-card-head"><strong>'+
+    escapeHtml(m.title)+'</strong><span class="status-chip">'+escapeHtml(m.state)+'</span></div>'+
+    '<p>'+escapeHtml(m.objective)+'</p>'+
+    '<div class="mission-steps">'+m.steps.map(x=>'<div class="mission-step"><b>Step '+(x.position+1)+' · '+escapeHtml(x.title)+'</b>'+
+    '<small>'+escapeHtml(x.status)+'</small>'+
+    (x.output?'<details><summary>Actual agent output · source-backed draft</summary><pre>'+escapeHtml(x.output)+'</pre></details>':'')+
+    '</div>').join("")+'</div>'+
+    '<button class="button button-secondary" type="button" data-advance-mission="'+escapeHtml(m.id)+'">'+
+    (m.state==="OUTPUT_READY_REVIEW_REQUIRED"?"Review complete draft":"Continue mission")+'</button>'+
+    '<small>Output hashes are traceability evidence, not independent verification.</small></article>').join("")||
+    '<p class="small-helper">No team missions yet. Assign a shared business objective above.</p>';
+  $("[data-advance-mission]").forEach(b=>b.addEventListener("click",()=>advanceMission(b.dataset.advanceMission)));
+ }catch(err){notice("Team missions: "+errorText(err))}
+}
+function fillMissionAgents(){
+ const team=$("mission-team")?.value;
+ const agents=(S.data?.agents||[]).filter(a=>a.team_id===team&&a.enabled!==false);
+ for(let i=1;i<=3;i++){
+  const select=$("mission-agent-"+i);
+  if(!select)continue;
+  const old=select.value;
+  select.innerHTML=(i===3?'<option value="">No third step</option>':'')+
+   agents.map(a=>'<option value="'+escapeHtml(a.id)+'">'+escapeHtml(a.name)+' · '+escapeHtml(a.role)+'</option>').join("");
+  if(agents.some(a=>a.id===old))select.value=old;
+  else if(agents.length>=i)select.value=agents[i-1].id;
+ }
+}
+function renderMissionComposer(){
+ const select=$("mission-team");
+ if(!select)return;
+ const old=select.value;
+ select.innerHTML=(S.data?.teams||[]).map(t=>'<option value="'+escapeHtml(t.id)+'">'+escapeHtml(t.name)+'</option>').join("");
+ if((S.data?.teams||[]).some(t=>t.id===old))select.value=old;
+ fillMissionAgents();
+}
+async function submitMission(e){
+ e.preventDefault();
+ const button=e.submitter;
+ const ids=[1,2,3].map(i=>$("mission-agent-"+i).value).filter(Boolean);
+ if(ids.length<2){notice("Add at least two agents to the selected team.");return}
+ const names=["Research","Analyze","Deliver"];
+ const objective=$("mission-objective").value.trim();
+ const payload={team_id:$("mission-team").value,title:$("mission-title").value.trim(),objective,
+  request_id:crypto.randomUUID(),steps:ids.map((agent_id,i)=>({
+   agent_id,title:names[i]+": "+$("mission-title").value.trim(),
+   instructions:i===0?"Investigate the objective and provide evidence, assumptions and actionable findings.":
+    i===1?"Analyze the actual prior agent output critically; identify gaps and provide an improved decision-ready analysis.":
+    "Use the prior analysis to produce a customer-ready deliverable. Do not invent facts, users, results or revenue."
+  }))};
+ setBusy(button,true,"Creating mission…");
+ try{
+  const m=await api("/api/missions","POST",payload);
+  const result=await api("/api/missions/"+encodeURIComponent(m.id)+"/advance","POST",{});
+  notice("Mission created. First step: "+result.state);
+  await loadMissions();
+ }catch(err){notice(errorText(err))}
+ finally{setBusy(button,false)}
+}
+async function advanceMission(id){
+ if(missionBusy)return;
+ missionBusy=true;
+ try{
+  const result=await api("/api/missions/"+encodeURIComponent(id)+"/advance","POST",{});
+  if(result.state==="BLOCKED")notice("Mission blocked: "+result.reason);
+  else if(result.state==="DISPATCHED")notice("Next teammate dispatched.");
+  else if(result.state==="WAITING_FOR_AGENT")notice("Waiting for actual model output.");
+  else if(result.state==="OUTPUT_READY_REVIEW_REQUIRED")notice("All agent outputs ready for review.");
+ }catch(err){notice(errorText(err))}
+ finally{missionBusy=false;await loadMissions()}
+}
 function renderWork(){
+ renderMissionComposer();
  const tickets=S.data.tickets||[];
  $("work-list").innerHTML=tickets.length?tickets.map(t=>{
   const a=S.data.agents.find(a=>a.id===t.agent_id);
@@ -383,7 +463,7 @@ async function pollActiveWork(){
 }
 async function refresh(){
  if(!S.authenticated)return;
- try{S.data=await api("/api/state");render();}
+ try{S.data=await api("/api/state");render();if(S.view==="work")await loadMissions();}
  catch(err){notice("Couldn't load your workspace: "+errorText(err))}
 }
 function openAgentEditor(id=null){
@@ -579,6 +659,8 @@ async function initialize(){
  $("team-form").addEventListener("submit",submitTeam);
  $("agent-form").addEventListener("submit",submitAgent);
  $("ticket-form").addEventListener("submit",submitTicket);
+ $("mission-form").addEventListener("submit",submitMission);
+ $("mission-team").addEventListener("change",fillMissionAgents);
  $("knowledge-form").addEventListener("submit",submitKnowledge);
  $("knowledge-import").addEventListener("change",importKnowledgeFile);
  $("knowledge-new").addEventListener("click",openKnowledgeCreator);
