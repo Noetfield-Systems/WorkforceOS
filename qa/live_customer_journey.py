@@ -61,7 +61,7 @@ def run():
         record("dispatch "+name,st,r)
         if st==200 and r.get("id"):
             tid=r["id"]
-            for attempt in range(3):
+            for attempt in range(5):
                 time.sleep(5)
                 ds,detail=call("GET","/api/tickets/"+tid)
                 source=((detail.get("runtime") or {}).get("task") or {}) if ds==200 else {}
