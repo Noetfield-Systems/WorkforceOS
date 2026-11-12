@@ -7,7 +7,7 @@
 <meta name="description" content="WorkforceOS is your workspace for building an AI team: create teammates, give work, review results and improve together. No developer required.">
 <title>WorkforceOS — Build a team that works with you</title>
 <link rel="icon" href="/static/favicon.svg" type="image/svg+xml">
-<link rel="stylesheet" href="/static/style.css?v=20261112-fix1">
+<link rel="stylesheet" href="/static/style.css?v=20261112-missions1">
 <script src="/static/app.js?v=20261112-fix1" defer></script>
 </head>
 <body>
@@ -156,6 +156,19 @@
       <section id="view-work" class="workspace-view" hidden>
         <div class="page-heading"><div><span class="studio-overline">REAL WORK, REAL PROGRESS</span><h1>The <em>workboard.</em></h1><p>Give work, see actual status, and improve the next version.</p></div><button type="button" class="button button-primary" id="work-new">+ New task</button></div>
         <div class="work-intro"><span>✦</span><div><b>One ticket. One clear result.</b><p>Queue means the execution was accepted, not that the job is complete. Model output is a draft until reviewed.</p></div></div>
+        <section class="mission-panel" aria-label="Team mission builder">
+          <div class="mission-head"><div><span class="studio-overline">TEAM EXECUTION · SOURCE BACKED</span><h2>Give your team a mission.</h2><p>Choose a team and up to three teammates in sequence. Each receives the real output of the previous agent. Nothing is marked verified automatically.</p></div></div>
+          <form id="mission-form" class="mission-form">
+            <label>Team<select id="mission-team" required></select></label>
+            <label>Mission title<input id="mission-title" maxlength="140" minlength="3" required placeholder="Launch a profitable courier offer"></label>
+            <label class="mission-wide">Business objective<textarea id="mission-objective" rows="3" minlength="12" maxlength="3000" required placeholder="Research the market, calculate realistic unit economics, then draft a conversion-ready offer."></textarea></label>
+            <label>Agent 1 · Research<select id="mission-agent-1" required></select></label>
+            <label>Agent 2 · Analysis<select id="mission-agent-2" required></select></label>
+            <label>Agent 3 · Deliverable<select id="mission-agent-3"></select></label>
+            <button class="button button-primary" type="submit">Start team mission</button>
+          </form>
+          <div id="mission-list" class="mission-list" aria-live="polite"></div>
+        </section>
         <div id="work-list" class="work-list"></div>
       </section>
 

@@ -100,6 +100,31 @@ def run():
             record("actual revised model deliverable",200 if verified_revision else 424,
                    {"detail":"revision_output_ready="+str(verified_revision)})
 
+    # Actual cross-agent handoff: researcher -> pricing analyst, no simulated outputs.
+    if len(agents)>=2:
+        st,m=call("POST","/api/missions",{
+            "team_id":team,"title":"Vancouver courier launch decision",
+            "objective":"Decide whether a solo Vancouver courier pilot at CAD 30 per job is viable using evidence and explicit assumptions. No invented customers or bookings.",
+            "request_id":uuid.uuid4().hex,
+            "steps":[
+                {"agent_id":agents[0][1],"title":"Demand research","instructions":"Identify plausible demand and limitations; label unsupported claims."},
+                {"agent_id":agents[1][1],"title":"Financial go/no-go","instructions":"Use the ACTUAL previous research output to evaluate CAD 30 job unit economics and produce a conditional go/no-go."}
+            ]})
+        record("create real two-agent mission",st,m)
+        if st==200:
+            mid=m["id"]
+            finished=False
+            for attempt in range(20):
+                status,advance=call("POST","/api/missions/"+mid+"/advance",{})
+                print(json.dumps({"step":"mission advance","http":status,"state":advance.get("state"),"position":advance.get("step")}))
+                if status!=200 or advance.get("state")=="BLOCKED":break
+                status,detail=call("GET","/api/missions/"+mid)
+                if status==200 and detail.get("state")=="OUTPUT_READY_REVIEW_REQUIRED":
+                    finished=all(x.get("output_ready") and x.get("sha256") for x in detail["steps"])
+                    print(json.dumps({"step":"mission receipt","complete":finished,"source_hashes":[x.get("sha256") for x in detail["steps"]],"independent":detail["receipt"].get("independently_verified")}))
+                    break
+                time.sleep(5)
+            record("two real agents chained with source-backed outputs",200 if finished else 424,{"detail":"complete="+str(finished)})
     st,r=call("GET","/api/state")
     if st==200:print(json.dumps({"final_task_states":[{"title":t.get("title"),"state":t.get("state"),"model_output_ready":t.get("model_output_ready")} for t in r.get("tickets",[])]}))
     record("all three real model outputs",200 if observed_outputs==3 else 424,{"detail":"actual_outputs="+str(observed_outputs)})
