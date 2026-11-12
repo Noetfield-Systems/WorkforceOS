@@ -155,7 +155,13 @@ def _session_response(raw, csrf, account):
 def _throttle(db,request,action,identity=""):
     ip=request.client.host if request.client else "unknown"
     digest=hashlib.sha256((ip+"|"+identity+"|"+action).encode()).hexdigest()
-    if not auth_rate_limit(db,action+":"+digest,threshold=7 if action=="login" else 5):
+    # Commit this security event in a separate transaction. A rejected login or
+    # duplicate registration aborts its business transaction; those failures
+    # must never roll back the abuse counter along with it.
+    with database() as limiter:
+        permitted=auth_rate_limit(limiter,action+":"+digest,
+                                  threshold=7 if action=="login" else 5)
+    if not permitted:
         raise HTTPException(status_code=429,detail="TOO_MANY_ATTEMPTS")
 
 
