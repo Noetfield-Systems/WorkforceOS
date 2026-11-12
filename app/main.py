@@ -856,6 +856,27 @@ async def mission_detail(mission_id:str,account=Depends(_authentication)):
             "state":"OUTPUT_READY_REVIEW_REQUIRED" if completed else mission["state"],
             "steps":results,"receipt":receipt}
 
+@app.get("/api/missions/{mission_id}/artifact.md")
+async def export_mission_artifact(mission_id:str,account=Depends(_authentication)):
+    detail=await mission_detail(mission_id,account)
+    steps=detail["steps"]
+    if not steps or not all(x.get("output_ready") and x.get("sha256") for x in steps):
+        raise HTTPException(status_code=409,detail="MISSION_OUTPUT_INCOMPLETE")
+    parts=["# "+detail["title"].replace("\n"," ").replace("\r"," "),
+           "## Business objective\n"+detail["objective"],
+           "**State:** Model-generated deliverable — customer review required; not independently verified.",
+           "**Mission ID:** "+mission_id,
+           "**Provenance:** Source task identifiers and SHA-256 content hashes below."]
+    for step in steps:
+        parts.append("## "+str(step["position"]+1)+". "+step["title"]+
+                     "\n\n**Source task:** "+step["ticket_id"]+
+                     "\n\n**SHA-256:** "+step["sha256"]+
+                     "\n\n"+str(step["output"]))
+    md="\n\n---\n\n".join(parts)+"\n"
+    return Response(md,media_type="text/markdown; charset=utf-8",
+                    headers={"Content-Disposition":'attachment; filename="workforce-mission-'+mission_id+'.md"',
+                             "Cache-Control":"private, no-store"})
+
 @app.post("/api/missions/{mission_id}/advance")
 async def advance_mission(mission_id:str,account=Depends(_write)):
     mission,steps=_mission_rows(account,mission_id)
