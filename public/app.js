@@ -6,7 +6,7 @@ const escapeHtml=value=>String(value??"").replace(/[&<>"']/g,c=>({"&":"&amp;","<
 const S={authenticated:false,csrf:"",user:null,data:null,templates:[],view:"overview",
   selectedTemplate:"growth",selectedTeam:null,editingAgent:null,currentTicket:null,
   lastTaskNonce:null,pendingSignupTemplate:null,authMode:"register"};
-const VALID_VIEWS=["overview","teams","work","activity"];
+const VALID_VIEWS=["overview","teams","work","knowledge","activity"];
 const LABELS={growth:"Growth & Sales",support:"Support Desk",content:"Creative Studio",builder:"Product Lab"};
 let toastTimer=0;
 
@@ -136,7 +136,7 @@ function setView(view){
  S.view=view;
  $$(".workspace-view").forEach(node=>node.hidden=node.id!=="view-"+view);
  $$(".side-link[data-view]").forEach(node=>node.classList.toggle("active",node.dataset.view===view));
- $("view-breadcrumb").textContent=({overview:"Overview",teams:"My teams",work:"Workboard",activity:"Activity"})[view];
+ $("view-breadcrumb").textContent=({overview:"Overview",teams:"My teams",work:"Workboard",knowledge:"Knowledge vault",activity:"Activity"})[view];
  $("studio").querySelector(".sidebar").classList.remove("mobile-open");
  window.scrollTo({top:0,behavior:"smooth"});
 }
@@ -190,6 +190,48 @@ function renderWork(){
    '<span class="status-chip '+chipClass(t.state)+'">'+escapeHtml(statusLabel(t.state))+'</span><span>↗</span></button>';
  }).join(""):empty("Your workboard is clear","Once you create a task, it will appear here with its real execution state.","work");
 }
+function renderKnowledge(){
+ const items=S.data?.knowledge||[];
+ $("knowledge-grid").innerHTML=items.length?items.map(k=>
+  '<article class="knowledge-card"><span class="knowledge-symbol">▤</span>'+
+  '<div><strong>'+escapeHtml(k.title)+'</strong><small>'+
+  Number(k.characters||0).toLocaleString()+' characters · '+fmtDate(k.created_at)+'</small></div>'+
+  '<button type="button" class="knowledge-remove" data-remove-knowledge="'+escapeHtml(k.id)+'" aria-label="Delete reference '+escapeHtml(k.title)+'">Remove</button></article>'
+ ).join(""):empty("Your private reference library","Save your product brief, brand voice, project requirements or customer context here.","knowledge");
+ $("[data-remove-knowledge]").forEach(b=>b.addEventListener("click",async()=>{
+  if(!confirm("Delete this reference? Tasks already submitted to the model will retain their original source-owned output."))return;
+  try{await api("/api/knowledge/"+encodeURIComponent(b.dataset.removeKnowledge),"DELETE",{});await refresh();notice("Reference deleted.");}
+  catch(err){notice(errorText(err))}
+ }));
+}
+function openKnowledgeCreator(){
+ $("knowledge-form").reset();$("knowledge-message").textContent="";
+ showModal("knowledge-modal");
+}
+async function submitKnowledge(event){
+ event.preventDefault();const b=$("knowledge-submit");setBusy(b,true,"Saving reference…");
+ try{
+  await api("/api/knowledge","POST",{
+   title:$("knowledge-name").value.trim(),content:$("knowledge-content").value.trim()});
+  hideModal("knowledge-modal");await refresh();notice("Knowledge saved privately to your workspace.");
+  if(S.view!=="work")setView("knowledge");
+  renderTicketKnowledge();
+ }catch(err){$("knowledge-message").textContent=errorText(err)}
+ finally{setBusy(b,false)}
+}
+function renderTicketKnowledge(){
+ const list=S.data?.knowledge||[];
+ const container=$("ticket-knowledge-options");
+ const selected=new Set($('input[name="ticket-knowledge"]:checked').map(x=>x.value));
+ container.innerHTML=list.length?list.map(k=>
+  '<label class="knowledge-choice"><input type="checkbox" name="ticket-knowledge" value="'+escapeHtml(k.id)+'" '+
+  (selected.has(k.id)?'checked ':'')+'><span>'+escapeHtml(k.title)+'</span></label>'
+ ).join(""):'<p class="small-helper">No references saved yet. Add one if your task needs context.</p>';
+ $('input[name="ticket-knowledge"]').forEach(b=>b.addEventListener("change",()=>{
+  const chosen=$('input[name="ticket-knowledge"]:checked');
+  if(chosen.length>4){b.checked=false;notice("Choose up to four references per task.")}
+ }));
+}
 function renderActivity(){
  const events=S.data.events||[];
  const names={"workspace.created":"Workspace created","team.created":"Team created","agent.created":"Teammate created",
@@ -225,6 +267,7 @@ function renderActivation(){
   const action=b.dataset.activationAction;
   if(action==="team")openTeamBuilder();
   if(action==="work")openTicketCreator();
+  if(action==="knowledge")openKnowledgeCreator();
   if(action==="output")model?openTicketDetail(model.id):setView("work");
   if(action==="feedback"){
    if(model)openTicketDetail(model.id);
@@ -250,7 +293,7 @@ function renderSummary(){
 }
 function render(){
  if(!S.data)return;
- renderSummary();renderActivation();renderTeams();renderAgentGrid();renderRecent();renderWork();renderActivity();
+ renderSummary();renderActivation();renderTeams();renderAgentGrid();renderRecent();renderWork();renderKnowledge();renderActivity();
  S.templates=S.data.templates||S.templates;
  document.querySelectorAll("[data-empty-action]").forEach(b=>b.addEventListener("click",()=>{
   const action=b.dataset.emptyAction;
@@ -297,6 +340,7 @@ function openTicketCreator(){
    escapeHtml(a.name)+" — "+escapeHtml(a.role)+'</option>').join("");
  if(!enabled.length){notice("Enable a teammate to create work.");return;}
  $("ticket-run-now").checked=true;
+ renderTicketKnowledge();
  S.lastTaskNonce=crypto.randomUUID();
  showModal("ticket-modal");
 }
@@ -320,6 +364,9 @@ async function openTicketDetail(id){
    '<div class="run-entry"><span>'+escapeHtml(x.status||"UNKNOWN")+'</span><small>'+
    formatTime(x.started_at)+' · $'+Number(x.estimated_usd||0).toFixed(4)+'</small></div>'
   ).join(""):'<p class="small-helper">No source-backed model execution attempts recorded.</p>';
+  const references=detail.knowledge||[];
+  $("detail-brief").textContent=ticket.instructions+
+    (references.length?"\n\nSelected references: "+references.map(x=>x.title).join(", "):"");
   const notes=detail.feedback||[];
   $("detail-notes").innerHTML=notes.length?notes.map(x=>
    '<div class="feedback-entry"><span>'+escapeHtml(x.body)+'</span><small>'+formatTime(x.created_at)+
@@ -385,7 +432,8 @@ async function submitTicket(event){
  try{
   const payload={agent_id:$("ticket-agent").value,title:$("ticket-name").value.trim(),
     instructions:$("ticket-instructions").value.trim(),request_id:S.lastTaskNonce||crypto.randomUUID(),
-    run_now:$("ticket-run-now").checked};
+    run_now:$("ticket-run-now").checked,
+    knowledge_ids:$("input[name=\"ticket-knowledge\"]:checked").map(x=>x.value)};
   const response=await api("/api/tickets","POST",payload);
   hideModal("ticket-modal");await refresh();setView("work");
   notice(response.queued?"Work accepted into the real model queue.":"Work ticket saved: "+statusLabel(response.state));
@@ -455,6 +503,9 @@ async function initialize(){
  $("team-form").addEventListener("submit",submitTeam);
  $("agent-form").addEventListener("submit",submitAgent);
  $("ticket-form").addEventListener("submit",submitTicket);
+ $("knowledge-form").addEventListener("submit",submitKnowledge);
+ $("knowledge-new").addEventListener("click",openKnowledgeCreator);
+ $("ticket-add-knowledge").addEventListener("click",openKnowledgeCreator);
  $("revision-form").addEventListener("submit",submitRevision);
  $("product-feedback-form").addEventListener("submit",sendProductFeedback);
  $("detail-run").addEventListener("click",runCurrentTicket);
