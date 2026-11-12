@@ -402,8 +402,11 @@ def knowledge_delete(document_id:str,account=Depends(_write)):
 
 @app.post("/api/teams")
 async def create_team(body:TeamInput,account=Depends(_write)):
-    try:specs=blueprint_plan(body.template,body.mission.strip())
-    except ValueError:raise HTTPException(status_code=400,detail="UNKNOWN_TEMPLATE")
+    if body.template=="blank":
+        specs=[]
+    else:
+        try:specs=blueprint_plan(body.template,body.mission.strip())
+        except ValueError:raise HTTPException(status_code=400,detail="UNKNOWN_TEMPLATE")
     tenant=account["workspace_id"]
     with database() as db:
         count=db.execute("SELECT count(*) n FROM teams WHERE workspace_id=%s",(tenant,)).fetchone()["n"]
