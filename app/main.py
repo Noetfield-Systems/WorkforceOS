@@ -675,3 +675,165 @@ def product_feedback(body:ProductFeedback,account=Depends(_write)):
                    (fid,tenant,body.feedback.strip()))
         event(db,tenant,"product.feedback",fid)
     return {"id":fid,"saved":True}
+
+
+# Team missions are persisted customer workflows, not fabricated multi-agent demos.
+# Each step runs through the existing Agent Fabric worker and only receives the
+# previous step's actual source output after it becomes available.
+class MissionStepInput(BaseModel):
+    agent_id:str=Field(min_length=8,max_length=60)
+    title:str=Field(min_length=3,max_length=140)
+    instructions:str=Field(min_length=8,max_length=2000)
+
+class MissionInput(BaseModel):
+    team_id:str=Field(min_length=8,max_length=60)
+    title:str=Field(min_length=3,max_length=140)
+    objective:str=Field(min_length=12,max_length=3000)
+    request_id:str=Field(min_length=16,max_length=100)
+    steps:list[MissionStepInput]=Field(min_length=2,max_length=3)
+
+def _mission_rows(account,mission_id):
+    tenant=account["workspace_id"]
+    with database() as db:
+        mission=db.execute("SELECT * FROM team_missions WHERE workspace_id=%s AND id=%s",
+                           (tenant,mission_id)).fetchone()
+        if not mission:raise HTTPException(status_code=404,detail="MISSION_NOT_FOUND")
+        steps=db.execute("""SELECT * FROM mission_steps WHERE workspace_id=%s AND mission_id=%s
+                            ORDER BY position""",(tenant,mission_id)).fetchall()
+    return mission,steps
+
+@app.post("/api/missions")
+async def create_mission(body:MissionInput,account=Depends(_write)):
+    tenant=account["workspace_id"]
+    if not CLIENT_ID.fullmatch(body.request_id):
+        raise HTTPException(status_code=400,detail="INVALID_REQUEST_ID")
+    with database() as db:
+        team=db.execute("SELECT id FROM teams WHERE workspace_id=%s AND id=%s",
+                        (tenant,body.team_id)).fetchone()
+        if not team:raise HTTPException(status_code=404,detail="TEAM_NOT_FOUND")
+        agents=db.execute("SELECT id FROM agents WHERE workspace_id=%s AND team_id=%s AND enabled=true",
+                          (tenant,body.team_id)).fetchall()
+        allowed={x["id"] for x in agents}
+        if any(step.agent_id not in allowed for step in body.steps):
+            raise HTTPException(status_code=404,detail="TEAM_AGENT_NOT_FOUND")
+        prior=db.execute("SELECT id,title,objective,team_id FROM team_missions WHERE workspace_id=%s AND request_id=%s",
+                         (tenant,body.request_id)).fetchone()
+        if prior:
+            if prior["title"]!=body.title or prior["objective"]!=body.objective or prior["team_id"]!=body.team_id:
+                raise HTTPException(status_code=409,detail="REQUEST_ID_REUSED")
+            old=db.execute("SELECT agent_id,title,instructions FROM mission_steps WHERE mission_id=%s AND workspace_id=%s ORDER BY position",
+                           (prior["id"],tenant)).fetchall()
+            if [(x["agent_id"],x["title"],x["instructions"]) for x in old]!=[
+                (x.agent_id,x.title.strip(),x.instructions.strip()) for x in body.steps]:
+                raise HTTPException(status_code=409,detail="REQUEST_ID_REUSED")
+            return {"id":prior["id"],"state":"EXISTING"}
+        if db.execute("SELECT COUNT(*) n FROM team_missions WHERE workspace_id=%s",(tenant,)).fetchone()["n"]>=20:
+            raise HTTPException(status_code=409,detail="MISSION_LIMIT_REACHED")
+        if db.execute("SELECT COUNT(*) n FROM tickets WHERE workspace_id=%s",(tenant,)).fetchone()["n"]+len(body.steps)>_limits(tenant)["tickets"]:
+            raise HTTPException(status_code=409,detail="TASK_LIMIT_REACHED")
+        mid=uid()
+        db.execute("""INSERT INTO team_missions(id,workspace_id,team_id,title,objective,request_id)
+                      VALUES (%s,%s,%s,%s,%s,%s)""",
+                   (mid,tenant,body.team_id,body.title.strip(),body.objective.strip(),body.request_id))
+        for i,step in enumerate(body.steps):
+            db.execute("""INSERT INTO mission_steps(mission_id,workspace_id,position,agent_id,title,instructions)
+                          VALUES (%s,%s,%s,%s,%s,%s)""",
+                       (mid,tenant,i,step.agent_id,step.title.strip(),step.instructions.strip()))
+        event(db,tenant,"mission.created",mid)
+    return {"id":mid,"state":"ACTIVE","step_count":len(body.steps)}
+
+@app.get("/api/missions")
+def list_missions(account=Depends(_authentication)):
+    with database() as db:
+        rows=db.execute("""SELECT m.id,m.title,m.state,m.created_at,
+                           (SELECT COUNT(*) FROM mission_steps s WHERE s.mission_id=m.id) AS step_count
+                           FROM team_missions m WHERE m.workspace_id=%s ORDER BY m.created_at DESC LIMIT 20""",
+                        (account["workspace_id"],)).fetchall()
+    return [public_row(r,("id","title","state","created_at","step_count")) for r in rows]
+
+@app.get("/api/missions/{mission_id}")
+async def mission_detail(mission_id:str,account=Depends(_authentication)):
+    import hashlib as _hashlib
+    mission,steps=_mission_rows(account,mission_id)
+    results=[]
+    for step in steps:
+        record={"position":step["position"],"title":step["title"],"agent_id":step["agent_id"],
+                "ticket_id":step["ticket_id"],"status":"PENDING","output_ready":False}
+        if step["ticket_id"]:
+            ticket=_get_ticket(account,step["ticket_id"])
+            record["status"]=ticket["state"]
+            if ticket["fabric_id"] and fabric.connected():
+                try:
+                    source=(await fabric.task_detail(account["workspace_id"],ticket["fabric_id"]))["task"]
+                    record["status"]=source.get("status",record["status"])
+                    output=source.get("output") or ""
+                    record["output_ready"]=bool(output)
+                    if output:
+                        record["output"]=output
+                        record["sha256"]=_hashlib.sha256(output.encode()).hexdigest()
+                    if source.get("error"):record["error"]=source["error"]
+                except (fabric.RuntimeUnavailable,KeyError,TypeError):
+                    record["status"]="SOURCE_UNAVAILABLE"
+        results.append(record)
+    completed=all(x["output_ready"] and x["status"] in ("NEEDS_REVIEW","VERIFIED") for x in results)
+    receipt={"type":"SOURCE_OUTPUT_HASHES_ONLY","independently_verified":False,
+             "steps":[{"position":x["position"],"sha256":x["sha256"],
+                       "ticket_id":x["ticket_id"]} for x in results if x.get("sha256")]}
+    return {"id":mission_id,"title":mission["title"],"objective":mission["objective"],
+            "state":"OUTPUT_READY_REVIEW_REQUIRED" if completed else mission["state"],
+            "steps":results,"receipt":receipt}
+
+@app.post("/api/missions/{mission_id}/advance")
+async def advance_mission(mission_id:str,account=Depends(_write)):
+    mission,steps=_mission_rows(account,mission_id)
+    tenant=account["workspace_id"]
+    if mission["state"]=="CANCELLED":
+        raise HTTPException(status_code=409,detail="MISSION_CANCELLED")
+    for idx,step in enumerate(steps):
+        if step["ticket_id"]:
+            ticket=_get_ticket(account,step["ticket_id"])
+            if not ticket["fabric_id"] or not fabric.connected():
+                return {"state":"WAITING_FOR_RUNTIME","step":idx}
+            try:
+                detail=await fabric.task_detail(tenant,ticket["fabric_id"])
+                source=detail["task"]
+            except (fabric.RuntimeUnavailable,KeyError,TypeError):
+                return {"state":"SOURCE_UNAVAILABLE","step":idx}
+            status=source.get("status")
+            if status in ("FAILED","CANCELLED","RECOVERY_NEEDED"):
+                return {"state":"BLOCKED","step":idx,"reason":status}
+            if not source.get("output") or status not in ("NEEDS_REVIEW","VERIFIED"):
+                return {"state":"WAITING_FOR_AGENT","step":idx,"source_status":status}
+            continue
+        previous=""
+        if idx:
+            prior=_get_ticket(account,steps[idx-1]["ticket_id"])
+            detail=await fabric.task_detail(tenant,prior["fabric_id"])
+            source=detail["task"]
+            if source.get("status") not in ("NEEDS_REVIEW","VERIFIED") or not source.get("output"):
+                return {"state":"WAITING_FOR_AGENT","step":idx-1}
+            previous=str(source["output"])[:4500]
+        objective=(mission["objective"]+"\n\nSTEP "+str(idx+1)+"/"+str(len(steps))+
+                   "\n"+step["instructions"]+
+                   ("\n\nACTUAL PREVIOUS AGENT OUTPUT (unverified draft):\n"+previous if previous else "")+
+                   "\n\nDo not invent customer results or claim independent verification.")
+        if len(objective)>6000:objective=objective[:6000]
+        request_id=mission_id+"_"+str(idx)
+        with database() as db:
+            # Lock this step across replicas to prevent duplicate downstream work.
+            current=db.execute("""SELECT ticket_id FROM mission_steps WHERE mission_id=%s
+                                  AND workspace_id=%s AND position=%s FOR UPDATE""",
+                               (mission_id,tenant,idx)).fetchone()
+            if current["ticket_id"]:return {"state":"ALREADY_DISPATCHED","step":idx}
+            if db.execute("SELECT COUNT(*) n FROM tickets WHERE workspace_id=%s",(tenant,)).fetchone()["n"]>=_limits(tenant)["tickets"]:
+                raise HTTPException(status_code=409,detail="TASK_LIMIT_REACHED")
+            tid=uid()
+            db.execute("""INSERT INTO tickets(id,workspace_id,agent_id,request_id,title,instructions)
+                          VALUES (%s,%s,%s,%s,%s,%s)""",
+                       (tid,tenant,step["agent_id"],request_id,step["title"],objective))
+            db.execute("""UPDATE mission_steps SET ticket_id=%s WHERE mission_id=%s AND workspace_id=%s AND position=%s""",
+                       (tid,mission_id,tenant,idx))
+            event(db,tenant,"mission.step_dispatched",mission_id,str(idx))
+        dispatched=await _dispatch_ticket(account,tid,True)
+        return {"state":"DISPATCHED","step":idx,"ticket_id":tid,"runtime":dispatched["state"]}
+    return {"state":"OUTPUT_READY_REVIEW_REQUIRED","independently_verified":False}
