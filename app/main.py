@@ -25,6 +25,7 @@ from .storage import (database, initialize, uid, hashed_password, password_match
                       auth_rate_limit, event, public_row)
 from .blueprints import available as available_blueprints, plan as blueprint_plan
 from . import fabric_gateway as fabric
+from . import billing
 
 ROOT=Path(__file__).resolve().parent
 PUBLIC=ROOT.parent/"public"
@@ -60,11 +61,13 @@ async def lifetime(application):
 app=FastAPI(title="WorkforceOS Agent Studio", version=APP_VERSION,
             docs_url=None,redoc_url=None,openapi_url=None,lifespan=lifetime)
 app.mount("/static",StaticFiles(directory=PUBLIC),name="static")
+app.include_router(billing.router)
 
 
 @app.middleware("http")
 async def headers(request:Request,call_next):
-    if request.method in ("POST","PATCH","PUT","DELETE") and request.url.path.startswith("/api/"):
+    if (request.method in ("POST","PATCH","PUT","DELETE") and request.url.path.startswith("/api/")
+        and request.url.path!="/api/billing/webhook"):
         origin=request.headers.get("origin")
         if origin and urlparse(origin).netloc.lower()!=request.headers.get("host","").lower():
             return JSONResponse(status_code=403,content={"error":"ORIGIN_REJECTED"})
@@ -347,7 +350,8 @@ async def state(account=Depends(_authentication)):
             "notes":[public_row(x,("id","ticket_id","body","state","created_at")) for x in notes],
             "events":[public_row(x,("event_type","subject_id","detail","created_at")) for x in events],
             "runtime":runtime,"templates":available_blueprints(),
-            "limits":{"teams":5,"agents_per_workspace":18}}
+            "limits":{"teams":5,"agents_per_workspace":18},
+            "billing":billing._status(tenant)}
 
 
 @app.get("/api/knowledge/{document_id}")
