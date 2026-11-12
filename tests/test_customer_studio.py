@@ -171,7 +171,9 @@ class CustomerE2ETests(unittest.TestCase):
         self.assertEqual(checkout.status_code,503,checkout.text)
         self.assertEqual(client.get("/api/billing/status").json()["plan"],"free")
         portal=client.post("/api/billing/portal",json={},headers=headers(auth["csrf"]))
-        self.assertEqual(portal.status_code,409,portal.text)
+        # TestClient uses testserver; the billing redirect must reject hosts
+        # that are not the explicitly configured public origin.
+        self.assertEqual(portal.status_code,403,portal.text)
         self.assertEqual(client.post("/api/billing/webhook",json={"type":"customer.subscription.created"},
                                      headers={"Stripe-Signature":"t=0,v1=invalid"}).status_code,400)
 
