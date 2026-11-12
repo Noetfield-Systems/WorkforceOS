@@ -201,6 +201,38 @@ function renderActivity(){
   (e.detail?" · "+escapeHtml(e.detail):"")+'</small></span></div>'
  ).join(""):empty("Nothing recorded yet","Actual workspace events will appear here. No synthetic history is shown.");
 }
+function renderActivation(){
+ const d=S.data||{},tickets=d.tickets||[],notes=d.notes||[],teams=d.teams||[];
+ const model=tickets.find(t=>t.model_output_ready===true);
+ const steps=[
+  {label:"Build your first team",hint:"Start with three teammates and customize them.",done:teams.length>0,action:"team"},
+  {label:"Give your first task",hint:"Describe an outcome you want from a teammate.",done:tickets.length>0,action:"work"},
+  {label:"See a real model result",hint:"Check the actual source-backed output, not just a queued ticket.",done:!!model,action:"output"},
+  {label:"Make it better",hint:"Give feedback and create a genuine revision.",done:notes.some(n=>Boolean(n.fabric_revision_id)),action:"feedback"}
+ ];
+ const done=steps.filter(x=>x.done).length,first=steps.findIndex(x=>!x.done);
+ $("activation-count").textContent=done+" / "+steps.length;
+ $("activation-bar").setAttribute("aria-valuenow",String(done));
+ $("activation-fill").style.width=(100*done/steps.length)+"%";
+ $("activation-list").innerHTML=steps.map((step,i)=>
+  '<button type="button" class="activation-step '+(step.done?'completed':i===first?'next-step':'')+
+  '" data-activation-action="'+escapeHtml(step.action)+'">'+
+  '<span class="step-indicator">'+(step.done?'✓':String(i+1).padStart(2,'0'))+'</span>'+
+  '<b>'+escapeHtml(step.label)+'</b><small>'+escapeHtml(step.hint)+'</small>'+
+  '<span class="step-cta">'+(step.done?'COMPLETE':i===first?'DO THIS NEXT →':'EXPLORE →')+'</span></button>'
+ ).join("");
+ $("[data-activation-action]").forEach(b=>b.addEventListener("click",()=>{
+  const action=b.dataset.activationAction;
+  if(action==="team")openTeamBuilder();
+  if(action==="work")openTicketCreator();
+  if(action==="output")model?openTicketDetail(model.id):setView("work");
+  if(action==="feedback"){
+   if(model)openTicketDetail(model.id);
+   else if(tickets.length)setView("work");
+   else openTicketCreator();
+  }
+ }));
+}
 function renderSummary(){
  $("side-workspace-name").textContent=S.data.workspace.name;
  $("stat-teams").textContent=S.data.teams.length;
@@ -218,7 +250,7 @@ function renderSummary(){
 }
 function render(){
  if(!S.data)return;
- renderSummary();renderTeams();renderAgentGrid();renderRecent();renderWork();renderActivity();
+ renderSummary();renderActivation();renderTeams();renderAgentGrid();renderRecent();renderWork();renderActivity();
  S.templates=S.data.templates||S.templates;
  document.querySelectorAll("[data-empty-action]").forEach(b=>b.addEventListener("click",()=>{
   const action=b.dataset.emptyAction;
