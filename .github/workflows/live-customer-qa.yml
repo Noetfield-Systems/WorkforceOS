@@ -1,5 +1,7 @@
 name: Live synthetic customer and real-business challenge
 on:
+  push:
+    branches: [qa/live-run-20261112]
   workflow_dispatch:
 jobs:
   live-customer:
