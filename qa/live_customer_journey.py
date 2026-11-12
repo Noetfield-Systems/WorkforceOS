@@ -54,6 +54,7 @@ def run():
       ("Conversion Specialist","Launch-ready copy","Draft a concise truthful landing-page headline, subheading, booking CTA, five FAQ entries and three low-cost customer acquisition experiments for Vancouver errand service. No invented results.")
     ]
     observed_outputs=0
+    conversion_ticket=None
     for (name,title,instructions) in tasks:
         match=next((a for a in agents if a[0]==name),None)
         if not match:continue
@@ -61,6 +62,7 @@ def run():
         record("dispatch "+name,st,r)
         if st==200 and r.get("id"):
             tid=r["id"]
+            if name=="Conversion Specialist":conversion_ticket=tid
             for attempt in range(5):
                 time.sleep(5)
                 ds,detail=call("GET","/api/tickets/"+tid)
@@ -71,9 +73,16 @@ def run():
                     observed_outputs+=1
                     break
                 if source.get("status") in ("FAILED","NEEDS_REVIEW","VERIFIED"):break
+    if conversion_ticket:
+        st,r=call("POST","/api/tickets/"+conversion_ticket+"/feedback",{
+          "feedback":"Correct the unsupported vehicle claim: the operator uses a car, not a van. Remove all unverified service promises and retain an explicit request-for-quote CTA. This is a revision test; do not claim customers or bookings.",
+          "request_id":uuid.uuid4().hex})
+        record("source-backed revision request",st,r)
+        if st==200:
+            print(json.dumps({"revision_id":r.get("revision_id"),"revision_state":r.get("state")}))
     st,r=call("GET","/api/state")
     if st==200:print(json.dumps({"final_task_states":[{"title":t.get("title"),"state":t.get("state"),"model_output_ready":t.get("model_output_ready")} for t in r.get("tickets",[])]}))
-    record("at least one actual model output",200 if observed_outputs else 424,{"detail":"actual_outputs="+str(observed_outputs)})
+    record("all three real model outputs",200 if observed_outputs==3 else 424,{"detail":"actual_outputs="+str(observed_outputs)})
 try:run()
 finally:
     os.makedirs("artifacts",exist_ok=True)
