@@ -233,6 +233,25 @@ function renderMissionComposer(){
  if((S.data?.teams||[]).some(t=>t.id===old))select.value=old;
  fillMissionAgents();
 }
+async function autoContinueMissions(){
+ if(!S.authenticated||document.hidden||S.view!=="work"||missionBusy||!missionList.length)return;
+ const active=missionList.filter(m=>m.state==="ACTIVE").slice(0,3);
+ if(!active.length)return;
+ missionBusy=true;
+ try{
+  for(const m of active){
+   const result=await api("/api/missions/"+encodeURIComponent(m.id)+"/advance","POST",{});
+   if(result.state==="OUTPUT_READY_REVIEW_REQUIRED"||result.state==="BLOCKED"){
+    await loadMissionsAfterAdvance();
+   }
+  }
+ }catch(err){notice("Mission continuation: "+errorText(err))}
+ finally{missionBusy=false}
+}
+async function loadMissionsAfterAdvance(){
+ const rows=await api("/api/missions");
+ missionList=rows;
+}
 async function submitMission(e){
  e.preventDefault();
  const button=e.submitter;
@@ -645,6 +664,7 @@ async function signOut(){
 }
 async function initialize(){
  setInterval(pollActiveWork,6500);
+ setInterval(autoContinueMissions,8500);
  document.querySelectorAll("[data-close]").forEach(b=>b.addEventListener("click",()=>hideModal(b.dataset.close)));
  document.querySelectorAll(".modal-backdrop").forEach(m=>m.addEventListener("click",e=>{
   if(e.target===m)hideModal(m.id);
