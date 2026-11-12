@@ -208,6 +208,22 @@ function openKnowledgeCreator(){
  $("knowledge-form").reset();$("knowledge-message").textContent="";
  showModal("knowledge-modal");
 }
+async function importKnowledgeFile(){
+ const file=$("knowledge-import").files?.[0];
+ if(!file)return;
+ const ext=file.name.split(".").pop().toLowerCase();
+ if(!["txt","md","csv","json"].includes(ext)||file.size>14000){
+  notice("Import a TXT, Markdown, CSV or JSON file under 14 KB.");
+  $("knowledge-import").value="";return;
+ }
+ try{
+  const content=await file.text();
+  if(!content.trim()||content.length>14000)throw Error("KNOWLEDGE_LIMIT_REACHED");
+  $("knowledge-content").value=content;
+  $("knowledge-name").value=file.name.replace(/\.[^.]+$/,"").slice(0,120);
+  notice("Imported locally. Review the content, then save it to your private workspace.");
+ }catch(err){notice(errorText(err))}
+}
 async function submitKnowledge(event){
  event.preventDefault();const b=$("knowledge-submit");setBusy(b,true,"Saving reference…");
  try{
@@ -541,6 +557,7 @@ async function initialize(){
  $("agent-form").addEventListener("submit",submitAgent);
  $("ticket-form").addEventListener("submit",submitTicket);
  $("knowledge-form").addEventListener("submit",submitKnowledge);
+ $("knowledge-import").addEventListener("change",importKnowledgeFile);
  $("knowledge-new").addEventListener("click",openKnowledgeCreator);
  $("[data-checkout-plan]").forEach(b=>b.addEventListener("click",()=>beginCheckout(b.dataset.checkoutPlan,b)));
  $("billing-portal").addEventListener("click",manageBilling);
