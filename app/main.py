@@ -37,6 +37,16 @@ AGENT_FIELDS=("id","team_id","name","role","instructions","enabled","monthly_bud
 TICKET_FIELDS=("id","agent_id","request_id","title","instructions","fabric_id","state","created_at","updated_at")
 TEAM_FIELDS=("id","name","mission","template","created_at")
 CLIENT_ID=re.compile(r"^[a-zA-Z0-9_-]{16,100}$")
+PLAN_LIMITS={
+    "free":{"teams":1,"agents":3,"knowledge":3,"tickets":20},
+    "solo":{"teams":2,"agents":6,"knowledge":10,"tickets":60},
+    "builder":{"teams":4,"agents":12,"knowledge":20,"tickets":120},
+    "team":{"teams":5,"agents":18,"knowledge":30,"tickets":150},
+}
+def _limits(tenant):
+    status=billing._status(tenant)
+    return PLAN_LIMITS.get(status["plan"] if status["active"] else "free",PLAN_LIMITS["free"])
+
 
 
 RUNTIME_BOOT_PROBE={"state":"NOT_CONFIGURED"}
@@ -350,7 +360,7 @@ async def state(account=Depends(_authentication)):
             "notes":[public_row(x,("id","ticket_id","body","state","created_at")) for x in notes],
             "events":[public_row(x,("event_type","subject_id","detail","created_at")) for x in events],
             "runtime":runtime,"templates":available_blueprints(),
-            "limits":{"teams":5,"agents_per_workspace":18},
+            "limits":_limits(tenant),
             "billing":billing._status(tenant)}
 
 
@@ -370,7 +380,7 @@ def knowledge_create(body:KnowledgeInput,account=Depends(_write)):
     with database() as db:
         count=db.execute("SELECT count(*) n FROM knowledge_documents WHERE workspace_id=%s",
                          (tenant,)).fetchone()["n"]
-        if count>=30:raise HTTPException(status_code=409,detail="KNOWLEDGE_LIMIT_REACHED")
+        if count>=_limits(tenant)["knowledge"]:raise HTTPException(status_code=409,detail="KNOWLEDGE_LIMIT_REACHED")
         document_id=uid()
         db.execute("""INSERT INTO knowledge_documents(id,workspace_id,title,content)
                       VALUES (%s,%s,%s,%s)""",
@@ -397,7 +407,10 @@ async def create_team(body:TeamInput,account=Depends(_write)):
     tenant=account["workspace_id"]
     with database() as db:
         count=db.execute("SELECT count(*) n FROM teams WHERE workspace_id=%s",(tenant,)).fetchone()["n"]
-        if count>=5:raise HTTPException(status_code=409,detail="TEAM_LIMIT_REACHED")
+        if count>=_limits(tenant)["teams"]:raise HTTPException(status_code=409,detail="TEAM_LIMIT_REACHED")
+        agent_count=db.execute("SELECT count(*) n FROM agents WHERE workspace_id=%s",(tenant,)).fetchone()["n"]
+        if agent_count+len(specs)>_limits(tenant)["agents"]:
+            raise HTTPException(status_code=409,detail="AGENT_LIMIT_REACHED")
         tid=uid();ids=[]
         db.execute("INSERT INTO teams(id,workspace_id,name,mission,template) VALUES (%s,%s,%s,%s,%s)",
                    (tid,tenant,body.name.strip(),body.mission.strip(),body.template))
@@ -421,7 +434,7 @@ async def create_agent(body:AgentInput,account=Depends(_write)):
                           (tenant,body.team_id)).fetchone():
             raise HTTPException(status_code=404,detail="TEAM_NOT_FOUND")
         count=db.execute("SELECT count(*) n FROM agents WHERE workspace_id=%s",(tenant,)).fetchone()["n"]
-        if count>=18:raise HTTPException(status_code=409,detail="AGENT_LIMIT_REACHED")
+        if count>=_limits(tenant)["agents"]:raise HTTPException(status_code=409,detail="AGENT_LIMIT_REACHED")
         aid=uid()
         db.execute("""INSERT INTO agents(id,workspace_id,team_id,name,role,instructions,monthly_budget)
                     VALUES (%s,%s,%s,%s,%s,%s,%s)""",
@@ -548,6 +561,8 @@ async def create_ticket(body:TicketInput,account=Depends(_write)):
                                    AND id=ANY(%s)""",(tenant,body.knowledge_ids)).fetchall()
                 if len(refs)!=len(body.knowledge_ids):
                     raise HTTPException(status_code=404,detail="KNOWLEDGE_NOT_FOUND")
+            if db.execute("SELECT count(*) n FROM tickets WHERE workspace_id=%s",(tenant,)).fetchone()["n"]>=_limits(tenant)["tickets"]:
+                raise HTTPException(status_code=409,detail="TASK_LIMIT_REACHED")
             tid=uid()
             db.execute("""INSERT INTO tickets(id,workspace_id,agent_id,request_id,title,instructions)
                         VALUES (%s,%s,%s,%s,%s,%s)""",
