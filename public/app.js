@@ -207,6 +207,7 @@ async function loadMissions(){
     '</div>').join("")+'</div>'+
     '<button class="button button-secondary" type="button" data-advance-mission="'+escapeHtml(m.id)+'">'+
     (m.state==="OUTPUT_READY_REVIEW_REQUIRED"?"Review complete draft":"Continue mission")+'</button>'+
+    (m.state==="OUTPUT_READY_REVIEW_REQUIRED"?'<a class="button button-secondary" download href="/api/missions/'+encodeURIComponent(m.id)+'/artifact.md">Download complete mission (.md)</a>':"")+
     '<small>Output hashes are traceability evidence, not independent verification.</small></article>').join("")||
     '<p class="small-helper">No team missions yet. Assign a shared business objective above.</p>';
   $("[data-advance-mission]").forEach(b=>b.addEventListener("click",()=>advanceMission(b.dataset.advanceMission)));
