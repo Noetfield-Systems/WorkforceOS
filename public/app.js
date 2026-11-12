@@ -372,7 +372,7 @@ function render(){
 let taskPollBusy=false;
 async function pollActiveWork(){
  if(!S.authenticated||document.hidden||taskPollBusy||!S.data)return;
- const active=(S.data.tickets||[]).some(t=>["DRAFT","QUEUED","RUNNING","RECOVERY_NEEDED"].includes(t.state));
+ const active=(S.data.tickets||[]).some(t=>["DRAFT","QUEUED","RUNNING","RECOVERY_NEEDED"].includes(t.state)) || (S.data.feedback||[]).some(n=>["DRAFT","QUEUED","RUNNING"].includes(n.state));
  if(!active)return;
  taskPollBusy=true;
  try{
