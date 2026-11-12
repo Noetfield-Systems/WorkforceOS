@@ -186,7 +186,7 @@ def intake(request: Request, body: Intake):
             (id,tracking_hash,full_name,email,organization,source,source_url,
              source_context,kind,intent,venture,participant,relevant_url,proposed_route,
              suggested_specialist,integration_lane,route_basis,next_action,owner,next_date)
-            VALUES (%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s)""", 
+            VALUES (%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s)""", 
             (case_id,hashlib.sha256(tracking_token.encode()).hexdigest(),
              body.full_name.strip(),email,body.organization.strip(),body.source,
              body.source_url.strip(),body.source_context.strip(),body.kind,
