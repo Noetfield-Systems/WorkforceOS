@@ -203,6 +203,55 @@ def website():
         headers={"Cache-Control":"no-cache"})
 
 
+@app.get("/partners")
+def partner_page():
+    return FileResponse(PUBLIC/"partners.html",media_type="text/html",
+                        headers={"Cache-Control":"no-cache"})
+
+class PartnerInterest(BaseModel):
+    name:str=Field(min_length=2,max_length=100)
+    email:str=Field(min_length=5,max_length=254)
+    organization:str=Field(default="",max_length=140)
+    profile:str=Field(min_length=3,max_length=60)
+    message:str=Field(min_length=15,max_length=2000)
+    website:str=Field(default="",max_length=250)
+
+@app.post("/api/partners/interest")
+def partner_interest(request:Request,body:PartnerInterest):
+    if body.website.strip():
+        return {"received":True}
+    try:email=email_normalize(body.email)
+    except ValueError:raise HTTPException(status_code=400,detail="INVALID_EMAIL")
+    allowed={"gtm","advisor","design_customer","investor_connector","founding_collaborator","other"}
+    if body.profile not in allowed:
+        raise HTTPException(status_code=400,detail="INVALID_PROFILE")
+    _throttle(None,request,"partner_interest",email)
+    with database() as db:
+        # Keep an existing contact editable by submitting again without
+        # collecting an unbounded pile of identical messages.
+        recent=db.execute("""SELECT id FROM partner_interests WHERE email=%s
+                             AND created_at>now()-interval '12 hours'
+                             ORDER BY created_at DESC LIMIT 1""",(email,)).fetchone()
+        if recent:return {"received":True}
+        db.execute("""INSERT INTO partner_interests(id,email,name,organization,profile,message)
+                      VALUES (%s,%s,%s,%s,%s,%s)""",
+                   (uid(),email,body.name.strip(),body.organization.strip(),
+                    body.profile,body.message.strip()))
+    return {"received":True}
+
+@app.get("/api/partners/interest/operator")
+def partner_interest_operator(request:Request):
+    # No public admin listing and no customer account can enumerate prospects.
+    import secrets
+    secret=os.getenv("WORKFORCE_PARTNER_OPERATOR_KEY","")
+    supplied=request.headers.get("X-Workforce-Operator-Key","")
+    if len(secret)<32 or not secrets.compare_digest(secret,supplied):
+        raise HTTPException(status_code=404,detail="NOT_FOUND")
+    with database() as db:
+        rows=db.execute("""SELECT id,name,email,organization,profile,message,created_at
+                           FROM partner_interests ORDER BY created_at DESC LIMIT 100""").fetchall()
+    return {"interests":[public_row(x,("id","name","email","organization","profile","message","created_at")) for x in rows]}
+
 @app.get("/api/templates")
 def templates():
     return {"templates":available_blueprints()}
