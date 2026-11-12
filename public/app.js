@@ -6,7 +6,7 @@ const escapeHtml=value=>String(value??"").replace(/[&<>"']/g,c=>({"&":"&amp;","<
 const S={authenticated:false,csrf:"",user:null,data:null,templates:[],view:"overview",
   selectedTemplate:"growth",selectedTeam:null,editingAgent:null,currentTicket:null,
   lastTaskNonce:null,pendingSignupTemplate:null,authMode:"register"};
-const VALID_VIEWS=["overview","teams","work","knowledge","activity"];
+const VALID_VIEWS=["overview","teams","work","knowledge","billing","activity"];
 const LABELS={growth:"Growth & Sales",support:"Support Desk",content:"Creative Studio",builder:"Product Lab"};
 let toastTimer=0;
 
@@ -136,7 +136,7 @@ function setView(view){
  S.view=view;
  $$(".workspace-view").forEach(node=>node.hidden=node.id!=="view-"+view);
  $$(".side-link[data-view]").forEach(node=>node.classList.toggle("active",node.dataset.view===view));
- $("view-breadcrumb").textContent=({overview:"Overview",teams:"My teams",work:"Workboard",knowledge:"Knowledge vault",activity:"Activity"})[view];
+ $("view-breadcrumb").textContent=({overview:"Overview",teams:"My teams",work:"Workboard",knowledge:"Knowledge vault",billing:"Plans & billing",activity:"Activity"})[view];
  $("studio").querySelector(".sidebar").classList.remove("mobile-open");
  window.scrollTo({top:0,behavior:"smooth"});
 }
@@ -232,6 +232,43 @@ function renderTicketKnowledge(){
   if(chosen.length>4){b.checked=false;notice("Choose up to four references per task.")}
  }));
 }
+async function renderBilling(){
+ const info=S.data?.billing||{plan:"free",status:"inactive",active:false};
+ const state=$("billing-status");
+ state.innerHTML='<span class="status-chip '+(info.active?'ready':'gray')+'">'+
+   escapeHtml(info.active?info.plan.toUpperCase()+" · "+info.status:"Explore · Free")+'</span>'+
+   '<span>'+escapeHtml(info.active?"Subscription status confirmed by Stripe.":"No active paid subscription recorded.")+'</span>';
+ const manage=$("billing-portal");
+ manage.hidden=!info.has_customer;
+ let config={checkout_ready:false,plans:[]};
+ try{config=await api("/api/billing/plans")}catch{}
+ $("[data-checkout-plan]").forEach(b=>{
+  b.disabled=!config.checkout_ready||info.active;
+  b.title=info.active?"Manage your subscription through Stripe":config.checkout_ready?
+    "Continue to secure Stripe Checkout":"Checkout is being connected. No payments can be collected yet.";
+  b.textContent=info.active?"Manage current plan":config.checkout_ready?
+    "Choose "+b.dataset.checkoutPlan+" ↗":"Coming soon";
+ });
+}
+async function beginCheckout(plan,button){
+ if(!S.authenticated)return openSignup();
+ setBusy(button,true,"Opening secure checkout…");
+ try{
+  const response=await api("/api/billing/checkout","POST",{plan});
+  if(!response.url?.startsWith("https://checkout.stripe.com/"))throw Error("INVALID_CHECKOUT_URL");
+  window.location.assign(response.url);
+ }catch(err){notice(errorText(err))}
+ finally{setBusy(button,false)}
+}
+async function manageBilling(){
+ const b=$("billing-portal");setBusy(b,true,"Opening billing…");
+ try{
+  const response=await api("/api/billing/portal","POST",{});
+  if(!response.url?.startsWith("https://billing.stripe.com/"))throw Error("INVALID_PORTAL_URL");
+  window.location.assign(response.url);
+ }catch(err){notice(errorText(err))}
+ finally{setBusy(b,false)}
+}
 function renderActivity(){
  const events=S.data.events||[];
  const names={"workspace.created":"Workspace created","team.created":"Team created","agent.created":"Teammate created",
@@ -293,7 +330,7 @@ function renderSummary(){
 }
 function render(){
  if(!S.data)return;
- renderSummary();renderActivation();renderTeams();renderAgentGrid();renderRecent();renderWork();renderKnowledge();renderActivity();
+ renderSummary();renderActivation();renderTeams();renderAgentGrid();renderRecent();renderWork();renderKnowledge();renderBilling();renderActivity();
  S.templates=S.data.templates||S.templates;
  document.querySelectorAll("[data-empty-action]").forEach(b=>b.addEventListener("click",()=>{
   const action=b.dataset.emptyAction;
@@ -505,6 +542,8 @@ async function initialize(){
  $("ticket-form").addEventListener("submit",submitTicket);
  $("knowledge-form").addEventListener("submit",submitKnowledge);
  $("knowledge-new").addEventListener("click",openKnowledgeCreator);
+ $("[data-checkout-plan]").forEach(b=>b.addEventListener("click",()=>beginCheckout(b.dataset.checkoutPlan,b)));
+ $("billing-portal").addEventListener("click",manageBilling);
  $("ticket-add-knowledge").addEventListener("click",openKnowledgeCreator);
  $("revision-form").addEventListener("submit",submitRevision);
  $("product-feedback-form").addEventListener("submit",sendProductFeedback);
