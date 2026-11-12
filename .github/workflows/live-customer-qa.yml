@@ -1,7 +1,5 @@
 name: Live synthetic customer and real-business challenge
 on:
-  pull_request:
-    branches: [main]
   workflow_dispatch:
 jobs:
   live-customer:
