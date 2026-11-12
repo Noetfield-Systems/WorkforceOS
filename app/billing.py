@@ -122,12 +122,27 @@ def _process(event_obj):
                 customer=obj.get("customer")
                 if isinstance(wid,str) and isinstance(customer,str) and customer.startswith("cus_"):
                     if db.execute("SELECT 1 FROM workspaces WHERE id=%s",(wid,)).fetchone():
-                        db.execute("""INSERT INTO billing_subscriptions(workspace_id,stripe_customer_id,status)
-                          VALUES (%s,%s,'incomplete') ON CONFLICT (workspace_id) DO UPDATE SET
-                          stripe_customer_id=EXCLUDED.stripe_customer_id,updated_at=now()""",(wid,customer))
-                        event(db,wid,"billing.checkout_completed",eid)
+                        linked=db.execute("SELECT stripe_customer_id FROM billing_subscriptions WHERE workspace_id=%s",(wid,)).fetchone()
+                        if not linked or linked["stripe_customer_id"] in (None,customer):
+                            db.execute("""INSERT INTO billing_subscriptions(workspace_id,stripe_customer_id,status)
+                              VALUES (%s,%s,'incomplete') ON CONFLICT (workspace_id) DO UPDATE SET
+                              stripe_customer_id=EXCLUDED.stripe_customer_id,updated_at=now()""",(wid,customer))
+                            event(db,wid,"billing.checkout_completed",eid)
         elif kind in ("customer.subscription.created","customer.subscription.updated","customer.subscription.deleted"):
             wid=_workspace_for(db,obj)
+            if not wid:
+                # Stripe may deliver subscription.created before checkout.session.completed.
+                # This metadata is set only by our server when creating the session.
+                candidate=obj.get("metadata",{}).get("workforce_workspace_id")
+                customer=obj.get("customer")
+                if isinstance(candidate,str) and isinstance(customer,str) and customer.startswith("cus_"):
+                    exists=db.execute("SELECT id FROM workspaces WHERE id=%s",(candidate,)).fetchone()
+                    linked=db.execute("SELECT workspace_id,stripe_customer_id FROM billing_subscriptions WHERE workspace_id=%s",(candidate,)).fetchone()
+                    if exists and (not linked or linked["stripe_customer_id"] in (None,customer)):
+                        db.execute("""INSERT INTO billing_subscriptions(workspace_id,stripe_customer_id,status)
+                          VALUES (%s,%s,'incomplete') ON CONFLICT (workspace_id) DO UPDATE SET
+                          stripe_customer_id=EXCLUDED.stripe_customer_id,updated_at=now()""",(candidate,customer))
+                        wid=candidate
             if wid:
                 status=obj.get("status","inactive")
                 if status not in VALID_STATUS:status="inactive"
