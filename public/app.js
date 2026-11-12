@@ -17,7 +17,7 @@ function notice(message){
 function errorText(ex){
  const key=String(ex?.message||"REQUEST_FAILED");
  const pretty={
-  SIGN_IN_REQUIRED:"Sign in to continue.",TEAM_LIMIT_REACHED:"You can create up to five teams in this early release.",
+  SIGN_IN_REQUIRED:"Sign in to continue.",TEAM_LIMIT_REACHED:"Your current plan has reached its team capacity. Upgrade in Plans & billing or customize the existing team.",
   AGENT_LIMIT_REACHED:"This workspace has reached its teammate limit.",
   MODEL_OUTPUT_REQUIRED:"You can request a revision once a real model result is available.",
   RUNTIME_NOT_CONNECTED:"The execution engine isn't connected yet. Your setup has been saved.",
@@ -540,7 +540,7 @@ async function signOut(){
  showScreen(false);window.scrollTo(0,0);
  notice("You're signed out.");
 }
-async function initialize(){
+async async function initialize(){
  document.querySelectorAll("[data-close]").forEach(b=>b.addEventListener("click",()=>hideModal(b.dataset.close)));
  document.querySelectorAll(".modal-backdrop").forEach(m=>m.addEventListener("click",e=>{
   if(e.target===m)hideModal(m.id);
