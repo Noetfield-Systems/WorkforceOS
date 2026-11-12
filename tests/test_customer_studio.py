@@ -157,6 +157,36 @@ class CustomerE2ETests(unittest.TestCase):
         self.assertEqual(denied.status_code,404,denied.text)
         self.assertEqual(a.get("/api/state").json()["tickets"],[])
 
+    def test_subscription_state_never_invented_and_checkout_is_disabled_without_keys(self):
+        client,auth=self.signup()
+        state=client.get("/api/state").json()
+        self.assertEqual(state["billing"]["plan"],"free")
+        self.assertFalse(state["billing"]["active"])
+        self.assertEqual(state["limits"]["teams"],1)
+        plans=client.get("/api/billing/plans")
+        self.assertEqual(plans.status_code,200)
+        self.assertFalse(plans.json()["checkout_ready"])
+        checkout=client.post("/api/billing/checkout",json={"plan":"builder"},
+                             headers=headers(auth["csrf"]))
+        self.assertEqual(checkout.status_code,503,checkout.text)
+        self.assertEqual(client.get("/api/billing/status").json()["plan"],"free")
+        portal=client.post("/api/billing/portal",json={},headers=headers(auth["csrf"]))
+        self.assertEqual(portal.status_code,409,portal.text)
+        self.assertEqual(client.post("/api/billing/webhook",json={"type":"customer.subscription.created"},
+                                     headers={"Stripe-Signature":"t=0,v1=invalid"}).status_code,400)
+
+    def test_real_free_tier_capacity_is_enforced(self):
+        client,auth=self.signup()
+        csrf=auth["csrf"]
+        first=client.post("/api/teams",json={"template":"growth","name":"First team",
+            "mission":"Test real customer demand and provide concrete next steps"},headers=headers(csrf))
+        self.assertEqual(first.status_code,200,first.text)
+        second=client.post("/api/teams",json={"template":"support","name":"Second team",
+            "mission":"Support real customer enquiries and track response quality"},headers=headers(csrf))
+        self.assertEqual(second.status_code,409,second.text)
+        self.assertEqual(second.json()["detail"],"TEAM_LIMIT_REACHED")
+        self.assertEqual(len(client.get("/api/state").json()["teams"]),1)
+
     def test_workspace_isolation(self):
         a,auth_a=self.signup()
         b,auth_b=self.signup()
