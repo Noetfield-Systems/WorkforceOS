@@ -443,7 +443,7 @@ async function openTicketDetail(id,background=false){
   const notes=detail.feedback||[];
   $("detail-notes").innerHTML=notes.length?notes.map(x=>
    '<div class="feedback-entry"><span>'+escapeHtml(x.body)+'</span><small>'+formatTime(x.created_at)+
-   ' · '+escapeHtml(x.state)+'</small></div>'
+   ' · '+escapeHtml(x.revision?.status||x.state)+'</small>'+(x.revision?.output?'<div class="revision-output"><strong>Revised model deliverable</strong><pre>'+escapeHtml(x.revision.output)+'</pre><small>Source-backed draft; not independently verified</small></div>':'<p class="small-helper">'+escapeHtml(x.revision?.error||'Revision pending; model output not ready.')+'</p>')+'</div>'
   ).join(""):'<p class="small-helper">No feedback recorded yet.</p>';
   const eligible=Boolean(source?.output&&["NEEDS_REVIEW","VERIFIED"].includes(source.status));
   $("revision-submit").disabled=!eligible;
