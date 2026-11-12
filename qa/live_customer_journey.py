@@ -1,4 +1,4 @@
-"""Live synthetic-customer smoke test. Never count as organic user or revenue."""
+"""Live synthetic-customer smoke test. Never count as organic user or revenue.\nOne-off QA: multi-agent source handoff acceptance run.\n"""
 import json, os, secrets, time, urllib.request, urllib.error, http.cookiejar, uuid
 BASE="https://workforce-web-production-2d15bf32.up.railway.app"
 cookie= http.cookiejar.CookieJar()
