@@ -92,6 +92,8 @@
       ["شناسه پرونده",result.case.id],["وضعیت",fa[result.case.status]||result.case.status],
       ["مسیر پیشنهادی",result.case.route],["متخصص پیشنهادی",result.case.specialist],
       ["موتور ارجاع مفهومی",result.case.integration_lane],["اقدام بعدی",result.case.next_action],
+      ["مسئول اولیه","صف بررسی ورودی، بدون انتساب شخص"],
+      ["تاریخ برنامه‌ریزی اولیه",result.case.next_date||"ثبت نشده"],
       ["اعتبار نتیجه","هنوز تأیید مستقل وجود ندارد"]
     ];
     success.innerHTML='<div class="success-symbol">✓</div><div class="step-kicker">CASE CREATED / REAL RECORD</div><h3>پرونده شما ثبت شد.</h3><p>این شناسه از پاسخ واقعی سرور دریافت شده و یک رکورد قابل پیگیری دارد. هنوز هیچ انتساب یا اجرای خودکاری ادعا نمی‌شود.</p><div class="success-receipt"><dl>'+
@@ -136,7 +138,7 @@
  async function loadCases(){
   if(!state.operatorKey)return;
   const params=new URLSearchParams();
-  for(const [key,id] of [["status","#filter-status"],["kind","#filter-kind"],["source","#filter-source"]]){
+  for(const [key,id] of [["status","#filter-status"],["kind","#filter-kind"],["source","#filter-source"],["stage","#filter-stage"],["outcome","#filter-outcome"],["due","#filter-due"],["match_quality","#filter-match"],["collaboration","#filter-collaboration"],["owner","#filter-owner"],["q","#filter-query"]]){
     const v=$(id)?.value||"";if(v)params.set(key,v);
   }
   params.set("limit","200");
@@ -149,28 +151,25 @@
   const totals=state.totals,total=Object.values(totals).reduce((a,b)=>a+Number(b||0),0);
   const data=[
    ["کل پرونده‌های ثبت‌شده",total],["نیازمند بررسی",(totals.new||0)+(totals.in_review||0)],
-   ["فرصت‌های فعال",(totals.active||0)+(totals.waiting_reply||0)],["تبدیل‌های ثبت‌شده",totals.won||0]];
+   ["فرصت‌های فعال",(totals.active||0)+(totals.waiting_reply||0)],["نتایج اعلام‌شده (تأییدنشده)",totals.won||0]];
   raw("#op-metrics",data.map(([name,count])=>'<div class="metric"><strong>'+Number(count).toLocaleString("fa-IR")+'</strong><span>'+esc(name)+'</span></div>').join(""));
  }
- const filterIds=["#filter-query","#filter-kind","#filter-status","#filter-source","#filter-match","#filter-collaboration","#filter-owner"];
- for(const id of filterIds){$(id).addEventListener("input",()=>{if(["#filter-kind","#filter-status","#filter-source"].includes(id))loadCases().catch(e=>showCaseError(e.message));else renderCases();});}
+ const filterIds=["#filter-query","#filter-kind","#filter-status","#filter-source","#filter-stage","#filter-outcome","#filter-due","#filter-match","#filter-collaboration","#filter-owner"];
+ let filterTimer=null;
+ for(const id of filterIds){$(id).addEventListener("input",()=>{
+  if(filterTimer)clearTimeout(filterTimer);
+  filterTimer=setTimeout(()=>loadCases().catch(e=>showCaseError(e.message)),240);
+ });}
  $("#refresh-cases").addEventListener("click",()=>loadCases().catch(e=>showCaseError(e.message)));
  function showCaseError(s){raw("#case-list",'<div class="empty-state">'+esc(s)+'</div>');}
  const rowDate=d=>d?new Date(d).toLocaleDateString("fa-IR"):"تعیین نشده";
  function renderCases(){
   let items=state.cases.slice();
-  const q=$("#filter-query").value.trim().toLowerCase();
-  const owner=$("#filter-owner").value.trim().toLowerCase();
-  const match=$("#filter-match").value,collab=$("#filter-collaboration").value;
-  if(q)items=items.filter(c=>[c.full_name,c.organization,c.intent,c.id].join(" ").toLowerCase().includes(q));
-  if(owner)items=items.filter(c=>c.owner.toLowerCase().includes(owner));
-  if(match)items=items.filter(c=>c.match_quality===match);
-  if(collab)items=items.filter(c=>c.collaboration===collab);
   raw("#case-list",items.length?items.map(c=>
    '<button type="button" class="case-row" data-open-id="'+esc(c.id)+'"><div><strong>'+esc(c.full_name)+' · '+esc(c.organization||"بدون سازمان")+'</strong><small><span dir="ltr">'+esc(c.id)+'</span> · '+esc(kindNames[c.kind])+' · '+esc(c.venture)+'</small></div>'+
    '<span class="pill '+(c.status==="waiting_reply"?"waiting":["lost","archived"].includes(c.status)?"closed":"")+'">'+esc(fa[c.status]||c.status)+'</span>'+
    '<span>'+esc(fa[c.stage]||c.stage)+'<small style="display:block">مرحله قیف</small></span>'+
-   '<span>'+esc(c.owner||"بدون مسئول")+'<small style="display:block">'+esc(c.next_action).slice(0,65)+' · '+esc(rowDate(c.next_date))+'</small></span><span class="row-arrow">↖</span></button>'
+   '<span>'+esc(c.owner==="intake_queue"?"صف بررسی ورودی":(c.owner||"بدون مسئول"))+'<small style="display:block">'+esc(c.next_action).slice(0,65)+' · '+esc(rowDate(c.next_date))+'</small></span><span class="row-arrow">↖</span></button>'
   ).join(""):'<div class="empty-state">در این نما هیچ پرونده واقعی پیدا نشد. داده نمونه ایجاد نمی‌شود. (حداکثر ۲۰۰ پرونده اخیر در یک بار دریافت)</div>');
   $$("[data-open-id]").forEach(btn=>btn.addEventListener("click",()=>openCase(btn.dataset.openId)));
  }
