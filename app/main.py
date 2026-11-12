@@ -26,6 +26,7 @@ from .storage import (database, initialize, uid, hashed_password, password_match
 from .blueprints import available as available_blueprints, plan as blueprint_plan
 from . import fabric_gateway as fabric
 from . import billing
+from .opportunity_os import router as opportunity_router, initialize_opportunities
 
 ROOT=Path(__file__).resolve().parent
 PUBLIC=ROOT.parent/"public"
@@ -54,6 +55,7 @@ RUNTIME_BOOT_PROBE={"state":"NOT_CONFIGURED"}
 @asynccontextmanager
 async def lifetime(application):
     initialize()
+    initialize_opportunities()
     if fabric.connected():
         # A read-only authenticated source probe uses an empty namespace;
         # it does NOT register a fictitious customer or create test work.
@@ -72,6 +74,7 @@ app=FastAPI(title="WorkforceOS Agent Studio", version=APP_VERSION,
             docs_url=None,redoc_url=None,openapi_url=None,lifespan=lifetime)
 app.mount("/static",StaticFiles(directory=PUBLIC),name="static")
 app.include_router(billing.router)
+app.include_router(opportunity_router)
 
 
 @app.middleware("http")
@@ -935,3 +938,10 @@ async def advance_mission(mission_id:str,account=Depends(_write)):
                    ("OUTPUT_READY_REVIEW_REQUIRED",tenant,mission_id))
         event(db,tenant,"mission.outputs_ready",mission_id)
     return {"state":"OUTPUT_READY_REVIEW_REQUIRED","independently_verified":False}
+
+
+@app.get("/opportunity-os")
+@app.get("/opportunity-os/")
+def opportunity_os_website():
+    return FileResponse(PUBLIC/"opportunity-os.html",media_type="text/html",
+                        headers={"Cache-Control":"no-cache"})
