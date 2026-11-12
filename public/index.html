@@ -7,8 +7,8 @@
 <meta name="description" content="WorkforceOS is your workspace for building an AI team: create teammates, give work, review results and improve together. No developer required.">
 <title>WorkforceOS — Build a team that works with you</title>
 <link rel="icon" href="/static/favicon.svg" type="image/svg+xml">
-<link rel="stylesheet" href="/static/style.css?v=20261111">
-<script src="/static/app.js?v=20261111" defer></script>
+<link rel="stylesheet" href="/static/style.css?v=20261112-pro">
+<script src="/static/app.js?v=20261112-pro" defer></script>
 </head>
 <body>
 <div class="noise" aria-hidden="true"></div>
@@ -103,6 +103,8 @@
       <button type="button" class="side-link active" data-view="overview"><span class="side-icon">◈</span><span>Overview</span></button>
       <button type="button" class="side-link" data-view="teams"><span class="side-icon">♧</span><span>My teams</span></button>
       <button type="button" class="side-link" data-view="work"><span class="side-icon">☷</span><span>Workboard</span></button>
+      <button type="button" class="side-link" data-view="knowledge"><span class="side-icon">▤</span><span>Knowledge vault</span></button>
+      <button type="button" class="side-link" data-view="billing"><span class="side-icon">◇</span><span>Plans & billing</span></button>
       <button type="button" class="side-link" data-view="activity"><span class="side-icon">◷</span><span>Activity</span></button>
     </nav>
     <div class="side-section-label">CREATE & IMPROVE</div>
@@ -157,6 +159,23 @@
         <div id="work-list" class="work-list"></div>
       </section>
 
+      <section id="view-knowledge" class="workspace-view" hidden>
+        <div class="page-heading"><div><span class="studio-overline">PRIVATE CONTEXT, BETTER OUTPUTS</span><h1>Your <em>knowledge.</em></h1><p>Save your briefs, voice, policies or reference text. Choose exactly what each task can use.</p></div><button type="button" class="button button-primary" id="knowledge-new">+ Add knowledge</button></div>
+        <div class="work-intro"><span>✦</span><div><b>Private to your workspace.</b><p>Reference text is only included in tasks you explicitly select. Maximum four sources per task. Never a shared public library.</p></div></div>
+        <div id="knowledge-grid" class="knowledge-grid"></div>
+      </section>
+      <section id="view-billing" class="workspace-view" hidden>
+        <div class="page-heading"><div><span class="studio-overline">GROW WITH YOUR TEAM</span><h1>Choose your <em>momentum.</em></h1><p>Start free. Move up when you need more capacity and premium tools.</p></div></div>
+        <div class="billing-status" id="billing-status">Loading your actual subscription…</div>
+        <div class="billing-grid">
+          <article class="billing-card"><span class="panel-eyebrow">START HERE</span><h3>Explore</h3><div class="billing-price">$0 <small>/ month</small></div><p>1 team · 3 agents · 3 knowledge references · 20 tasks.</p><span class="billing-plan-foot">Current starter access</span></article>
+          <article class="billing-card"><span class="panel-eyebrow">FOR SOLO FOUNDERS</span><h3>Solo</h3><div class="billing-price">$29 <small>/ month</small></div><p>2 teams · 6 agents · 10 knowledge references · 60 tasks.</p><button type="button" class="button button-secondary" data-checkout-plan="solo">Choose Solo ↗</button></article>
+          <article class="billing-card highlighted"><span class="panel-eyebrow">MOST FLEXIBLE</span><h3>Builder</h3><div class="billing-price">$79 <small>/ month</small></div><p>4 teams · 12 agents · 20 knowledge references · 120 tasks.</p><button type="button" class="button button-primary" data-checkout-plan="builder">Choose Builder ↗</button></article>
+          <article class="billing-card"><span class="panel-eyebrow">GROWING TEAMS</span><h3>Team</h3><div class="billing-price">$199 <small>/ month</small></div><p>5 teams · 18 agents · 30 knowledge references · 150 tasks.</p><button type="button" class="button button-secondary" data-checkout-plan="team">Choose Team ↗</button></article>
+        </div>
+        <p class="small-helper billing-disclosure">USD pricing proposals. Paid access and plan-specific allowances are activated only after Stripe Checkout and verified subscription events. No charge occurs unless you explicitly complete checkout.</p>
+        <button type="button" id="billing-portal" class="button button-secondary" hidden>Manage billing in Stripe ↗</button>
+      </section>
       <section id="view-activity" class="workspace-view" hidden>
         <div class="page-heading"><div><span class="studio-overline">YOUR TRAIL</span><h1>Actual <em>activity.</em></h1><p>Workspace changes, created work, submitted feedback. Only real recorded events.</p></div></div>
         <div class="panel activity-panel"><div id="activity-list" class="activity-feed"></div></div>
@@ -165,6 +184,18 @@
   </main>
 </div>
 
+<div id="knowledge-modal" class="modal-backdrop" hidden><div class="modal modal-wide" role="dialog" aria-modal="true" aria-labelledby="knowledge-title">
+  <button type="button" class="modal-close" data-close="knowledge-modal" aria-label="Close">×</button>
+  <span class="modal-eyebrow">YOUR TEAM'S PRIVATE REFERENCE LIBRARY</span>
+  <h2 id="knowledge-title">Give your team<br><em>real context.</em></h2>
+  <p>Save the information your teammates should know. Nothing is published or shared with other workspaces.</p>
+  <form id="knowledge-form">
+    <label class="file-import-label">Import a text file <input type="file" id="knowledge-import" accept=".txt,.md,.csv,.json,text/plain,text/markdown,text/csv,application/json"><small>TXT · Markdown · CSV · JSON · max 14 KB</small></label>
+    <label>Reference title<input id="knowledge-name" required minlength="2" maxlength="120" placeholder="e.g. Our brand voice and customers"></label>
+    <label>Knowledge text<textarea id="knowledge-content" required minlength="20" maxlength="14000" rows="9" placeholder="Paste a document, policy, product brief or detailed customer context."></textarea></label>
+    <div class="modal-bottom"><span class="small-helper">Text references · 14,000 characters max · 30 per workspace</span><button type="submit" id="knowledge-submit" class="button button-primary">Save reference ↗</button></div>
+  </form><p class="modal-message" id="knowledge-message" role="alert"></p>
+</div></div>
 <div id="auth-modal" class="modal-backdrop" hidden><div class="modal auth-modal" role="dialog" aria-modal="true" aria-labelledby="auth-title">
   <button type="button" class="modal-close" data-close="auth-modal" aria-label="Close">×</button>
   <div class="modal-logo"><span class="brand-symbol">w.</span></div>
@@ -213,6 +244,7 @@
   <form id="ticket-form"><label>Who should take this on?<select id="ticket-agent" required></select></label>
     <label>Task name<input id="ticket-name" required minlength="3" maxlength="140" placeholder="e.g. Research five potential customers"></label>
     <label>What should they deliver?<textarea id="ticket-instructions" required minlength="8" maxlength="6000" rows="5" placeholder="Explain the outcome, context, format and what a good result should include."></textarea></label>
+    <fieldset class="knowledge-picker" id="ticket-knowledge-fieldset"><legend>Bring your own knowledge <small>(optional, up to 4)</small></legend><div id="ticket-knowledge-options"></div><button type="button" id="ticket-add-knowledge" class="inline-knowledge">+ Save a new reference</button></fieldset>
     <label class="switch-label"><input id="ticket-run-now" type="checkbox" checked> Queue with the connected model runtime</label>
     <div class="modal-bottom"><span class="small-helper">No external emails or purchases are sent by this task.</span><button type="submit" id="ticket-submit" class="button button-primary">Create task <span>↗</span></button></div>
   </form><p class="modal-message" id="ticket-message" role="alert"></p>
