@@ -327,7 +327,7 @@ async def state(account=Depends(_authentication)):
         knowledge=db.execute("""SELECT id,title,created_at,updated_at,length(content) AS characters
                             FROM knowledge_documents WHERE workspace_id=%s
                             ORDER BY created_at DESC LIMIT 30""",(tenant,)).fetchall()
-        notes=db.execute("""SELECT id,ticket_id,body,state,created_at FROM feedback
+        notes=db.execute("""SELECT id,ticket_id,body,state,fabric_revision_id,created_at FROM feedback
                            WHERE workspace_id=%s ORDER BY created_at DESC LIMIT 80""",(tenant,)).fetchall()
     runtime={"state":"NOT_CONNECTED","agent_count":0}
     live_tasks={}
