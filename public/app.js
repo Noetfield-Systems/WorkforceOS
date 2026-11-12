@@ -233,6 +233,19 @@ function renderMissionComposer(){
  if((S.data?.teams||[]).some(t=>t.id===old))select.value=old;
  fillMissionAgents();
 }
+async function autoContinueMissions(){
+ if(!S.authenticated||document.hidden||S.view!=="work"||missionBusy||!missionList.length)return;
+ const active=missionList.filter(m=>m.state==="ACTIVE").slice(0,3);
+ if(!active.length)return;
+ missionBusy=true;
+ try{
+  for(const m of active){
+   const result=await api("/api/missions/"+encodeURIComponent(m.id)+"/advance","POST",{});
+   if(result.state==="BLOCKED")notice("Mission blocked: "+result.reason);
+  }
+ }catch(err){notice("Mission continuation: "+errorText(err))}
+ finally{missionBusy=false;await loadMissions()}
+}
 async function submitMission(e){
  e.preventDefault();
  const button=e.submitter;
@@ -645,6 +658,7 @@ async function signOut(){
 }
 async function initialize(){
  setInterval(pollActiveWork,6500);
+ setInterval(autoContinueMissions,8500);
  document.querySelectorAll("[data-close]").forEach(b=>b.addEventListener("click",()=>hideModal(b.dataset.close)));
  document.querySelectorAll(".modal-backdrop").forEach(m=>m.addEventListener("click",e=>{
   if(e.target===m)hideModal(m.id);

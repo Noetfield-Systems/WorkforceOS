@@ -836,4 +836,8 @@ async def advance_mission(mission_id:str,account=Depends(_write)):
             event(db,tenant,"mission.step_dispatched",mission_id,str(idx))
         dispatched=await _dispatch_ticket(account,tid,True)
         return {"state":"DISPATCHED","step":idx,"ticket_id":tid,"runtime":dispatched["state"]}
+    with database() as db:
+        db.execute("UPDATE team_missions SET state=%s WHERE workspace_id=%s AND id=%s",
+                   ("OUTPUT_READY_REVIEW_REQUIRED",tenant,mission_id))
+        event(db,tenant,"mission.outputs_ready",mission_id)
     return {"state":"OUTPUT_READY_REVIEW_REQUIRED","independently_verified":False}
