@@ -549,7 +549,7 @@ async function signOut(){
  showScreen(false);window.scrollTo(0,0);
  notice("You're signed out.");
 }
-async async function initialize(){
+async function initialize(){
  document.querySelectorAll("[data-close]").forEach(b=>b.addEventListener("click",()=>hideModal(b.dataset.close)));
  document.querySelectorAll(".modal-backdrop").forEach(m=>m.addEventListener("click",e=>{
   if(e.target===m)hideModal(m.id);
