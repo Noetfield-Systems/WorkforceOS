@@ -124,6 +124,17 @@
       <section id="view-overview" class="workspace-view">
         <div class="studio-welcome"><div><span class="studio-overline">YOUR WORKSPACE, YOUR WAY</span><h1>Good to have you here<span class="welcome-spark">✳</span></h1><p id="welcome-subtitle">A little progress every day. Build what matters with your team.</p></div><span class="date-mark" id="today-date">Today</span></div>
         <div class="quick-stats"><div class="stat-box"><span>YOUR TEAMS</span><strong id="stat-teams">0</strong><small>Built around your goals</small></div><div class="stat-box"><span>AI TEAMMATES</span><strong id="stat-agents">0</strong><small>Ready to customize</small></div><div class="stat-box"><span>WORK TICKETS</span><strong id="stat-tickets">0</strong><small>Real work records</small></div><div class="stat-box"><span>READY TO REVIEW</span><strong id="stat-review">0</strong><small>Model outputs, not receipts</small></div></div>
+        <section class="activation-track" aria-labelledby="activation-title">
+          <div class="activation-top">
+            <div><span class="panel-eyebrow">YOUR FIRST FOUR MOVES</span>
+              <h2 id="activation-title">Your team-building journey <span id="activation-count">0 / 4</span></h2>
+              <p>Simple steps. Visible progress. Every milestone is backed by your actual work.</p>
+            </div>
+            <span class="activation-star" aria-hidden="true">✳</span>
+          </div>
+          <div class="activation-bar" id="activation-bar" role="progressbar" aria-label="Getting started" aria-valuenow="0" aria-valuemin="0" aria-valuemax="4"><span id="activation-fill"></span></div>
+          <div id="activation-list" class="activation-list"></div>
+        </section>
         <div class="studio-columns">
           <section class="panel panel-hero"><span class="panel-eyebrow">LET'S GET TO WORK</span><div class="panel-top"><h2>What are we<br><em>building today?</em></h2><span class="panel-star">✳</span></div><p>Describe a goal, choose a team and make the first move. We handle the setup.</p><button type="button" class="button button-primary" id="welcome-start">Build a team <span>↗</span></button></section>
           <section class="panel panel-recent"><div class="panel-heading"><h3>Your recent work</h3><button type="button" class="text-link" data-view="work">View all →</button></div><div id="recent-work" class="recent-list"></div></section>
