@@ -79,3 +79,4 @@ finally:
     os.makedirs("artifacts",exist_ok=True)
     with open("artifacts/live-qa.json","w") as f:json.dump(results,f,indent=2)
     print("SYNTHETIC_TEST_NOT_A_CUSTOMER_NOT_REVENUE")
+    assert all(item["pass"] for item in results), "Live business journey did not produce verified output"
