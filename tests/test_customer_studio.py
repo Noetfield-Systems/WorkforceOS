@@ -262,6 +262,8 @@ class CustomerE2ETests(unittest.TestCase):
         detail=client.get("/api/missions/"+mid)
         self.assertEqual(detail.status_code,200,detail.text)
         self.assertEqual(len(detail.json()["steps"]),2)
+        self.assertEqual(client.get("/api/missions/"+mid+"/artifact.md").status_code,409)
+        self.assertEqual(self.root.get("/api/missions/"+mid+"/artifact.md").status_code,401)
         self.assertFalse(detail.json()["receipt"]["independently_verified"])
         again=client.post("/api/missions",json=body,headers=headers(csrf))
         self.assertEqual(again.json()["id"],mid)
