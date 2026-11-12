@@ -262,3 +262,24 @@ button{cursor:pointer}button:disabled{cursor:not-allowed;opacity:.55}a{text-deco
 .recent-item-body{min-width:0}
 @media(max-width:1200px){.activation-list{grid-template-columns:repeat(2,minmax(0,1fr))}.activation-step{min-height:115px}}
 @media(max-width:650px){.activation-track{padding:19px 15px 15px}.activation-top h2{font-size:17px}.activation-top p{font-size:10px}.activation-star{font-size:33px}.activation-list{gap:7px}.activation-step{padding:11px 9px;min-height:135px}}
+
+
+/* Premium private knowledge vault */
+.knowledge-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:14px;margin:24px 0}
+.knowledge-card{display:flex;align-items:center;gap:14px;min-width:0;background:linear-gradient(140deg,#17232e,#121c27);border:1px solid #30404b;border-radius:13px;padding:19px;transition:border-color .2s,transform .2s}
+.knowledge-card:hover{border-color:#7b9e81;transform:translateY(-1px)}
+.knowledge-card>div{display:flex;flex-direction:column;gap:7px;min-width:0;flex:1}
+.knowledge-card strong{font-size:14px;overflow-wrap:anywhere}
+.knowledge-card small{font-size:11px;color:#9eaeb4}
+.knowledge-symbol{width:43px;height:43px;display:grid;place-items:center;background:#2b443c;color:#d7f89b;font-size:23px;border-radius:12px;flex-shrink:0}
+.knowledge-remove{border:1px solid #46505a;border-radius:7px;background:transparent;color:#b8c2c7;padding:7px 9px;font-size:11px}
+.knowledge-remove:hover{border-color:#d7b5a9;color:#ffe4da}
+.knowledge-picker{margin:15px 0;border:1px solid #35424b;border-radius:12px;padding:13px 15px}
+.knowledge-picker legend{color:#e5e9e6;font-size:13px;font-weight:650;padding:0 6px}
+.knowledge-picker legend small{font-weight:400;color:#a6b2b5}
+#ticket-knowledge-options{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:7px}
+.knowledge-choice{display:flex;align-items:center;gap:9px;padding:10px;border:1px solid #34424a;border-radius:8px;color:#e3e9e7;font-size:12px;min-width:0}
+.knowledge-choice span{overflow-wrap:anywhere}
+.knowledge-choice input{accent-color:#d7f89b;width:16px;height:16px;flex-shrink:0}
+.inline-knowledge{border:0;background:transparent;color:#d7f89b;font-size:12px;padding:10px 0 0;text-align:left}
+@media(max-width:680px){.knowledge-grid,#ticket-knowledge-options{grid-template-columns:1fr}.knowledge-card{padding:14px}}
