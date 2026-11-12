@@ -140,6 +140,7 @@ function clearTeamFilter(){
 function setView(view){
  if(!VALID_VIEWS.includes(view))return;
  S.view=view;
+ if(view==="work"&&S.authenticated)loadMissions();
  if(view==="teams")clearTeamFilter();
  $$(".workspace-view").forEach(node=>node.hidden=node.id!=="view-"+view);
  $$(".side-link[data-view]").forEach(node=>node.classList.toggle("active",node.dataset.view===view));
