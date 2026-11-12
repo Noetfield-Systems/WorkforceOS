@@ -137,7 +137,6 @@ function setView(view){
  $$(".workspace-view").forEach(node=>node.hidden=node.id!=="view-"+view);
  $$(".side-link[data-view]").forEach(node=>node.classList.toggle("active",node.dataset.view===view));
  $("view-breadcrumb").textContent=({overview:"Overview",teams:"My teams",work:"Workboard",activity:"Activity"})[view];
- $(".sidebar");
  $("studio").querySelector(".sidebar").classList.remove("mobile-open");
  window.scrollTo({top:0,behavior:"smooth"});
 }
@@ -175,7 +174,7 @@ function renderRecent(){
  const tickets=S.data.tickets||[];
  $("recent-work").innerHTML=tickets.length?tickets.slice(0,4).map(t=>
   '<div class="recent-item" role="button" tabindex="0" data-open-ticket="'+escapeHtml(t.id)+'">'+
-  '<span class="recent-icon">☷</span><div style="min-width:0"><strong>'+escapeHtml(t.title)+'</strong>'+
+  '<span class="recent-icon">☷</span><div class="recent-item-body"><strong>'+escapeHtml(t.title)+'</strong>'+
   '<small>'+fmtDate(t.updated_at)+'</small></div><span class="status-chip '+chipClass(t.state)+'">'+
   escapeHtml(statusLabel(t.state))+'</span></div>'
  ).join(""):'<div class="empty-state"><strong>No tasks yet</strong><p>Give your first task to a teammate to start a real work history.</p>'+
