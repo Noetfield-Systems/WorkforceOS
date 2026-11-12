@@ -7,7 +7,7 @@ const S={authenticated:false,csrf:"",user:null,data:null,templates:[],view:"over
   selectedTemplate:"growth",selectedTeam:null,editingAgent:null,currentTicket:null,
   lastTaskNonce:null,pendingSignupTemplate:null,authMode:"register",finishedRevisions:new Set()};
 const VALID_VIEWS=["overview","teams","work","knowledge","billing","activity"];
-const LABELS={blank:"Custom team",growth:"Growth & Sales",support:"Support Desk",content:"Creative Studio",builder:"Product Lab"};
+const LABELS={blank:"Custom team",startup:"Startup Launch",gtm:"GTM Execution",fundraising:"Investor Readiness",growth:"Growth & Sales",support:"Support Desk",content:"Creative Studio",builder:"Product Lab"};
 let toastTimer=0;
 
 function notice(message){
@@ -527,6 +527,8 @@ async function openTicketDetail(id,background=false){
    " · Verification: not independent";
   $("detail-output").textContent=source?.output||source?.error||
    (ticket.fabric_id?"No completed model output yet.":"No model runtime is linked to this task yet.");
+  const artifactLink=$("detail-artifact");
+  if(artifactLink){artifactLink.hidden=!source?.output;artifactLink.href="/api/tickets/"+encodeURIComponent(id)+"/artifact.md";}
   $("detail-runs").innerHTML=attempts.length?attempts.map(x=>
    '<div class="run-entry"><span>'+escapeHtml(x.status||"UNKNOWN")+'</span><small>'+
    formatTime(x.started_at)+' · $'+Number(x.estimated_usd||0).toFixed(4)+'</small></div>'
@@ -666,7 +668,7 @@ async function initialize(){
  document.addEventListener("keydown",e=>{if(e.key==="Escape")$$(".modal-backdrop:not([hidden])").forEach(m=>hideModal(m.id));});
  $$("[data-start]").forEach(b=>b.addEventListener("click",()=>openSignup()));
  $$("[data-template]").forEach(b=>b.addEventListener("click",()=>openSignup(b.dataset.template)));
- $("see-teams").addEventListener("click",()=>$("teams").scrollIntoView({behavior:"smooth"}));
+ $("see-teams").addEventListener("click",()=>$("how").scrollIntoView({behavior:"smooth"}));
  $("top-signin").addEventListener("click",()=>{switchAuth("login");showModal("auth-modal")});
  $("auth-register-tab").addEventListener("click",()=>switchAuth("register"));
  $("auth-login-tab").addEventListener("click",()=>switchAuth("login"));
