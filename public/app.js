@@ -7,7 +7,7 @@ const S={authenticated:false,csrf:"",user:null,data:null,templates:[],view:"over
   selectedTemplate:"growth",selectedTeam:null,editingAgent:null,currentTicket:null,
   lastTaskNonce:null,pendingSignupTemplate:null,authMode:"register"};
 const VALID_VIEWS=["overview","teams","work","knowledge","billing","activity"];
-const LABELS={growth:"Growth & Sales",support:"Support Desk",content:"Creative Studio",builder:"Product Lab"};
+const LABELS={blank:"Custom team",growth:"Growth & Sales",support:"Support Desk",content:"Creative Studio",builder:"Product Lab"};
 let toastTimer=0;
 
 function notice(message){
@@ -118,7 +118,7 @@ function chooseTemplate(id){
  if(!goal.value.trim())goal.value=S.user?.mission||"Help me make tangible progress on my next business goal.";
 }
 function renderTemplateOptions(){
- $("template-options").innerHTML=S.templates.map(t=>
+ $("template-options").innerHTML=[{id:"blank",name:"Start from scratch",description:"No pre-made agents. Add exactly the teammates you need."},...S.templates].map(t=>
   '<button type="button" class="template-option '+(t.id===S.selectedTemplate?"selected":"")+
   '" data-option="'+escapeHtml(t.id)+'"><b>'+escapeHtml(t.name)+'</b><small>'+escapeHtml(t.description)+'</small></button>'
  ).join("");
@@ -126,15 +126,22 @@ function renderTemplateOptions(){
 }
 function openTeamBuilder(template=null){
  if(!S.authenticated){openSignup(template||S.selectedTemplate);return}
- S.selectedTemplate=template||S.selectedTemplate||"growth";
+ S.selectedTemplate=template||"blank";
  $("team-form").reset();$("team-message").textContent="";
  renderTemplateOptions();chooseTemplate(S.selectedTemplate);
  showModal("team-modal");
 }
+function clearTeamFilter(){
+ S.selectedTeam=null;
+ renderAgentGrid();
+ const button=$("all-teammates");
+ if(button)button.hidden=true;
+}
 function setView(view){
  if(!VALID_VIEWS.includes(view))return;
  S.view=view;
- $$(".workspace-view").forEach(node=>node.hidden=node.id!=="view-"+view);
+ if(view==="teams")clearTeamFilter();
+ $(".workspace-view").forEach(node=>node.hidden=node.id!=="view-"+view);
  $$(".side-link[data-view]").forEach(node=>node.classList.toggle("active",node.dataset.view===view));
  $("view-breadcrumb").textContent=({overview:"Overview",teams:"My teams",work:"Workboard",knowledge:"Knowledge vault",billing:"Plans & billing",activity:"Activity"})[view];
  $("studio").querySelector(".sidebar").classList.remove("mobile-open");
@@ -154,7 +161,8 @@ function renderTeams(){
  $("overview-teams").innerHTML=teams.length?teams.slice(0,3).map(templateCard).join(""):empty("Your team starts here","Build a team for the work you actually want to do.","team");
  $("team-grid").innerHTML=teams.length?teams.map(templateCard).join(""):empty("Meet your first teammates","Choose a team to start with, then shape every role to your goals.","team");
  $$(".team-card").forEach(card=>card.addEventListener("click",()=>{
-  S.selectedTeam=card.dataset.openTeam;setView("teams");renderAgentGrid();
+  setView("teams");S.selectedTeam=card.dataset.openTeam;renderAgentGrid();
+  $("all-teammates").hidden=false;
   $("agent-grid").scrollIntoView({behavior:"smooth",block:"start"});
  }));
 }
@@ -459,6 +467,7 @@ async function submitTeam(event){
    name:$("team-name").value.trim(),mission:$("team-mission").value.trim(),template:S.selectedTemplate});
   hideModal("team-modal");await refresh();setView("teams");S.selectedTeam=result.id;
   renderAgentGrid();
+  if(S.selectedTemplate==="blank")openAgentEditor();
   notice(result.runtime_connected?"Your team is ready with the model engine.":"Your team is saved. Model connection is pending.");
  }catch(err){$("team-message").textContent=errorText(err)}
  finally{setBusy(button,false)}
@@ -574,6 +583,7 @@ async async function initialize(){
  $("side-build").addEventListener("click",()=>openTeamBuilder());
  $("side-feedback").addEventListener("click",()=>showModal("feedback-modal"));
  $("add-agent").addEventListener("click",()=>openAgentEditor());
+ $("all-teammates").addEventListener("click",clearTeamFilter);
  $("work-new").addEventListener("click",openTicketCreator);
  $("mobile-new").addEventListener("click",()=>openTeamBuilder());
  $("mobile-menu").addEventListener("click",()=>$("studio").querySelector(".sidebar").classList.toggle("mobile-open"));
