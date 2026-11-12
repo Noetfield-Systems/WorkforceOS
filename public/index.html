@@ -1,0 +1,229 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#0b1019">
+<meta name="description" content="WorkforceOS is your workspace for building an AI team: create teammates, give work, review results and improve together. No developer required.">
+<title>WorkforceOS — Build a team that works with you</title>
+<link rel="icon" href="/static/favicon.svg" type="image/svg+xml">
+<link rel="stylesheet" href="/static/style.css?v=20261111">
+<script src="/static/app.js?v=20261111" defer></script>
+</head>
+<body>
+<div class="noise" aria-hidden="true"></div>
+<div id="toast" class="toast" role="status" aria-live="polite"></div>
+
+<section id="marketing" class="marketing">
+  <header class="site-header">
+    <a class="brand" href="/" aria-label="WorkforceOS home">
+      <span class="brand-symbol">w<span class="brand-dot">.</span></span><span>workforce<span class="brand-os">OS</span></span>
+    </a>
+    <nav class="site-nav" aria-label="Main navigation">
+      <a href="#how">How it works</a><a href="#teams">Team gallery</a><a href="#platform">The platform</a>
+    </nav>
+    <div class="nav-actions"><span class="nav-mini">A new way to work</span><button id="top-signin" class="nav-signin" type="button">Sign in</button><button class="button button-primary button-small" data-start="1" type="button">Get started <span>↗</span></button></div>
+  </header>
+
+  <main>
+    <section class="hero wrap">
+      <div class="hero-copy">
+        <div class="eyebrow"><span class="green-dot"></span> THE WORKSPACE FOR YOUR NEXT TEAM</div>
+        <h1>You bring the idea.<br><span class="hero-italic">We bring</span> <span class="hero-outlined">the team<span class="hero-star">✳</span></span></h1>
+        <p class="hero-description">Create AI teammates, give them work, and improve the way they work with you. One beautiful workspace. No code, no complicated setup.</p>
+        <div class="hero-actions"><button data-start="1" class="button button-primary button-large">Build my first team <span>↗</span></button><button id="see-teams" class="button button-quiet button-large">Explore the teams <span>↘</span></button></div>
+        <div class="hero-foot"><span class="foot-avatars"><i>S</i><i>A</i><i>M</i></span><span>Start solo. Build your own way.<br><strong>Real work, visible progress.</strong></span></div>
+      </div>
+      <div class="hero-art" aria-label="Illustrative product preview">
+        <div class="art-aura"></div>
+        <div class="art-label"><span class="live-pin"></span> YOUR FUTURE WORKSPACE <span class="art-label-muted">/ ILLUSTRATIVE</span></div>
+        <div class="art-window">
+          <div class="window-top"><div class="window-controls"><span></span><span></span><span></span></div><div class="window-crumb">Workspace <span>/</span> My team</div><div class="window-trailing">✦</div></div>
+          <div class="art-content">
+            <div class="art-greeting"><span class="mini-caption">GOOD MORNING, FOUNDER</span><span class="wave-icon">✳</span></div>
+            <h3>Meet your new<br><em>teammates.</em></h3>
+            <div class="art-agents">
+              <div class="mini-agent"><div class="face face-purple">S</div><div class="mini-agent-name"><b>Scout</b><small>Research partner</small></div><span class="mini-agent-badge">01</span></div>
+              <div class="mini-agent"><div class="face face-yellow">N</div><div class="mini-agent-name"><b>Nova</b><small>Sales partner</small></div><span class="mini-agent-badge">02</span></div>
+              <div class="mini-agent"><div class="face face-blue">M</div><div class="mini-agent-name"><b>Milo</b><small>Follow-up partner</small></div><span class="mini-agent-badge">03</span></div>
+            </div>
+            <div class="art-work"><div><span class="mini-caption">A TASK FOR YOUR TEAM</span><p>Research my next customers</p></div><span class="art-work-arrow">↗</span></div>
+          </div>
+        </div>
+        <div class="floating-note"><div class="floating-note-icon">✓</div><div><strong>Your team, your rules.</strong><small>Always in the loop.</small></div></div>
+        <div class="floating-orbit"><span>✦</span></div>
+      </div>
+    </section>
+
+    <section class="proof-bar"><div class="wrap proof-bar-inner"><span>BUILT FOR PEOPLE WHO DO THINGS</span><div>Founders <i>✳</i> Creators <i>✳</i> Small businesses <i>✳</i> Independent teams</div></div></section>
+
+    <section id="how" class="how wrap section-space">
+      <div class="section-kicker"><span>01</span><span>WORK, REIMAGINED</span></div>
+      <div class="section-intro"><h2>Your ideas deserve<br><em>good company.</em></h2><p>Don't learn another complex software suite. Tell us what you're trying to do, and build a team around your own goals.</p></div>
+      <div class="steps">
+        <article class="step"><span class="step-count">01 / DREAM IT</span><div class="step-shape shape-one"><span>“</span></div><h3>Tell us your goal</h3><p>Describe what you want in everyday language. We'll suggest a team and the jobs they'll tackle.</p></article>
+        <article class="step"><span class="step-count">02 / MAKE IT YOURS</span><div class="step-shape shape-two"><span>✳</span><span class="shape-dot"></span></div><h3>Design your team</h3><p>Give teammates names, jobs, instructions and budgets. Keep refining until they fit your style.</p></article>
+        <article class="step"><span class="step-count">03 / SEE IT MOVE</span><div class="step-shape shape-three"><span>↗</span></div><h3>Give real work</h3><p>Create work tickets, follow progress, inspect outputs and give feedback that becomes the next revision.</p></article>
+      </div>
+    </section>
+
+    <section id="teams" class="gallery-section section-space">
+      <div class="wrap">
+        <div class="section-kicker"><span>02</span><span>YOUR STARTING POINT</span></div>
+        <div class="section-intro"><h2>Great teams<br><em>start somewhere.</em></h2><p>Choose a starting team. Every teammate and instruction is yours to customize.</p></div>
+        <div class="template-gallery" id="landing-templates">
+          <button type="button" class="gallery-card gallery-growth" data-template="growth"><div class="gallery-card-top"><span>GROWTH & SALES</span><span class="gallery-arrow">↗</span></div><div class="gallery-icon">↗</div><h3>Find your next<br>big opportunity.</h3><div class="gallery-card-bottom">3 teammates <span>Start here →</span></div></button>
+          <button type="button" class="gallery-card gallery-support" data-template="support"><div class="gallery-card-top"><span>SUPPORT DESK</span><span class="gallery-arrow">↗</span></div><div class="gallery-icon">✳</div><h3>Be there for<br>every customer.</h3><div class="gallery-card-bottom">3 teammates <span>Start here →</span></div></button>
+          <button type="button" class="gallery-card gallery-content" data-template="content"><div class="gallery-card-top"><span>CREATIVE STUDIO</span><span class="gallery-arrow">↗</span></div><div class="gallery-icon">✦</div><h3>Make more<br>of your ideas.</h3><div class="gallery-card-bottom">3 teammates <span>Start here →</span></div></button>
+          <button type="button" class="gallery-card gallery-product" data-template="builder"><div class="gallery-card-top"><span>PRODUCT LAB</span><span class="gallery-arrow">↗</span></div><div class="gallery-icon">⌘</div><h3>Build what<br>comes next.</h3><div class="gallery-card-bottom">3 teammates <span>Start here →</span></div></button>
+        </div>
+      </div>
+    </section>
+
+    <section id="platform" class="platform-section wrap section-space">
+      <div class="platform-head"><div class="section-kicker"><span>03</span><span>ONE PLACE TO DO IT ALL</span></div><h2>Less managing.<br><em>More momentum.</em></h2></div>
+      <div class="feature-grid">
+        <div class="feature-card feature-large"><span class="feature-icon">◈</span><h3>Your people, in one place.</h3><p>Give each teammate a clear purpose. Bring AI agents and human collaborators together as your work grows.</p><div class="feature-wire"><span class="wire-node">You</span><span class="wire-branch">╱ ─ ╲</span><div><span>Scout</span><span>Nova</span><span>Milo</span></div></div></div>
+        <div class="feature-card"><span class="feature-icon">◷</span><h3>Every task has a story.</h3><p>Keep the brief, current status, model attempts and your feedback together. Know what actually happened.</p><div class="feature-tag">Source-backed progress <span>↗</span></div></div>
+        <div class="feature-card"><span class="feature-icon">◎</span><h3>Better every time.</h3><p>Edit your teammates' instructions and request revisions. Keep your own approach, without touching code.</p><div class="feature-tag">Your feedback matters <span>✳</span></div></div>
+      </div>
+    </section>
+
+    <section class="final-cta"><div class="wrap final-cta-inner"><span class="section-kicker">YOUR NEXT CHAPTER</span><h2>A little less busy.<br><em>A lot more possible.</em></h2><button data-start="1" type="button" class="button button-dark button-large">Let's build your team <span>↗</span></button><div class="cta-decoration">✳</div></div></section>
+  </main>
+  <footer class="public-footer wrap"><span class="brand"><span class="brand-symbol">w.</span> workforceOS</span><span>Build the team you wish you had.</span><span>© 2026 WorkforceOS · A standalone platform</span></footer>
+</section>
+
+<div id="studio" class="studio" hidden>
+  <aside class="sidebar">
+    <a href="/" id="studio-logo" class="brand studio-brand"><span class="brand-symbol">w<span class="brand-dot">.</span></span><span>workforce<span class="brand-os">OS</span></span></a>
+    <div class="side-workspace"><div class="workspace-identity">W</div><div class="side-workspace-info"><strong id="side-workspace-name">My workspace</strong><small>YOUR SPACE</small></div><span class="side-chevron">⌄</span></div>
+    <div class="side-section-label">WORKSPACE</div>
+    <nav class="side-nav" aria-label="Workspace">
+      <button type="button" class="side-link active" data-view="overview"><span class="side-icon">◈</span><span>Overview</span></button>
+      <button type="button" class="side-link" data-view="teams"><span class="side-icon">♧</span><span>My teams</span></button>
+      <button type="button" class="side-link" data-view="work"><span class="side-icon">☷</span><span>Workboard</span></button>
+      <button type="button" class="side-link" data-view="activity"><span class="side-icon">◷</span><span>Activity</span></button>
+    </nav>
+    <div class="side-section-label">CREATE & IMPROVE</div>
+    <nav class="side-nav">
+      <button type="button" class="side-link" id="side-build"><span class="side-icon">✳</span><span>Team builder</span><span class="side-plus">+</span></button>
+      <button type="button" class="side-link" id="side-feedback"><span class="side-icon">✎</span><span>Send feedback</span></button>
+    </nav>
+    <div class="side-bottom">
+      <div class="side-tip"><span>✦</span><strong>A team that grows with you.</strong><p>Keep work small, practical and easy to review.</p></div>
+      <button type="button" class="user-switch"><span class="user-avatar">Y</span><span><b id="side-email">Your account</b><small>Workspace owner</small></span></button>
+      <button type="button" id="logout" class="logout-button">Sign out ↗</button>
+    </div>
+  </aside>
+  <div class="mobile-bar"><button type="button" id="mobile-menu" aria-label="Open menu">☰</button><span class="brand"><span class="brand-symbol">w.</span> workforceOS</span><button type="button" id="mobile-new" aria-label="New team">＋</button></div>
+
+  <main class="studio-main">
+    <header class="studio-topbar"><div><span class="studio-path">Workspace / <strong id="view-breadcrumb">Overview</strong></span></div><div class="studio-top-actions"><span id="runtime-pill" class="runtime-pill"><span class="green-dot"></span> Checking runtime</span><button type="button" class="button button-primary button-small" id="top-new-team">+ New team</button></div></header>
+    <div class="studio-inner">
+      <section id="view-overview" class="workspace-view">
+        <div class="studio-welcome"><div><span class="studio-overline">YOUR WORKSPACE, YOUR WAY</span><h1>Good to have you here<span class="welcome-spark">✳</span></h1><p id="welcome-subtitle">A little progress every day. Build what matters with your team.</p></div><span class="date-mark" id="today-date">Today</span></div>
+        <div class="quick-stats"><div class="stat-box"><span>YOUR TEAMS</span><strong id="stat-teams">0</strong><small>Built around your goals</small></div><div class="stat-box"><span>AI TEAMMATES</span><strong id="stat-agents">0</strong><small>Ready to customize</small></div><div class="stat-box"><span>WORK TICKETS</span><strong id="stat-tickets">0</strong><small>Real work records</small></div><div class="stat-box"><span>READY TO REVIEW</span><strong id="stat-review">0</strong><small>Model outputs, not receipts</small></div></div>
+        <div class="studio-columns">
+          <section class="panel panel-hero"><span class="panel-eyebrow">LET'S GET TO WORK</span><div class="panel-top"><h2>What are we<br><em>building today?</em></h2><span class="panel-star">✳</span></div><p>Describe a goal, choose a team and make the first move. We handle the setup.</p><button type="button" class="button button-primary" id="welcome-start">Build a team <span>↗</span></button></section>
+          <section class="panel panel-recent"><div class="panel-heading"><h3>Your recent work</h3><button type="button" class="text-link" data-view="work">View all →</button></div><div id="recent-work" class="recent-list"></div></section>
+        </div>
+        <div class="panel-heading heading-below"><h3>Your teams</h3><button type="button" class="text-link" data-view="teams">Explore teams →</button></div>
+        <div id="overview-teams" class="team-grid"></div>
+        <section class="honesty-note"><span>◎</span><div><b>Clarity comes standard.</b><p>We show model drafts, queued work, human reviews and independently verified results as different things. A created ticket is not a completed task.</p></div></section>
+      </section>
+
+      <section id="view-teams" class="workspace-view" hidden>
+        <div class="page-heading"><div><span class="studio-overline">MY PEOPLE</span><h1>My <em>teams.</em></h1><p>Every teammate has a purpose. Every team follows your goal.</p></div><button type="button" class="button button-primary" id="teams-new">+ Build a team</button></div>
+        <div id="team-grid" class="team-grid full"></div>
+        <div class="section-row"><h2>Teammates</h2><button type="button" id="add-agent" class="button button-secondary button-small">+ New teammate</button></div>
+        <div id="agent-grid" class="agent-grid"></div>
+      </section>
+
+      <section id="view-work" class="workspace-view" hidden>
+        <div class="page-heading"><div><span class="studio-overline">REAL WORK, REAL PROGRESS</span><h1>The <em>workboard.</em></h1><p>Give work, see actual status, and improve the next version.</p></div><button type="button" class="button button-primary" id="work-new">+ New task</button></div>
+        <div class="work-intro"><span>✦</span><div><b>One ticket. One clear result.</b><p>Queue means the execution was accepted, not that the job is complete. Model output is a draft until reviewed.</p></div></div>
+        <div id="work-list" class="work-list"></div>
+      </section>
+
+      <section id="view-activity" class="workspace-view" hidden>
+        <div class="page-heading"><div><span class="studio-overline">YOUR TRAIL</span><h1>Actual <em>activity.</em></h1><p>Workspace changes, created work, submitted feedback. Only real recorded events.</p></div></div>
+        <div class="panel activity-panel"><div id="activity-list" class="activity-feed"></div></div>
+      </section>
+    </div>
+  </main>
+</div>
+
+<div id="auth-modal" class="modal-backdrop" hidden><div class="modal auth-modal" role="dialog" aria-modal="true" aria-labelledby="auth-title">
+  <button type="button" class="modal-close" data-close="auth-modal" aria-label="Close">×</button>
+  <div class="modal-logo"><span class="brand-symbol">w.</span></div>
+  <span class="modal-eyebrow">A LITTLE MORE POSSIBILITY</span><h2 id="auth-title">Make room for<br><em>your next big thing.</em></h2>
+  <p id="auth-subtitle">Create your workspace in a moment. No technical setup required.</p>
+  <div class="auth-switch"><button type="button" id="auth-register-tab" class="active">Create account</button><button type="button" id="auth-login-tab">Sign in</button></div>
+  <form id="auth-form">
+    <label id="auth-workspace-label">Workspace name<input id="auth-workspace" name="workspace" placeholder="Your studio or company" required maxlength="80"></label>
+    <label>Email address<input id="auth-email" name="email" type="email" placeholder="you@company.com" autocomplete="email" required></label>
+    <label>Password<input id="auth-password" name="password" type="password" minlength="10" maxlength="128" autocomplete="new-password" placeholder="At least 10 characters" required></label>
+    <div class="form-footer-note" id="register-note">One private space for your team and work.</div>
+    <button type="submit" id="auth-submit" class="button button-primary button-full">Create my workspace <span>↗</span></button>
+  </form>
+  <p class="modal-message" id="auth-message" role="alert"></p>
+</div></div>
+
+<div id="team-modal" class="modal-backdrop" hidden><div class="modal modal-wide" role="dialog" aria-modal="true" aria-labelledby="team-title">
+  <button type="button" class="modal-close" data-close="team-modal" aria-label="Close">×</button>
+  <span class="modal-eyebrow">STEP 01 / YOUR TEAM</span><h2 id="team-title">Who should be<br><em>on your team?</em></h2>
+  <p>Choose a starting point. You can edit every teammate after creating your team.</p>
+  <form id="team-form">
+    <div id="template-options" class="template-options"></div>
+    <div class="form-row"><label>Give your team a name<input id="team-name" placeholder="e.g. My growth team" required minlength="2" maxlength="80"></label></div>
+    <label>What should this team help you achieve?<textarea id="team-mission" rows="3" placeholder="e.g. Find new customers for my design studio and draft useful follow-ups" required minlength="8" maxlength="1200"></textarea></label>
+    <div class="modal-bottom"><span class="small-helper">Starts with 3 editable teammates.</span><button id="team-submit" class="button button-primary" type="submit">Create my team <span>↗</span></button></div>
+  </form>
+  <p class="modal-message" id="team-message" role="alert"></p>
+</div></div>
+
+<div id="agent-modal" class="modal-backdrop" hidden><div class="modal modal-wide" role="dialog" aria-modal="true" aria-labelledby="agent-title">
+  <button type="button" class="modal-close" data-close="agent-modal" aria-label="Close">×</button>
+  <span class="modal-eyebrow">YOUR TEAMMATE</span><h2 id="agent-title">Make it <em>yours.</em></h2><p>Tell your teammate how you want it to work. No code required.</p>
+  <form id="agent-form">
+    <label>Team<select id="agent-team" required></select></label>
+    <div class="form-two"><label>Teammate's name<input id="agent-name" required minlength="2" maxlength="90" placeholder="e.g. Nova"></label><label>Job title<input id="agent-role" required minlength="3" maxlength="90" placeholder="e.g. Sales partner"></label></div>
+    <label>How should this teammate work?<textarea id="agent-instructions" required rows="5" minlength="10" maxlength="3500" placeholder="Be concise, cite evidence, ask before taking external actions..."></textarea></label>
+    <div class="form-two"><label>Monthly model budget (USD)<input id="agent-budget" type="number" min="0" max="10" step=".5" value="2" required></label><label class="switch-label"><input id="agent-enabled" type="checkbox" checked> Teammate enabled</label></div>
+    <div class="modal-bottom"><span class="small-helper">Changes are saved to your workspace and synced to the runtime when connected.</span><button class="button button-primary" id="agent-submit" type="submit">Save teammate <span>↗</span></button></div>
+  </form><p class="modal-message" id="agent-message" role="alert"></p>
+</div></div>
+
+<div id="ticket-modal" class="modal-backdrop" hidden><div class="modal modal-wide" role="dialog" aria-modal="true" aria-labelledby="ticket-title">
+  <button type="button" class="modal-close" data-close="ticket-modal" aria-label="Close">×</button>
+  <span class="modal-eyebrow">REAL WORK STARTS HERE</span><h2 id="ticket-title">Give your team<br><em>something to do.</em></h2>
+  <p>A clear goal is enough. You can inspect what happened and request changes afterward.</p>
+  <form id="ticket-form"><label>Who should take this on?<select id="ticket-agent" required></select></label>
+    <label>Task name<input id="ticket-name" required minlength="3" maxlength="140" placeholder="e.g. Research five potential customers"></label>
+    <label>What should they deliver?<textarea id="ticket-instructions" required minlength="8" maxlength="6000" rows="5" placeholder="Explain the outcome, context, format and what a good result should include."></textarea></label>
+    <label class="switch-label"><input id="ticket-run-now" type="checkbox" checked> Queue with the connected model runtime</label>
+    <div class="modal-bottom"><span class="small-helper">No external emails or purchases are sent by this task.</span><button type="submit" id="ticket-submit" class="button button-primary">Create task <span>↗</span></button></div>
+  </form><p class="modal-message" id="ticket-message" role="alert"></p>
+</div></div>
+
+<div id="detail-modal" class="modal-backdrop" hidden><div class="modal modal-wide detail-modal" role="dialog" aria-modal="true" aria-labelledby="detail-title">
+  <button type="button" class="modal-close" data-close="detail-modal" aria-label="Close">×</button>
+  <span class="modal-eyebrow">SOURCE-OWNED TASK</span><h2 id="detail-title">Work details</h2>
+  <div id="detail-meta" class="detail-meta">Loading…</div>
+  <div class="detail-section"><span class="detail-label">YOUR BRIEF</span><p id="detail-brief"></p></div>
+  <div class="detail-section"><span class="detail-label">MODEL OUTPUT / NOT AN INDEPENDENT RECEIPT</span><div id="detail-output" class="detail-output"></div></div>
+  <div class="detail-section"><span class="detail-label">RUN HISTORY</span><div id="detail-runs"></div></div>
+  <div class="detail-section"><span class="detail-label">FEEDBACK & REVISIONS</span><div id="detail-notes"></div></div>
+  <form id="revision-form"><label>Help your teammate improve<textarea id="revision-text" rows="3" maxlength="2000" minlength="8" placeholder="What would make the next version better?"></textarea></label><div class="modal-bottom"><button id="detail-run" class="button button-secondary" type="button">Run / Retry</button><button id="detail-review" class="button button-secondary" type="button">Mark human-reviewed</button><button id="revision-submit" class="button button-primary" type="submit">Request revision <span>↗</span></button></div></form>
+  <p class="modal-message" id="detail-message" role="alert"></p>
+</div></div>
+
+<div id="feedback-modal" class="modal-backdrop" hidden><div class="modal" role="dialog" aria-modal="true" aria-labelledby="feedback-title">
+  <button type="button" class="modal-close" data-close="feedback-modal" aria-label="Close">×</button>
+  <span class="modal-eyebrow">HELP SHAPE WORKFORCEOS</span><h2 id="feedback-title">Tell us what<br><em>could be better.</em></h2>
+  <p>Your feedback goes to the product team. It does not change another customer's agents.</p>
+  <form id="product-feedback-form"><label>Your feedback<textarea id="product-feedback-text" required minlength="8" maxlength="2500" rows="5" placeholder="A feature I would love, something confusing, or a workflow we should support..."></textarea></label><button id="product-feedback-submit" type="submit" class="button button-primary button-full">Send feedback <span>↗</span></button></form>
+</div></div>
+</body>
+</html>
