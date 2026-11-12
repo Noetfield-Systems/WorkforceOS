@@ -208,6 +208,39 @@ class CustomerE2ETests(unittest.TestCase):
         self.assertEqual(len(state["agents"]),1)
         self.assertEqual(state["agents"][0]["name"],"Research Analyst")
 
+    def test_team_mission_persists_and_blocks_cross_tenant_agents(self):
+        client,auth=self.signup()
+        csrf=auth["csrf"]
+        team=client.post("/api/teams",json={"template":"blank","name":"Real ops","mission":"Coordinate a real customer mission."},headers=headers(csrf))
+        self.assertEqual(team.status_code,200,team.text)
+        tid=team.json()["id"]
+        ids=[]
+        for name in ("Researcher","Analyst"):
+            r=client.post("/api/agents",json={"team_id":tid,"name":name,"role":name,
+                "instructions":"Analyze only supplied facts and identify assumptions.","monthly_budget":2},headers=headers(csrf))
+            self.assertEqual(r.status_code,200,r.text)
+            ids.append(r.json()["id"])
+        body={"team_id":tid,"title":"Courier pricing research",
+              "objective":"Assess whether a Vancouver courier offer can earn a positive margin.",
+              "request_id":uuid.uuid4().hex,
+              "steps":[{"agent_id":ids[0],"title":"Demand research","instructions":"Research realistic demand and explicit assumptions."},
+                       {"agent_id":ids[1],"title":"Pricing review","instructions":"Analyze the actual previous output and make a recommendation."}]}
+        r=client.post("/api/missions",json=body,headers=headers(csrf))
+        self.assertEqual(r.status_code,200,r.text)
+        mid=r.json()["id"]
+        detail=client.get("/api/missions/"+mid)
+        self.assertEqual(detail.status_code,200,detail.text)
+        self.assertEqual(len(detail.json()["steps"]),2)
+        self.assertFalse(detail.json()["receipt"]["independently_verified"])
+        again=client.post("/api/missions",json=body,headers=headers(csrf))
+        self.assertEqual(again.json()["id"],mid)
+        other,other_auth=self.signup()
+        self.assertEqual(other.get("/api/missions/"+mid).status_code,404)
+        bad={**body,"request_id":uuid.uuid4().hex}
+        self.assertEqual(other.post("/api/missions",json=bad,headers=headers(other_auth["csrf"])).status_code,404)
+        mismatch={**body,"objective":"Changed objective"}
+        self.assertEqual(client.post("/api/missions",json=mismatch,headers=headers(csrf)).status_code,409)
+
     def test_workspace_isolation(self):
         a,auth_a=self.signup()
         b,auth_b=self.signup()
