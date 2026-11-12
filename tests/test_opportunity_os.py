@@ -118,8 +118,10 @@ class OpportunitySystemTests(unittest.TestCase):
         self.assertEqual(denied.status_code,422,denied.text)
         denied=self.client.patch("/api/opportunity-os/operator/cases/"+cid,headers=headers,
                                  json={"verification_state":"VERIFIED"})
-        self.assertEqual(denied.status_code,200,denied.text)
-        self.assertEqual(denied.json()["case"]["verification_state"],
+        self.assertEqual(denied.status_code,422,denied.text)
+        current=self.client.get("/api/opportunity-os/operator/cases/"+cid,
+                                headers={"X-Opportunity-Operator-Key":KEY})
+        self.assertEqual(current.json()["case"]["verification_state"],
                          "NOT_INDEPENDENTLY_VERIFIED")
 
 
