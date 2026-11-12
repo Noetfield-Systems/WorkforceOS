@@ -15,7 +15,7 @@ from urllib.parse import urlparse
 
 import psycopg
 from fastapi import FastAPI, HTTPException, Request, Depends
-from fastapi.responses import FileResponse, JSONResponse
+from fastapi.responses import FileResponse, JSONResponse, Response
 from fastapi.staticfiles import StaticFiles
 from pydantic import BaseModel, Field
 from contextlib import asynccontextmanager
@@ -202,6 +202,55 @@ def website():
     return FileResponse(PUBLIC/"index.html",media_type="text/html",
         headers={"Cache-Control":"no-cache"})
 
+
+@app.get("/partners")
+def partner_page():
+    return FileResponse(PUBLIC/"partners.html",media_type="text/html",
+                        headers={"Cache-Control":"no-cache"})
+
+class PartnerInterest(BaseModel):
+    name:str=Field(min_length=2,max_length=100)
+    email:str=Field(min_length=5,max_length=254)
+    organization:str=Field(default="",max_length=140)
+    profile:str=Field(min_length=3,max_length=60)
+    message:str=Field(min_length=15,max_length=2000)
+    website:str=Field(default="",max_length=250)
+
+@app.post("/api/partners/interest")
+def partner_interest(request:Request,body:PartnerInterest):
+    if body.website.strip():
+        return {"received":True}
+    try:email=email_normalize(body.email)
+    except ValueError:raise HTTPException(status_code=400,detail="INVALID_EMAIL")
+    allowed={"gtm","advisor","design_customer","investor_connector","founding_collaborator","other"}
+    if body.profile not in allowed:
+        raise HTTPException(status_code=400,detail="INVALID_PROFILE")
+    _throttle(None,request,"partner_interest",email)
+    with database() as db:
+        # Keep an existing contact editable by submitting again without
+        # collecting an unbounded pile of identical messages.
+        recent=db.execute("""SELECT id FROM partner_interests WHERE email=%s
+                             AND created_at>now()-interval '12 hours'
+                             ORDER BY created_at DESC LIMIT 1""",(email,)).fetchone()
+        if recent:return {"received":True}
+        db.execute("""INSERT INTO partner_interests(id,email,name,organization,profile,message)
+                      VALUES (%s,%s,%s,%s,%s,%s)""",
+                   (uid(),email,body.name.strip(),body.organization.strip(),
+                    body.profile,body.message.strip()))
+    return {"received":True}
+
+@app.get("/api/partners/interest/operator")
+def partner_interest_operator(request:Request):
+    # No public admin listing and no customer account can enumerate prospects.
+    import secrets
+    secret=os.getenv("WORKFORCE_PARTNER_OPERATOR_KEY","")
+    supplied=request.headers.get("X-Workforce-Operator-Key","")
+    if len(secret)<32 or not secrets.compare_digest(secret,supplied):
+        raise HTTPException(status_code=404,detail="NOT_FOUND")
+    with database() as db:
+        rows=db.execute("""SELECT id,name,email,organization,profile,message,created_at
+                           FROM partner_interests ORDER BY created_at DESC LIMIT 100""").fetchall()
+    return {"interests":[public_row(x,("id","name","email","organization","profile","message","created_at")) for x in rows]}
 
 @app.get("/api/templates")
 def templates():
@@ -621,6 +670,30 @@ async def ticket_detail(ticket_id:str,account=Depends(_authentication)):
     result["knowledge"]=[public_row(x,("id","title")) for x in refs]
     return result
 
+
+@app.get("/api/tickets/{ticket_id}/artifact.md")
+async def export_ticket_artifact(ticket_id:str,account=Depends(_authentication)):
+    ticket=_get_ticket(account,ticket_id)
+    if not ticket["fabric_id"] or not fabric.connected():
+        raise HTTPException(status_code=409,detail="MODEL_OUTPUT_REQUIRED")
+    try:
+        source=(await fabric.task_detail(account["workspace_id"],ticket["fabric_id"]))["task"]
+    except fabric.RuntimeUnavailable as err:
+        raise HTTPException(status_code=err.status,detail=err.code)
+    output=source.get("output")
+    if not output or source.get("status") not in ("NEEDS_REVIEW","VERIFIED"):
+        raise HTTPException(status_code=409,detail="MODEL_OUTPUT_REQUIRED")
+    import hashlib as _hashlib
+    digest=_hashlib.sha256(str(output).encode("utf-8")).hexdigest()
+    md=("\n\n".join(["# "+ticket["title"].replace("\n"," ").replace("\r"," "),
+        "**Origin:** WorkforceOS / Agent Fabric",
+        "**Task ID:** "+ticket["id"],"**Source task:** "+ticket["fabric_id"],
+        "**Created:** "+ticket["created_at"].isoformat(),
+        "**Status:** "+source["status"]+" (model draft; not independently verified)",
+        "**SHA-256:** "+digest,"---",str(output)])+"\n")
+    return Response(md,media_type="text/markdown; charset=utf-8",
+                    headers={"Content-Disposition":'attachment; filename="workforce-artifact-'+ticket_id+'.md"',
+                             "Cache-Control":"private, no-store"})
 
 @app.post("/api/tickets/{ticket_id}/feedback")
 async def submit_feedback(ticket_id:str,body:FeedbackInput,account=Depends(_write)):

@@ -127,6 +127,14 @@ def initialize():
         )""")
         db.execute("""CREATE INDEX IF NOT EXISTS mission_steps_tenant_idx
                       ON mission_steps(workspace_id,mission_id)""")
+        db.execute("""CREATE TABLE IF NOT EXISTS partner_interests (
+            id text PRIMARY KEY, email text NOT NULL, name text NOT NULL,
+            organization text NOT NULL DEFAULT '', profile text NOT NULL,
+            message text NOT NULL, source text NOT NULL DEFAULT 'partners',
+            created_at timestamptz NOT NULL DEFAULT now()
+        )""")
+        db.execute("""CREATE INDEX IF NOT EXISTS partner_interests_created_idx
+                      ON partner_interests(created_at DESC)""")
         db.execute("""CREATE TABLE IF NOT EXISTS auth_limits (
             bucket text PRIMARY KEY, count integer NOT NULL, window_start timestamptz NOT NULL
         )""")
