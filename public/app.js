@@ -252,13 +252,26 @@ async function submitMission(e){
  const ids=[1,2,3].map(i=>$("mission-agent-"+i).value).filter(Boolean);
  if(ids.length<2){notice("Add at least two agents to the selected team.");return}
  const names=["Research","Analyze","Deliver"];
+ const selectedTeam=(S.data?.teams||[]).find(t=>t.id===$("mission-team").value);
+ const missionPacks={
+  startup:["Map customer segments, problem urgency, alternatives and evidence-versus-assumption inventory.",
+   "Using actual prior research, define differentiation, a feasible MVP and major validation unknowns.",
+   "Deliver a practical 30-day validation roadmap, channel experiments, milestones, KPIs and go/no-go criteria."],
+  gtm:["Define ICP, buyer personas, triggers, competitors and likely acquisition channels; distinguish hypotheses.",
+   "Use actual upstream findings to draft positioning, landing-page copy, outreach drafts and lead qualification criteria.",
+   "Deliver a prioritized experiment backlog, weekly acquisition operating plan, KPI definitions and next actions."],
+  fundraising:["Create an honest investor narrative, investment thesis, product maturity and market framing without invented traction.",
+   "Audit the actual prior narrative against evidence, diligence requirements, investor-fit criteria and missing proof.",
+   "Produce a pitch outline, investor introduction drafts, fundraising workflow and follow-up plan without inventing contacts."]
+ };
+ const packSteps=missionPacks[selectedTeam?.template]||null;
  const objective=$("mission-objective").value.trim();
  const payload={team_id:$("mission-team").value,title:$("mission-title").value.trim(),objective,
   request_id:crypto.randomUUID(),steps:ids.map((agent_id,i)=>({
    agent_id,title:names[i]+": "+$("mission-title").value.trim(),
-   instructions:i===0?"Investigate the objective and provide evidence, assumptions and actionable findings.":
+   instructions:packSteps?packSteps[i]:(i===0?"Investigate the objective and provide evidence, assumptions and actionable findings.":
     i===1?"Analyze the actual prior agent output critically; identify gaps and provide an improved decision-ready analysis.":
-    "Use the prior analysis to produce a customer-ready deliverable. Do not invent facts, users, results or revenue."
+    "Use the prior analysis to produce a customer-ready deliverable. Do not invent facts, users, results or revenue.")
   }))};
  setBusy(button,true,"Creating mission…");
  try{
