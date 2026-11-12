@@ -110,6 +110,23 @@ def initialize():
             event_id text PRIMARY KEY, event_type text NOT NULL,
             processed_at timestamptz NOT NULL DEFAULT now()
         )""")
+        db.execute("""CREATE TABLE IF NOT EXISTS team_missions (
+            id text PRIMARY KEY, workspace_id text NOT NULL REFERENCES workspaces(id) ON DELETE CASCADE,
+            team_id text NOT NULL REFERENCES teams(id), title text NOT NULL,
+            objective text NOT NULL, request_id text NOT NULL,
+            state text NOT NULL DEFAULT 'ACTIVE',
+            created_at timestamptz NOT NULL DEFAULT now(),
+            UNIQUE(workspace_id,request_id)
+        )""")
+        db.execute("""CREATE TABLE IF NOT EXISTS mission_steps (
+            mission_id text NOT NULL REFERENCES team_missions(id) ON DELETE CASCADE,
+            workspace_id text NOT NULL REFERENCES workspaces(id) ON DELETE CASCADE,
+            position integer NOT NULL, agent_id text NOT NULL REFERENCES agents(id),
+            title text NOT NULL, instructions text NOT NULL, ticket_id text REFERENCES tickets(id),
+            PRIMARY KEY(mission_id,position)
+        )""")
+        db.execute("""CREATE INDEX IF NOT EXISTS mission_steps_tenant_idx
+                      ON mission_steps(workspace_id,mission_id)""")
         db.execute("""CREATE TABLE IF NOT EXISTS auth_limits (
             bucket text PRIMARY KEY, count integer NOT NULL, window_start timestamptz NOT NULL
         )""")
