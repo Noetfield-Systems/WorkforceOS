@@ -5,7 +5,7 @@ const $$=sel=>[...document.querySelectorAll(sel)];
 const escapeHtml=value=>String(value??"").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
 const S={authenticated:false,csrf:"",user:null,data:null,templates:[],view:"overview",
   selectedTemplate:"growth",selectedTeam:null,editingAgent:null,currentTicket:null,
-  lastTaskNonce:null,pendingSignupTemplate:null,authMode:"register"};
+  lastTaskNonce:null,pendingSignupTemplate:null,authMode:"register",finishedRevisions:new Set()};
 const VALID_VIEWS=["overview","teams","work","knowledge","billing","activity"];
 const LABELS={blank:"Custom team",growth:"Growth & Sales",support:"Support Desk",content:"Creative Studio",builder:"Product Lab"};
 let toastTimer=0;
@@ -372,7 +372,7 @@ function render(){
 let taskPollBusy=false;
 async function pollActiveWork(){
  if(!S.authenticated||document.hidden||taskPollBusy||!S.data)return;
- const active=(S.data.tickets||[]).some(t=>["DRAFT","QUEUED","RUNNING","RECOVERY_NEEDED"].includes(t.state));
+ const active=(S.data.tickets||[]).some(t=>["DRAFT","QUEUED","RUNNING","RECOVERY_NEEDED"].includes(t.state)) || (S.data.feedback||[]).some(n=>["DRAFT","QUEUED","RUNNING"].includes(n.state)&&!S.finishedRevisions.has(n.fabric_revision_id));
  if(!active)return;
  taskPollBusy=true;
  try{
@@ -441,9 +441,10 @@ async function openTicketDetail(id,background=false){
   $("detail-brief").textContent=ticket.instructions+
     (references.length?"\n\nSelected references: "+references.map(x=>x.title).join(", "):"");
   const notes=detail.feedback||[];
+  notes.forEach(n=>{if(n.fabric_revision_id&&["NEEDS_REVIEW","VERIFIED","FAILED","CANCELLED"].includes(n.revision?.status))S.finishedRevisions.add(n.fabric_revision_id);});
   $("detail-notes").innerHTML=notes.length?notes.map(x=>
    '<div class="feedback-entry"><span>'+escapeHtml(x.body)+'</span><small>'+formatTime(x.created_at)+
-   ' · '+escapeHtml(x.state)+'</small></div>'
+   ' · '+escapeHtml(x.revision?.status||x.state)+'</small>'+(x.revision?.output?'<div class="revision-output"><strong>Revised model deliverable</strong><pre>'+escapeHtml(x.revision.output)+'</pre><small>Source-backed draft; not independently verified</small></div>':'<p class="small-helper">'+escapeHtml(x.revision?.error||'Revision pending; model output not ready.')+'</p>')+'</div>'
   ).join(""):'<p class="small-helper">No feedback recorded yet.</p>';
   const eligible=Boolean(source?.output&&["NEEDS_REVIEW","VERIFIED"].includes(source.status));
   $("revision-submit").disabled=!eligible;

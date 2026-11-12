@@ -327,7 +327,7 @@ async def state(account=Depends(_authentication)):
         knowledge=db.execute("""SELECT id,title,created_at,updated_at,length(content) AS characters
                             FROM knowledge_documents WHERE workspace_id=%s
                             ORDER BY created_at DESC LIMIT 30""",(tenant,)).fetchall()
-        notes=db.execute("""SELECT id,ticket_id,body,state,created_at FROM feedback
+        notes=db.execute("""SELECT id,ticket_id,body,state,fabric_revision_id,created_at FROM feedback
                            WHERE workspace_id=%s ORDER BY created_at DESC LIMIT 80""",(tenant,)).fetchall()
     runtime={"state":"NOT_CONNECTED","agent_count":0}
     live_tasks={}
@@ -595,6 +595,24 @@ async def ticket_detail(ticket_id:str,account=Depends(_authentication)):
                             ORDER BY created_at DESC LIMIT 30""",
                          (account["workspace_id"],ticket_id)).fetchall()
     result["feedback"]=[public_row(x,("id","body","state","fabric_revision_id","created_at")) for x in notes]
+    # A feedback receipt is not a revised deliverable. Resolve actual source tasks
+    # in the same authenticated tenant so customers can inspect the new output.
+    if fabric.connected():
+        for note in result["feedback"][:8]:
+            revision_id=note.get("fabric_revision_id")
+            if not revision_id:continue
+            try:
+                detail=await fabric.task_detail(account["workspace_id"],revision_id)
+                source=detail.get("task") if isinstance(detail,dict) else None
+                if isinstance(source,dict):
+                    note["revision"]={
+                        "id":revision_id,"status":source.get("status","UNKNOWN"),
+                        "output":source.get("output") or None,
+                        "error":source.get("error") or None,
+                        "output_ready":bool(source.get("output"))}
+            except fabric.RuntimeUnavailable as err:
+                note["revision"]={"id":revision_id,"status":"SOURCE_UNAVAILABLE",
+                                  "error":err.code,"output_ready":False}
     with database() as db:
         refs=db.execute("""SELECT k.id,k.title FROM task_knowledge tk JOIN knowledge_documents k
                           ON k.id=tk.document_id AND k.workspace_id=tk.workspace_id
