@@ -189,6 +189,25 @@ class CustomerE2ETests(unittest.TestCase):
         self.assertEqual(second.json()["detail"],"TEAM_LIMIT_REACHED")
         self.assertEqual(len(client.get("/api/state").json()["teams"]),1)
 
+    def test_real_blank_team_and_custom_agent_lifecycle(self):
+        client,auth=self.signup()
+        csrf=auth["csrf"]
+        team=client.post("/api/teams",json={"template":"blank","name":"My custom studio",
+            "mission":"Coordinate my own AI specialists without imposed presets."},
+            headers=headers(csrf))
+        self.assertEqual(team.status_code,200,team.text)
+        self.assertEqual(team.json()["agent_ids"],[])
+        self.assertEqual(client.get("/api/state").json()["agents"],[])
+        created=client.post("/api/agents",json={
+            "team_id":team.json()["id"],"name":"Research Analyst",
+            "role":"Custom market analyst","instructions":"Only use evidence provided in the request and disclose uncertainty.",
+            "monthly_budget":2},headers=headers(csrf))
+        self.assertEqual(created.status_code,200,created.text)
+        state=client.get("/api/state").json()
+        self.assertEqual(len(state["teams"]),1)
+        self.assertEqual(len(state["agents"]),1)
+        self.assertEqual(state["agents"][0]["name"],"Research Analyst")
+
     def test_workspace_isolation(self):
         a,auth_a=self.signup()
         b,auth_b=self.signup()

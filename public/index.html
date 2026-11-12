@@ -7,8 +7,8 @@
 <meta name="description" content="WorkforceOS is your workspace for building an AI team: create teammates, give work, review results and improve together. No developer required.">
 <title>WorkforceOS — Build a team that works with you</title>
 <link rel="icon" href="/static/favicon.svg" type="image/svg+xml">
-<link rel="stylesheet" href="/static/style.css?v=20261112-pro">
-<script src="/static/app.js?v=20261112-pro" defer></script>
+<link rel="stylesheet" href="/static/style.css?v=20261112-fix1">
+<script src="/static/app.js?v=20261112-fix1" defer></script>
 </head>
 <body>
 <div class="noise" aria-hidden="true"></div>
@@ -149,7 +149,7 @@
       <section id="view-teams" class="workspace-view" hidden>
         <div class="page-heading"><div><span class="studio-overline">MY PEOPLE</span><h1>My <em>teams.</em></h1><p>Every teammate has a purpose. Every team follows your goal.</p></div><button type="button" class="button button-primary" id="teams-new">+ Build a team</button></div>
         <div id="team-grid" class="team-grid full"></div>
-        <div class="section-row"><h2>Teammates</h2><button type="button" id="add-agent" class="button button-secondary button-small">+ New teammate</button></div>
+        <div class="section-row"><h2>Teammates</h2><button type="button" id="all-teammates" class="button button-secondary button-small" hidden>All teammates</button><button type="button" id="add-agent" class="button button-secondary button-small">+ New teammate</button></div>
         <div id="agent-grid" class="agent-grid"></div>
       </section>
 
@@ -215,12 +215,12 @@
 <div id="team-modal" class="modal-backdrop" hidden><div class="modal modal-wide" role="dialog" aria-modal="true" aria-labelledby="team-title">
   <button type="button" class="modal-close" data-close="team-modal" aria-label="Close">×</button>
   <span class="modal-eyebrow">STEP 01 / YOUR TEAM</span><h2 id="team-title">Who should be<br><em>on your team?</em></h2>
-  <p>Choose a starting point. You can edit every teammate after creating your team.</p>
+  <p>Start from scratch or choose an optional blueprint. You decide which agents exist and what they do.</p>
   <form id="team-form">
     <div id="template-options" class="template-options"></div>
     <div class="form-row"><label>Give your team a name<input id="team-name" placeholder="e.g. My growth team" required minlength="2" maxlength="80"></label></div>
     <label>What should this team help you achieve?<textarea id="team-mission" rows="3" placeholder="e.g. Find new customers for my design studio and draft useful follow-ups" required minlength="8" maxlength="1200"></textarea></label>
-    <div class="modal-bottom"><span class="small-helper">Starts with 3 editable teammates.</span><button id="team-submit" class="button button-primary" type="submit">Create my team <span>↗</span></button></div>
+    <div class="modal-bottom"><span class="small-helper">Start from scratch creates no agents. Templates are optional.</span><button id="team-submit" class="button button-primary" type="submit">Create my team <span>↗</span></button></div>
   </form>
   <p class="modal-message" id="team-message" role="alert"></p>
 </div></div>
