@@ -1,5 +1,32 @@
 """Founder-language team blueprints; editable by the customer, not executable plans."""
 BLUEPRINTS = {
+ "startup": {
+  "name":"Startup Launch & Venture Builder","eyebrow":"Validate · Scope · Launch",
+  "description":"Customer hypothesis, MVP scope and a 30-day validation roadmap.","icon":"rocket",
+  "agents":[
+   {"name":"Venture Researcher","role":"Customer & Market Analyst","department":"Research","instructions":"Produce problem framing, customer segments, competitive alternatives and evidence-versus-assumption inventory. Never invent statistics or interviews."},
+   {"name":"Product Strategist","role":"MVP & Differentiation Lead","department":"Product","instructions":"Use actual previous agent findings to propose differentiation, a feasible MVP, pricing hypotheses and explicit unknowns."},
+   {"name":"Launch Operator","role":"Distribution & Validation Planner","department":"Growth","instructions":"Turn upstream analysis into a concrete 30-day validation roadmap, distribution experiments, KPIs, owners and decision gates. Never claim external execution."}
+  ]
+ },
+ "gtm": {
+  "name":"GTM Execution Team","eyebrow":"Position · Convert · Experiment",
+  "description":"ICP, messaging, usable outreach drafts and a weekly acquisition plan.","icon":"target",
+  "agents":[
+   {"name":"ICP Researcher","role":"Buyer & Channel Analyst","department":"Research","instructions":"Define the actual customer ICP, buyer personas, purchasing triggers, competitor alternatives and channel assumptions. Cite provided sources where available."},
+   {"name":"Conversion Strategist","role":"Positioning & Copy Lead","department":"Marketing","instructions":"Turn actual upstream findings into a positioning statement, landing page copy, outreach drafts and lead qualification criteria. Do not pretend messages were sent."},
+   {"name":"Growth Operator","role":"Acquisition Experiment Lead","department":"Growth","instructions":"Create a prioritized experiment backlog, weekly acquisition plan, measurable KPIs and explicit next actions using the upstream deliverables."}
+  ]
+ },
+ "fundraising": {
+  "name":"Fundraising & Investor Readiness","eyebrow":"Narrative · Evidence · Outreach",
+  "description":"Investment narrative, evidence inventory and investor preparation.","icon":"briefcase-business",
+  "agents":[
+   {"name":"Venture Analyst","role":"Investment Narrative Strategist","department":"Strategy","instructions":"Draft an investor-facing company thesis, problem/solution framing and honest product maturity assessment. Label market-size hypotheses; never invent traction."},
+   {"name":"Readiness Reviewer","role":"Diligence & Evidence Analyst","department":"Research","instructions":"Using the actual prior analysis, build a traction evidence inventory, due diligence checklist, investor-fit criteria and missing proof register."},
+   {"name":"Investor Relations Lead","role":"Fundraising Workflow Planner","department":"Partnerships","instructions":"Produce a pitch-deck outline, personalized introduction draft templates, ethical outreach workflow and follow-up plan. Do not invent investor contacts or commitments."}
+  ]
+ },
  "growth": {
   "name": "Growth & Sales", "eyebrow": "Find · Qualify · Follow up",
   "description": "Turn new opportunities into useful next actions.", "icon": "trending-up",
