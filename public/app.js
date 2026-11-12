@@ -369,6 +369,18 @@ function render(){
   });
  });
 }
+let taskPollBusy=false;
+async function pollActiveWork(){
+ if(!S.authenticated||document.hidden||taskPollBusy||!S.data)return;
+ const active=(S.data.tickets||[]).some(t=>["DRAFT","QUEUED","RUNNING","RECOVERY_NEEDED"].includes(t.state));
+ if(!active)return;
+ taskPollBusy=true;
+ try{
+  await refresh();
+  const modal=$("detail-modal");
+  if(modal&&!modal.hidden&&S.currentTicket)await openTicketDetail(S.currentTicket,true);
+ }finally{taskPollBusy=false}
+}
 async function refresh(){
  if(!S.authenticated)return;
  try{S.data=await api("/api/state");render();}
@@ -405,12 +417,12 @@ function openTicketCreator(){
  S.lastTaskNonce=crypto.randomUUID();
  showModal("ticket-modal");
 }
-async function openTicketDetail(id){
+async function openTicketDetail(id,background=false){
  S.currentTicket=id;
  $("detail-message").textContent="";$("detail-runs").textContent="";$("detail-notes").textContent="";
  $("detail-output").textContent="Loading source details…";
- $("revision-text").value="";
- showModal("detail-modal");
+ if(!background)$("revision-text").value="";
+ if(!background)showModal("detail-modal");
  try{
   const detail=await api("/api/tickets/"+encodeURIComponent(id));
   if(S.currentTicket!==id)return;
@@ -550,6 +562,7 @@ async function signOut(){
  notice("You're signed out.");
 }
 async function initialize(){
+ setInterval(pollActiveWork,6500);
  document.querySelectorAll("[data-close]").forEach(b=>b.addEventListener("click",()=>hideModal(b.dataset.close)));
  document.querySelectorAll(".modal-backdrop").forEach(m=>m.addEventListener("click",e=>{
   if(e.target===m)hideModal(m.id);
