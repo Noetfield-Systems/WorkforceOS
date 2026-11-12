@@ -36,6 +36,37 @@ class CustomerE2ETests(unittest.TestCase):
         self.assertEqual(r.status_code,200,r.text)
         return client,r.json()
 
+    def test_partner_page_and_durable_interest(self):
+        page=self.root.get("/partners")
+        self.assertEqual(page.status_code,200,page.text)
+        self.assertIn("Build your AI team",page.text)
+        email="partner_"+uuid.uuid4().hex[:14]+"@example.org"
+        payload={"name":"QA Partner","email":email,"organization":"Test Venture",
+                 "profile":"design_customer","message":"I would like to test this platform with my startup."}
+        result=self.root.post("/api/partners/interest",json=payload,headers=headers())
+        self.assertEqual(result.status_code,200,result.text)
+        self.assertTrue(result.json()["received"])
+        from app.storage import database
+        with database() as db:
+            record=db.execute("SELECT * FROM partner_interests WHERE email=%s",(email,)).fetchone()
+        self.assertIsNotNone(record)
+        self.assertEqual(record["profile"],"design_customer")
+        self.assertEqual(self.root.get("/api/partners/interest/operator").status_code,404)
+        duplicate=self.root.post("/api/partners/interest",json=payload,headers=headers())
+        self.assertEqual(duplicate.status_code,200)
+        with database() as db:
+            count=db.execute("SELECT COUNT(*) n FROM partner_interests WHERE email=%s",(email,)).fetchone()["n"]
+        self.assertEqual(count,1)
+
+    def test_new_real_team_blueprints_are_executable_configs(self):
+        templates=self.root.get("/api/templates").json()["templates"]
+        keys={x["id"] for x in templates}
+        self.assertTrue({"startup","gtm","fundraising"}.issubset(keys))
+        from app.blueprints import plan
+        for key in ("startup","gtm","fundraising"):
+            agents=plan(key,"Launch a real B2B business with documented assumptions")
+            self.assertEqual(len(agents),3)
+            self.assertTrue(all(len(x["instructions"])>50 for x in agents))
     def test_health_and_templates_never_invent_users(self):
         r=self.root.get("/health")
         self.assertEqual(r.status_code,200,r.text)
