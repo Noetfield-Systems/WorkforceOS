@@ -91,6 +91,19 @@ class CustomerE2ETests(unittest.TestCase):
         state=client.get("/api/state").json()
         self.assertEqual(state["notes"],[])
 
+    def test_invalid_login_attempts_persist_after_failed_transactions(self):
+        _,signed=self.signup()
+        email=signed["account"]["email"]
+        for n in range(7):
+            denied=self.root.post("/api/login",json={
+                "email":email,"password":"wrong-password"
+            },headers=headers())
+            self.assertEqual(denied.status_code,401,(n,denied.text))
+        blocked=self.root.post("/api/login",json={
+            "email":email,"password":"wrong-password"
+        },headers=headers())
+        self.assertEqual(blocked.status_code,429,blocked.text)
+
     def test_workspace_isolation(self):
         a,auth_a=self.signup()
         b,auth_b=self.signup()
