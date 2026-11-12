@@ -338,3 +338,5 @@ button{cursor:pointer}button:disabled{cursor:not-allowed;opacity:.55}a{text-deco
  .team-card{min-height:0}
  .agent-card{min-height:0}
 }
+
+.revision-output{margin-top:14px;padding:15px;border:1px solid var(--line,#ddd);border-radius:12px;min-width:0}.revision-output pre{white-space:pre-wrap;overflow-wrap:anywhere;max-height:360px;overflow:auto;font:inherit;font-size:13px;line-height:1.65;margin:12px 0}.revision-output strong{display:block;font-weight:650}
