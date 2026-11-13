@@ -40,7 +40,10 @@ jobs:
       - name: Python static checks
         run: python -m compileall -q app tests
       - name: Frontend JS syntax
-        run: node --check public/app.js
+        run: |
+          node --check public/app.js
+          node --check public/collaborate.js
+          node --check public/collaborate-desk.js
       - name: Verify real-progress Team Workshop UI
         run: node tests/workshop-ui.cjs
       - name: Customer no-code and security E2E tests
