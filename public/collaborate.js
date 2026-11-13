@@ -135,7 +135,7 @@ function translate(){
  });
  if(state.lang==="fa"){
    for(const [field,map] of Object.entries(optionsFa))for(const option of $$('select[name="'+field+'"] option')){
-     if(map[option.value])option.textContent=map[option.value]);
+     if(map[option.value])option.textContent=map[option.value];
    }
  }else{
    const labels={
