@@ -86,6 +86,13 @@ def collaboration_page():
                         headers={"Cache-Control": "no-store"})
 
 
+@router.get("/collaborate/desk")
+@router.get("/join/desk")
+def collaboration_operator_page():
+    return FileResponse(PUBLIC / "collaborate-desk.html", media_type="text/html",
+                        headers={"Cache-Control": "no-store", "X-Robots-Tag": "noindex, nofollow"})
+
+
 class FunnelEvent(BaseModel):
     session_id: str = Field(min_length=16, max_length=80)
     event_name: str = Field(min_length=3, max_length=40)
@@ -267,6 +274,9 @@ def collaboration_overview():
                             GROUP BY lane ORDER BY n DESC""").fetchall()
         feedback=db.execute("""SELECT count(*) n,avg(rating) average
                                FROM collaboration_feedback""").fetchone()
+        events=db.execute("""SELECT event_name,count(DISTINCT session_id) sessions
+                             FROM collaboration_events GROUP BY event_name
+                             ORDER BY sessions DESC""").fetchall()
     return {"measurement":"REAL_DATABASE_RECORDS",
             "consented_unique_view_sessions":views,
             "consented_started_sessions":starts,
@@ -274,6 +284,7 @@ def collaboration_overview():
             "feedback_count":feedback["n"],
             "feedback_average":float(feedback["average"]) if feedback["average"] is not None else None,
             "by_lane":[dict(x) for x in lanes],
+            "events_by_type":[dict(x) for x in events],
             "recent_applications":[{
                 **{k:(v.isoformat() if isinstance(v,(datetime,)) else v)
                    for k,v in x.items()}} for x in rows],
