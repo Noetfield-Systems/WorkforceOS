@@ -10,7 +10,7 @@ const context={
   ref:(params.get("ref")||"").slice(0,80).replace(/[^a-zA-Z0-9_.-]/g,"")
 };
 const state={
-  step:0,lang:params.get("lang")==="fa"?"fa":"en",
+  step:0,lang:params.get("lang")==="en"?"en":((params.get("lang")==="fa"||location.pathname==="/connect")?"fa":"en"),
   session:crypto.randomUUID(),consent:false,
   caseId:"",token:"",started:false,submitting:false
 };
