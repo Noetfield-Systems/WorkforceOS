@@ -1,0 +1,106 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="theme-color" content="#101a22">
+<meta name="description" content="Work with Noetfield WorkforceOS. Share your skills, suggest a real collaboration, and track your application through an evidence-led workflow.">
+<title>Work with us · WorkforceOS</title>
+<link rel="icon" type="image/svg+xml" href="/static/favicon.svg">
+<link rel="stylesheet" href="/static/collaborate.css?v=1">
+<script src="/static/collaborate.js?v=1" defer></script>
+</head>
+<body>
+<header class="topbar">
+ <a class="brand" href="/" aria-label="WorkforceOS home"><span class="brandmark">w<span>.</span></span><span>workforce<b>OS</b></span></a>
+ <div class="nav-right"><span class="top-pill"><span class="pulse"></span><span data-i18n="top">Open to meaningful collaboration</span></span>
+ <button type="button" id="lang" class="lang" aria-label="Switch language">فارسی</button>
+ <a class="nav-back" href="/" data-i18n="back">Main platform ↗</a></div>
+</header>
+<main>
+<section class="hero-shell">
+ <div class="hero-inner">
+  <div class="hero-copy">
+   <div class="eyebrow"><span class="line"></span><span data-i18n="eyebrow">NOETFIELD / PEOPLE × INTELLIGENCE</span></div>
+   <h1 data-i18n="headline">Good work begins<br>with the <em>right people.</em></h1>
+   <p class="lead" data-i18n="lead">Developers, operators, designers, growth partners and independent teams: tell us what you do and what you want to build. We'll turn the introduction into a trackable collaboration request.</p>
+   <div class="hero-actions"><button type="button" id="hero-start" class="btn btn-primary"><span data-i18n="start">Explore working together</span><span aria-hidden="true">↗</span></button><a href="#how" class="btn btn-subtle" data-i18n="how-link">See the process ↓</a></div>
+   <div class="hero-fine"><span class="dot"></span><span data-i18n="fine">No account required. No invented vacancies or guaranteed offers.</span></div>
+  </div>
+  <aside class="process-card" aria-label="Collaboration workflow">
+   <div class="process-header"><span data-i18n="process">HOW THE WORK MOVES</span><span class="process-counter">01 / 04</span></div>
+   <div class="flow-step"><span class="step-node node-active">01</span><div><strong data-i18n="flow1">Introduce yourself</strong><small data-i18n="flow1d">Choose your working lane and strengths.</small></div><span class="flow-state">START</span></div>
+   <div class="flow-step"><span class="step-node">02</span><div><strong data-i18n="flow2">Make a concrete proposal</strong><small data-i18n="flow2d">Link proof and propose the first useful task.</small></div></div>
+   <div class="flow-step"><span class="step-node">03</span><div><strong data-i18n="flow3">Route & review</strong><small data-i18n="flow3d">A real case enters the Opportunity OS queue.</small></div></div>
+   <div class="flow-step"><span class="step-node">04</span><div><strong data-i18n="flow4">Track the outcome</strong><small data-i18n="flow4d">Check status and send feedback.</small></div></div>
+   <div class="process-footer"><span class="process-spark">✳</span><span data-i18n="proof">Case ID · next action · transparent status</span></div>
+  </aside>
+ </div>
+</section>
+
+<section id="how" class="value-strip" aria-label="Ways to collaborate">
+ <div class="value-inner"><div><span>01 —</span><strong data-i18n="way1">Build products together</strong></div><div><span>02 —</span><strong data-i18n="way2">Bring customers & opportunities</strong></div><div><span>03 —</span><strong data-i18n="way3">Connect specialist AI or teams</strong></div></div>
+</section>
+
+<section class="portal-shell" id="apply">
+ <div class="intro"><div class="eyebrow dark"><span class="line"></span><span data-i18n="portal-kicker">THE COLLABORATION GATEWAY</span></div><h2 data-i18n="portal-title">A clear way to <em>get involved.</em></h2><p data-i18n="portal-sub">Tell us how you could contribute. We keep the context, source and next step together—not lost in a LinkedIn inbox.</p></div>
+ <div class="portal-grid">
+ <div class="wizard-card" id="wizard-card">
+  <div class="wizard-top"><div><span class="wizard-eyebrow" data-i18n="wizard">YOUR INTRODUCTION</span><h3 id="step-heading">How would you like to collaborate?</h3></div><span class="wizard-count" id="step-counter">01 / 03</span></div>
+  <div class="progress" aria-label="Wizard progress"><span id="progress-fill"></span></div>
+  <form id="application" novalidate>
+   <fieldset class="wizard-step" data-step="0">
+    <legend class="sr-only" data-i18n="legend1">Choose collaboration type</legend>
+    <p class="form-hint" data-i18n="lane-hint">Pick the closest fit. You can explain your specific proposal later.</p>
+    <div class="lane-grid" role="radiogroup" aria-label="Collaboration path">
+     <label class="lane"><input type="radio" name="lane" value="freelancer" required checked><span class="lane-icon">⌘</span><span><strong data-i18n="lane1">Freelancer / Builder</strong><small data-i18n="lane1d">Engineering, AI, design, product</small></span><span class="lane-check">✓</span></label>
+     <label class="lane"><input type="radio" name="lane" value="sales_partner"><span class="lane-icon">↗</span><span><strong data-i18n="lane2">Growth / Sales Partner</strong><small data-i18n="lane2d">Leads, distribution, community</small></span><span class="lane-check">✓</span></label>
+     <label class="lane"><input type="radio" name="lane" value="agent_owner"><span class="lane-icon">✳</span><span><strong data-i18n="lane3">AI Agent Owner</strong><small data-i18n="lane3d">Specialized agent or workflow</small></span><span class="lane-check">✓</span></label>
+     <label class="lane"><input type="radio" name="lane" value="company"><span class="lane-icon">◇</span><span><strong data-i18n="lane4">Team / Organization</strong><small data-i18n="lane4d">Pilot, partnership or co-build</small></span><span class="lane-check">✓</span></label>
+    </div>
+    <div class="form-two">
+     <label><span data-i18n="focus">Primary expertise</span><select name="focus" required><option value="" data-i18n="select">Select a focus</option><option value="engineering">Software engineering</option><option value="ai_automation">AI & automation</option><option value="design">Design / UX</option><option value="growth">Growth & sales</option><option value="web3">Web3 / crypto</option><option value="operations">Operations</option><option value="product">Product</option><option value="other">Other</option></select></label>
+     <label><span data-i18n="available">Availability</span><select name="availability" required><option value="" data-i18n="select">Select availability</option><option value="now">Available now</option><option value="two_weeks">Within 2 weeks</option><option value="part_time">Part-time / flexible</option><option value="project">Project-based</option><option value="exploring">Exploring</option></select></label>
+    </div>
+    <label class="checkline muted"><input type="checkbox" name="analytics_consent" id="analytics-consent"><span data-i18n="analytics">Optional: allow first-party anonymous journey analytics to improve this form. No ad tracking.</span></label>
+   </fieldset>
+   <fieldset class="wizard-step" data-step="1" hidden>
+    <legend class="sr-only" data-i18n="legend2">Your profile</legend>
+    <p class="form-hint" data-i18n="profile-hint">Make it easy to evaluate your work, with real examples if you have them.</p>
+    <div class="form-two"><label><span data-i18n="name">Your name *</span><input name="full_name" autocomplete="name" required minlength="2" maxlength="120" placeholder="Your full name"></label><label><span data-i18n="email">Email *</span><input name="email" type="email" autocomplete="email" required maxlength="254" placeholder="you@example.com"></label></div>
+    <label><span data-i18n="skills">Your skills / tools *</span><input name="skills" minlength="3" maxlength="800" required placeholder="e.g. Python, Next.js, LLM agents, B2B outbound"></label>
+    <div class="form-two"><label><span data-i18n="linkedin">LinkedIn profile (optional)</span><input name="linkedin_url" type="url" placeholder="https://linkedin.com/in/..."></label><label><span data-i18n="portfolio">Work samples / GitHub (optional)</span><input name="portfolio_url" type="url" placeholder="https://github.com/..."></label></div>
+    <label><span data-i18n="organization">Organization / studio (optional)</span><input name="organization" maxlength="140" placeholder="Independent, or company name"></label>
+   </fieldset>
+   <fieldset class="wizard-step" data-step="2" hidden>
+    <legend class="sr-only" data-i18n="legend3">Collaboration proposal</legend>
+    <p class="form-hint" data-i18n="proposal-hint">One specific starting point beats a generic “let's connect”.</p>
+    <label><span data-i18n="venture">Project you're interested in</span><select name="venture"><option value="unspecified" data-i18n="open">Open to matching</option><option value="Noetfield">Noetfield</option><option value="WorkforceOS">WorkforceOS</option><option value="BuildRelay">BuildRelay</option><option value="SignalForge">SignalForge</option><option value="Earnloop">Earnloop</option><option value="Other">Other</option></select></label>
+    <label><span data-i18n="proposal">What could we accomplish together? *</span><textarea name="proposal" rows="5" required minlength="20" maxlength="3000" placeholder="What can you deliver, what is your first idea, and what does success look like?"></textarea></label>
+    <label class="checkline"><input type="checkbox" name="contact_consent" required><span data-i18n="contact">I agree that my information may be used to assess and follow up on this collaboration request.</span></label>
+    <label class="hp" aria-hidden="true">Website<input name="website" tabindex="-1" autocomplete="off"></label>
+   </fieldset>
+   <p id="form-error" class="form-error" role="alert" aria-live="polite"></p>
+   <div class="wizard-bottom"><button type="button" class="btn btn-back" id="prev" hidden><span aria-hidden="true">←</span><span data-i18n="previous">Back</span></button><button type="button" class="btn btn-primary" id="next"><span data-i18n="continue">Continue</span><span>↗</span></button><button type="submit" class="btn btn-primary" id="submit" hidden><span data-i18n="submit">Submit my proposal</span><span>↗</span></button></div>
+  </form>
+  <section id="success" class="success" hidden aria-live="polite">
+   <span class="success-symbol">✓</span><span class="wizard-eyebrow" data-i18n="received">RECEIVED / SAVED IN OPPORTUNITY OS</span>
+   <h3 data-i18n="success-title">Your introduction is now a real case.</h3>
+   <p data-i18n="success-desc">Your proposal has been saved for review. This is not yet a job offer or an assigned agent task.</p>
+   <div class="receipt-row"><span data-i18n="case">Reference ID</span><strong id="receipt-id"></strong></div>
+   <div class="receipt-row"><span data-i18n="route">Review lane</span><strong id="receipt-lane"></strong></div>
+   <div class="receipt-row"><span data-i18n="next-action">Next action</span><strong id="receipt-next"></strong></div>
+   <button type="button" class="btn btn-quiet" id="copy-receipt" data-i18n="copy">Copy private tracking details</button>
+   <div class="feedback-inline"><h4 data-i18n="feedback-title">How was your experience?</h4><form id="feedback-form"><label><span data-i18n="rate">Rate the onboarding</span><select name="rating" required><option value="5">5 — Excellent</option><option value="4">4 — Good</option><option value="3">3 — Okay</option><option value="2">2 — Difficult</option><option value="1">1 — Poor</option></select></label><label><span data-i18n="comment">Your feedback</span><textarea name="message" required minlength="5" maxlength="1500" rows="3" placeholder="What would improve this experience?"></textarea></label><button class="btn btn-subtle" type="submit" data-i18n="feedback-submit">Send feedback</button><p id="feedback-result" role="status"></p></form></div>
+  </section>
+ </div>
+ <aside class="sidebar">
+  <div class="side-card"><span class="side-label" data-i18n="why">WHY THIS IS DIFFERENT</span><h3 data-i18n="sidebar-title">Not another inbox black hole.</h3><p data-i18n="sidebar-desc">We capture what you can do, where you fit, and what the next review action is. Your status is readable with a private tracking token.</p><ul><li data-i18n="point1">Structured skill & availability profile</li><li data-i18n="point2">Source and referral attribution</li><li data-i18n="point3">A real owner queue and next action</li><li data-i18n="point4">Private status and post-submission feedback</li></ul></div>
+  <div class="side-card track-card"><span class="side-label" data-i18n="already">ALREADY SUBMITTED?</span><h3 data-i18n="track-title">Check your status.</h3><form id="track-form"><label><span data-i18n="caseid">Case ID</span><input name="case_id" required placeholder="opp_..."></label><label><span data-i18n="token">Private tracking token</span><input name="token" required placeholder="Your private token"></label><button class="btn btn-quiet" type="submit" data-i18n="check">Check status ↗</button><p id="track-result" role="status"></p></form></div>
+  <div class="privacy-note" data-i18n="privacy">No public applicant directory. We don't sell your information. An application is a request for review, not a promise of work or compensation.</div>
+ </aside></div>
+</section>
+</main>
+<footer><div class="foot-inner"><span>© 2026 WorkforceOS · Noetfield Systems Inc.</span><span data-i18n="footer">People, agents and useful work — with evidence.</span><a href="/" data-i18n="home">Back to platform</a></div></footer>
+<div id="toast" class="toast" role="status" aria-live="polite" hidden></div>
+</body>
+</html>
