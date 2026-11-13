@@ -1,0 +1,51 @@
+name: Founder Connect production smoke
+on:
+  push:
+    branches: [main]
+    paths:
+      - "app/collaborate.py"
+      - "app/people_ops.py"
+      - "public/collaborate.html"
+      - "public/connect-desk.html"
+      - ".github/workflows/connect-production-smoke.yml"
+  workflow_dispatch:
+jobs:
+  read-only-smoke:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - name: Check real production routes without creating any users or cases
+        env:
+          ORIGIN: https://workforce-web-production-2d15bf32.up.railway.app
+        run: |
+          python - <<'PY'
+          import json, os, sys, time
+          from urllib.error import HTTPError
+          from urllib.request import Request, urlopen
+          base=os.environ["ORIGIN"]
+          def get(path):
+              with urlopen(Request(base+path,headers={"User-Agent":"WorkforceOS-production-proof/1.0"}),timeout=12) as response:
+                  return response.status,response.read(160000).decode("utf-8","replace")
+          for attempt in range(10):
+              try:
+                  health_code,health_body=get("/health")
+                  health=json.loads(health_body)
+                  assert health_code==200 and health.get("ok") is True and health.get("database")=="connected",health
+                  join_code,join=get("/connect?lang=fa&source=linkedin")
+                  assert join_code==200 and 'name="rate_expectation"' in join and 'name="source_message"' in join,"wizard missing fields"
+                  desk_code,desk=get("/connect/desk")
+                  assert desk_code==200 and "Founder Desk" in desk and "میز عملیاتی" in desk,"desk missing"
+                  js_code,js=get("/static/connect-desk.js?v=2")
+                  assert js_code==200 and "api/collaborate/operator/people" in js,"desk JS missing"
+                  try:
+                      get("/api/collaborate/operator/people")
+                      raise AssertionError("operator API must not return data anonymously")
+                  except HTTPError as e:
+                      assert e.code==403,f"operator API security unexpected {e.code}"
+                  print("PRODUCTION_SMOKE_PASS: health=200, public_wizard=200, private_desk_page=200, desk_js=200, unauthorized_api=403; no user/case created")
+                  sys.exit(0)
+              except Exception as exc:
+                  print(f"Attempt {attempt+1}: {exc}")
+                  if attempt==9:raise
+                  time.sleep(4)
+          PY
