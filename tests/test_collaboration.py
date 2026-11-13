@@ -50,11 +50,12 @@ class CollaborationGatewayTests(unittest.TestCase):
     def test_public_page_and_private_operator(self):
         res = self.client.get("/join?source=linkedin&ref=abc")
         self.assertEqual(res.status_code, 200, res.text)
-        self.assertIn("The collaboration gateway", res.text.lower())
+        self.assertIn("the collaboration gateway", res.text.lower())
         self.assertIn('name="contact_consent"', res.text)
         self.assertIn("فارسی", res.text)
         self.assertEqual(self.client.get("/collaborate").status_code, 200)
         self.assertEqual(self.client.get("/work-with-us").status_code, 200)
+        self.assertEqual(self.client.get("/collaborate/desk").status_code, 200)
         self.assertEqual(self.client.get("/static/collaborate.js").status_code, 200)
         self.assertEqual(self.client.get("/static/collaborate.css").status_code, 200)
         self.assertEqual(self.client.get("/api/collaborate/operator/overview").status_code, 403)
