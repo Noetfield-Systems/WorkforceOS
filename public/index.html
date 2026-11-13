@@ -7,7 +7,7 @@
 <meta name="description" content="WorkforceOS is your workspace for building an AI team: create teammates, give work, review results and improve together. No developer required.">
 <title>WorkforceOS — Build a team that works with you</title>
 <link rel="icon" href="/static/favicon.svg" type="image/svg+xml">
-<link rel="stylesheet" href="/static/style.css?v=20261112-premium1">
+<link rel="stylesheet" href="/static/style.css?v=20261112-workshop2">
 <script src="/static/app.js?v=20261112-premium1" defer></script>
 </head>
 <body>
@@ -140,6 +140,17 @@
           </div>
           <div class="activation-bar" id="activation-bar" role="progressbar" aria-label="Getting started" aria-valuenow="0" aria-valuemin="0" aria-valuemax="4"><span id="activation-fill"></span></div>
           <div id="activation-list" class="activation-list"></div>
+        </section>
+        <section class="workshop-world" aria-labelledby="workshop-title">
+          <div class="workshop-heading">
+            <div><span class="panel-eyebrow">YOUR WORKSHOP / REAL WORK ONLY</span><h2 id="workshop-title">Watch your teams <em>make progress.</em></h2>
+              <p>Start with a goal, give your team a mission, then review what they actually produce. Every step comes from your workspace data.</p></div>
+            <button id="workshop-next" class="button button-primary button-small" type="button">Take the next step ↗</button>
+          </div>
+          <div class="workshop-path" id="workshop-path" role="list" aria-label="Source-backed mission journey"><span>Checking your real progress…</span></div>
+          <div class="workshop-rooms-heading"><h3>Team rooms</h3><span id="workshop-count">No team records loaded</span></div>
+          <div class="workshop-rooms" id="workshop-rooms" aria-label="Your working teams"></div>
+          <div class="workshop-evidence"><span aria-hidden="true">◎</span><p><b>Your progress is real.</b> Creating a team, assigning work, receiving a model draft and reviewing it are different steps. A human review is not independent verification, and points are never money.</p></div>
         </section>
         <div class="studio-columns">
           <section class="panel panel-hero"><span class="panel-eyebrow">LET'S GET TO WORK</span><div class="panel-top"><h2>What are we<br><em>building today?</em></h2><span class="panel-star">✳</span></div><p>Describe a goal, choose a team and make the first move. We handle the setup.</p><button type="button" class="button button-primary" id="welcome-start">Build a team <span>↗</span></button></section>
