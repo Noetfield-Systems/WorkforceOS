@@ -61,6 +61,7 @@
      <label><span data-i18n="focus">Primary expertise</span><select name="focus" required><option value="" data-i18n="select">Select a focus</option><option value="engineering">Software engineering</option><option value="ai_automation">AI & automation</option><option value="design">Design / UX</option><option value="growth">Growth & sales</option><option value="web3">Web3 / crypto</option><option value="operations">Operations</option><option value="product">Product</option><option value="other">Other</option></select></label>
      <label><span data-i18n="available">Availability</span><select name="availability" required><option value="" data-i18n="select">Select availability</option><option value="now">Available now</option><option value="two_weeks">Within 2 weeks</option><option value="part_time">Part-time / flexible</option><option value="project">Project-based</option><option value="exploring">Exploring</option></select></label>
     </div>
+    <label class="checkline muted"><input type="checkbox" name="analytics_consent" id="analytics-consent"><span data-i18n="analytics">Optional: allow first-party anonymous journey analytics to improve this form. No ad tracking.</span></label>
    </fieldset>
    <fieldset class="wizard-step" data-step="1" hidden>
     <legend class="sr-only" data-i18n="legend2">Your profile</legend>
@@ -76,7 +77,6 @@
     <label><span data-i18n="venture">Project you're interested in</span><select name="venture"><option value="unspecified" data-i18n="open">Open to matching</option><option value="Noetfield">Noetfield</option><option value="WorkforceOS">WorkforceOS</option><option value="BuildRelay">BuildRelay</option><option value="SignalForge">SignalForge</option><option value="Earnloop">Earnloop</option><option value="Other">Other</option></select></label>
     <label><span data-i18n="proposal">What could we accomplish together? *</span><textarea name="proposal" rows="5" required minlength="20" maxlength="3000" placeholder="What can you deliver, what is your first idea, and what does success look like?"></textarea></label>
     <label class="checkline"><input type="checkbox" name="contact_consent" required><span data-i18n="contact">I agree that my information may be used to assess and follow up on this collaboration request.</span></label>
-    <label class="checkline muted"><input type="checkbox" name="analytics_consent" id="analytics-consent"><span data-i18n="analytics">Optional: allow first-party anonymous journey analytics to improve this form. No ad tracking.</span></label>
     <label class="hp" aria-hidden="true">Website<input name="website" tabindex="-1" autocomplete="off"></label>
    </fieldset>
    <p id="form-error" class="form-error" role="alert" aria-live="polite"></p>
