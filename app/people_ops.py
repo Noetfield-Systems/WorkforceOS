@@ -267,6 +267,11 @@ def applicant_follow_up(case_id: str, body: ApplicantFollowUp):
         if not row or not hmac.compare_digest(
             row["tracking_hash"],hashlib.sha256(body.tracking_token.encode()).hexdigest()):
             raise HTTPException(404,"NOT_FOUND")
+        recent=db.execute("""SELECT count(*) AS n FROM opportunity_events
+            WHERE case_id=%s AND actor='applicant' AND event_type='follow_up'
+            AND created_at > now()-interval '1 hour'""",(case_id,)).fetchone()
+        if recent["n"]>=3:
+            raise HTTPException(429,"FOLLOW_UP_LIMIT")
         if body.availability is not None:
             if body.availability not in {"now","two_weeks","part_time","project","exploring"}:
                 raise HTTPException(422,"INVALID_AVAILABILITY")
