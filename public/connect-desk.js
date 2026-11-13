@@ -148,7 +148,10 @@ function detailMarkup(c,data){
  const mailBody=encodeURIComponent("Hello "+c.full_name+",\n\nThanks for sharing your background. Would you be interested in discussing a specific scoped collaboration? Please reply with your availability.\n\nBest,\nNoetfield Team");
  return '<section class="detail-section"><h3>پروفایل واقعی و منبع ورود</h3><div class="detail-grid">'+profile+
     '</div><div class="profile-links">'+links+'</div></section>'+
- '<section class="detail-section"><h3>تصمیم و پیگیری / Human Review</h3>'+
+ '<section class="detail-section"><h3>Evidence intelligence / ارزیابی مستند</h3>'+
+ '<p class="detail-help">این بخش صرفاً با درخواست‌های واقعی ثبت‌شده و اطلاعات اعلام‌شده توسط متقاضی کار می‌کند؛ امتیاز مهارت، Job Offer یا انتساب قطعی نیست.</p>'+
+ '<div id="candidate-evidence-review" class="detail-help">در حال بررسی شواهد و نیازهای ثبت‌شده…</div></section>'+
+'<section class="detail-section"><h3>تصمیم و پیگیری / Human Review</h3>'+
  '<p class="detail-help">تطبیق تنها پس از Qualification و ثبت مبنا به Shortlist می‌رود. ارجاع فعال نیازمند reference واقعی است. لینک، اثبات اجرای خارجی یا تأیید مستقل نیست.</p>'+
  '<form class="review-form" id="review-form">'+review+
  '<button class="primary" type="submit">ذخیره ارزیابی و اقدام بعدی ←</button></form><p class="error" id="review-error" role="alert"></p>'+
@@ -166,6 +169,31 @@ function detailMarkup(c,data){
  '<section class="detail-section"><h3>بازخورد فریلنسر</h3>'+feedbackHtml+'</section>'+
  '<section class="detail-section"><h3>تاریخچه قابل ردیابی</h3>'+history+'</section>';
 }
+async function loadCandidateIntelligence(caseId){
+  const target=$("#candidate-evidence-review");
+  if(!target)return;
+  try{
+   const result=await api("/api/collaborate/operator/people/"+encodeURIComponent(caseId)+"/intelligence");
+   if(current?.case_id!==caseId||!$("#candidate-evidence-review"))return;
+   const c=result.candidate||{},related=result.related_source_inquiries||[];
+   const present=(c.present_evidence_fields||[]).join(" · ")||"—";
+   const missing=(c.missing_evidence_fields||[]).join(" · ")||"—";
+   target.innerHTML='<p><b>تکمیل اطلاعات:</b> '+Number(c.profile_completeness_percent||0)+
+    '% <small>(Profile completeness, NOT verified competency)</small></p>'+
+    '<p><b>شواهد ارائه‌شده:</b> '+esc(present)+'</p>'+
+    '<p><b>اطلاعات ناقص:</b> '+esc(missing)+'</p>'+
+    '<p><b>اقدام پیشنهادی:</b> '+esc(c.next_action_suggestion)+'</p>'+
+    '<p><b>فرصت‌های ورودی مرتبط:</b> '+related.length+
+    ' <small>(پرونده‌های واقعی داخلی، نه پروژه استخدامی قطعی)</small></p>'+
+    (related.length?'<div class="event">'+related.map(x=>
+      '<p><b>'+esc(x.case_id)+'</b> · '+esc(x.venture)+
+      ' · '+esc((x.overlapping_self_reported_terms||[]).join(", "))+
+      ' · <small>Operator review required</small></p>').join("")+'</div>':
+      '<p>هیچ فرصت مرتبط و قابل استناد در همین Venture پیدا نشد.</p>')+
+    '<p><small>Assignment: not created · Independent verification: not established</small></p>';
+  }catch(ex){if($("#candidate-evidence-review"))$("#candidate-evidence-review").textContent=
+    "Evidence intelligence unavailable: "+String(ex.message||ex);}
+}
 async function openCase(id){
  const box=$("#overlay");box.hidden=false;document.body.style.overflow="hidden";
  $("#detail-title").textContent="پرونده همکاری";
@@ -175,6 +203,7 @@ async function openCase(id){
    current=result.case;
    $("#detail-title").textContent=current.full_name;
    $("#detail-body").innerHTML=detailMarkup(current,result);
+   loadCandidateIntelligence(id);
    $("#review-form").addEventListener("submit",saveReview);
    $("#note-form").addEventListener("submit",saveNote);
    $("#close").focus();
