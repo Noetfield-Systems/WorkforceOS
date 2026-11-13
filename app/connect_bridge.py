@@ -215,3 +215,124 @@ def import_canonical_connect(request: Request, body: SourceIntake):
     return {"accepted": True, "deduped": False, "case_id": case_id,
             "source_intake_id": body.source_intake_id,
             "assigned": False, "independently_verified": False}
+
+
+# Platform operator actions are carried over the existing server-to-server
+# integration identity. They modify a real WorkforceOS case, never create an
+# independent work order or treat an operator note as proof of agent execution.
+class ConnectOperatorHandoff(BaseModel):
+    model_config = ConfigDict(extra="forbid")
+    source_intake_id: str = Field(min_length=10, max_length=84)
+    request_id: str = Field(min_length=16, max_length=100, pattern=r"^[A-Za-z0-9_-]{16,100}$")
+    owner: str = Field(min_length=2, max_length=140)
+    next_action: str = Field(min_length=5, max_length=1000)
+    due_date: str | None = Field(default=None, max_length=10)
+    match_quality: str = Field(default="not_assessed", max_length=20)
+    assignment_reference: str = Field(default="", max_length=1500)
+
+
+def _connect_case_state(row):
+    return {
+        "source_intake_id": row["source_intake_id"],
+        "case_id": row["id"],
+        "owner": row["owner"],
+        "status": row["status"],
+        "stage": row["stage"],
+        "collaboration": row["collaboration"],
+        "match_quality": row["match_quality"],
+        "next_action": row["next_action"],
+        "next_date": row["next_date"].isoformat() if row["next_date"] else None,
+        "assignment_reference": row["assignment_reference"],
+        "outcome": row["outcome"],
+        "outcome_evidence": row["outcome_evidence"],
+        "verification_reference": row["verification_reference"],
+        "verification_state": row["verification_state"],
+        "updated_at": row["updated_at"].isoformat() if row["updated_at"] else None,
+        "external_agent_execution_verified": False,
+        "collected_cash_verified": False,
+    }
+
+
+@router.get("/api/integrations/noetfield-connect/cases/{source_intake_id}")
+def read_canonical_connect_case(request: Request, source_intake_id: str):
+    """Authenticated, PII-minimal readback of the existing WorkforceOS case."""
+    _authorize(request)
+    if not SOURCE_ID.fullmatch(source_intake_id):
+        raise HTTPException(422, "INVALID_SOURCE_INTAKE_ID")
+    with database() as db:
+        row = db.execute(
+            "SELECT * FROM opportunity_cases WHERE source_intake_id=%s",
+            (source_intake_id,),
+        ).fetchone()
+    if not row:
+        raise HTTPException(404, "SOURCE_CASE_NOT_FOUND")
+    return {"found": True, "source": "workforce_os_postgres",
+            "case": _connect_case_state(row)}
+
+
+@router.post("/api/integrations/noetfield-connect/handoff")
+def record_canonical_connect_handoff(request: Request, body: ConnectOperatorHandoff):
+    """Idempotently assign a real operator to an already-consented source case.
+
+    A reference to an actual workpacket may be supplied; it is not independently
+    verified, does not trigger an agent, and is never an authorization grant.
+    """
+    _authorize(request)
+    if not SOURCE_ID.fullmatch(body.source_intake_id):
+        raise HTTPException(422, "INVALID_SOURCE_INTAKE_ID")
+    owner, action = body.owner.strip(), body.next_action.strip()
+    if len(owner) < 2 or owner.lower() in {"intake_queue", "unassigned", "none"}:
+        raise HTTPException(422, "ACTUAL_OPERATOR_OWNER_REQUIRED")
+    if len(action) < 5:
+        raise HTTPException(422, "NEXT_ACTION_REQUIRED")
+    if body.match_quality not in {"not_assessed", "low", "medium", "high"}:
+        raise HTTPException(422, "MATCH_QUALITY_INVALID")
+    if body.assignment_reference and (
+        not body.assignment_reference.startswith("https://")
+        or any(c.isspace() for c in body.assignment_reference)
+        or urlsplit(body.assignment_reference).username
+        or urlsplit(body.assignment_reference).password
+        or not urlsplit(body.assignment_reference).hostname
+    ):
+        raise HTTPException(422, "HTTPS_ASSIGNMENT_REFERENCE_REQUIRED")
+    due = None
+    if body.due_date:
+        try:
+            due = datetime.strptime(body.due_date, "%Y-%m-%d").date()
+        except ValueError as exc:
+            raise HTTPException(422, "DUE_DATE_INVALID") from exc
+    with database() as db:
+        row = db.execute(
+            "SELECT * FROM opportunity_cases WHERE source_intake_id=%s FOR UPDATE",
+            (body.source_intake_id,),
+        ).fetchone()
+        if not row:
+            raise HTTPException(404, "SOURCE_CASE_NOT_FOUND")
+        was_sent = db.execute(
+            """SELECT id FROM opportunity_events
+               WHERE case_id=%s AND event_type='noetfield_connect.operator_handoff'
+                 AND body=%s LIMIT 1""",
+            (row["id"], body.request_id),
+        ).fetchone()
+        if was_sent:
+            return {"accepted": True, "deduped": True,
+                    "case": _connect_case_state(row),
+                    "external_agent_executed": False,
+                    "independently_verified": False}
+        if row["status"] in {"won", "lost", "archived"}:
+            raise HTTPException(409, "CASE_ALREADY_CLOSED")
+        assigned = bool(body.assignment_reference)
+        new = db.execute(
+            """UPDATE opportunity_cases SET
+                 owner=%s, next_action=%s, next_date=%s, match_quality=%s,
+                 assignment_reference=%s, status='in_review',
+                 stage=%s, collaboration=%s, updated_at=now()
+               WHERE id=%s RETURNING *""",
+            (owner, action, due, body.match_quality, body.assignment_reference,
+             "handoff" if assigned else "qualifying",
+             "handoff_recorded" if assigned else "suggested", row["id"]),
+        ).fetchone()
+        record_event(db, row["id"], "noetfield_connect.operator_handoff",
+                     "noetfield_connect_operator", body.request_id)
+    return {"accepted": True, "deduped": False, "case": _connect_case_state(new),
+            "external_agent_executed": False, "independently_verified": False}
