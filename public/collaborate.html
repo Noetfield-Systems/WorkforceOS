@@ -106,6 +106,20 @@
    <div class="receipt-row"><span data-i18n="next-action">Next action</span><strong id="receipt-next"></strong></div>
    <button type="button" class="btn btn-quiet" id="copy-receipt" data-i18n="copy">Copy private tracking details</button>
    <div class="feedback-inline"><h4 data-i18n="feedback-title">How was your experience?</h4><form id="feedback-form"><label><span data-i18n="rate">Rate the onboarding</span><select name="rating" required><option value="5">5 — Excellent</option><option value="4">4 — Good</option><option value="3">3 — Okay</option><option value="2">2 — Difficult</option><option value="1">1 — Poor</option></select></label><label><span data-i18n="comment">Your feedback</span><textarea name="message" required minlength="5" maxlength="1500" rows="3" placeholder="What would improve this experience?"></textarea></label><button class="btn btn-subtle" type="submit" data-i18n="feedback-submit">Send feedback</button><p id="feedback-result" role="status"></p></form></div>
+   <div class="feedback-inline">
+     <h4 id="followup-title">Add an update to your case</h4>
+     <p id="followup-description">Share a change of availability or send new information. It goes to your existing case.</p>
+     <form id="followup-form" hidden>
+       <label><span>Availability update (optional)</span><select name="availability">
+         <option value="">No change</option><option value="now">Available now</option>
+         <option value="two_weeks">Within 2 weeks</option><option value="part_time">Part-time / flexible</option>
+         <option value="project">Project-based</option><option value="exploring">Exploring</option>
+       </select></label>
+       <label><span>New information</span><textarea name="message" required minlength="5" maxlength="2000" rows="3"></textarea></label>
+       <button class="btn btn-subtle" type="submit" id="followup-submit">Send case update</button>
+       <p id="followup-result" role="status"></p>
+     </form>
+   </div>
   </section>
  </div>
  <aside class="sidebar">
