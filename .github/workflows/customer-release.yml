@@ -44,6 +44,7 @@ jobs:
           node --check public/app.js
           node --check public/collaborate.js
           node --check public/collaborate-desk.js
+          node --check public/connect-desk.js
       - name: Verify real-progress Team Workshop UI
         run: node tests/workshop-ui.cjs
       - name: Customer no-code and security E2E tests

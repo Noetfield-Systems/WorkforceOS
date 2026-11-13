@@ -4,10 +4,10 @@
 <meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
 <meta name="theme-color" content="#101a22">
 <meta name="description" content="Work with Noetfield WorkforceOS. Share your skills, suggest a real collaboration, and track your application through an evidence-led workflow.">
-<title>Work with us · WorkforceOS</title>
+<title>WorkforceOS Connect · Talent & collaboration intake</title>
 <link rel="icon" type="image/svg+xml" href="/static/favicon.svg">
-<link rel="stylesheet" href="/static/collaborate.css?v=1">
-<script src="/static/collaborate.js?v=1" defer></script>
+<link rel="stylesheet" href="/static/collaborate.css?v=connect2">
+<script src="/static/collaborate.js?v=connect2" defer></script>
 </head>
 <body>
 <header class="topbar">
@@ -70,11 +70,26 @@
     <label><span data-i18n="skills">Your skills / tools *</span><input name="skills" minlength="3" maxlength="800" required placeholder="e.g. Python, Next.js, LLM agents, B2B outbound"></label>
     <div class="form-two"><label><span data-i18n="linkedin">LinkedIn profile (optional)</span><input name="linkedin_url" type="url" placeholder="https://linkedin.com/in/..."></label><label><span data-i18n="portfolio">Work samples / GitHub (optional)</span><input name="portfolio_url" type="url" placeholder="https://github.com/..."></label></div>
     <label><span data-i18n="organization">Organization / studio (optional)</span><input name="organization" maxlength="140" placeholder="Independent, or company name"></label>
+    <div class="form-two">
+      <label><span data-i18n="location">Location / time zone *</span><input name="location" required maxlength="160" placeholder="Vancouver, Canada · PST"></label>
+      <label><span data-i18n="languages">Working languages *</span><input name="languages" required maxlength="200" placeholder="English, French, Persian"></label>
+    </div>
+    <label><span data-i18n="commitment">Weekly capacity *</span><select name="time_commitment" required><option value="">Choose capacity</option><option value="under_10h">Under 10 hours</option><option value="10_20h">10–20 hours</option><option value="20_40h">20–40 hours</option><option value="40h_plus">40+ hours</option><option value="flexible">Flexible / project-based</option></select></label>
    </fieldset>
    <fieldset class="wizard-step" data-step="2" hidden>
     <legend class="sr-only" data-i18n="legend3">Collaboration proposal</legend>
     <p class="form-hint" data-i18n="proposal-hint">One specific starting point beats a generic “let's connect”.</p>
     <label><span data-i18n="venture">Project you're interested in</span><select name="venture"><option value="unspecified" data-i18n="open">Open to matching</option><option value="Noetfield">Noetfield</option><option value="WorkforceOS">WorkforceOS</option><option value="BuildRelay">BuildRelay</option><option value="SignalForge">SignalForge</option><option value="Earnloop">Earnloop</option><option value="Other">Other</option></select></label>
+    <div class="form-two">
+      <label><span data-i18n="desired-role">Desired role</span><input name="desired_role" maxlength="140" placeholder="e.g. Backend engineer, Growth partner"></label>
+      <label><span data-i18n="model">Collaboration model *</span><select name="collaboration_model" required><option value="">Choose model</option><option value="freelance">Paid freelance contract</option><option value="project">Fixed-scope project</option><option value="revenue_share">Revenue share / performance</option><option value="co_build">Co-build / co-founder exploration</option><option value="volunteer">Open-source / voluntary</option><option value="flexible">Flexible / discuss</option></select></label>
+    </div>
+    <div class="form-two">
+      <label><span data-i18n="rate">Rate / compensation expectations</span><input name="rate_expectation" maxlength="120" placeholder="CAD $80/hour, fixed quote, flexible"></label>
+      <label><span data-i18n="project-preference">Project / work preference</span><input name="project_preference" maxlength="500" placeholder="Products, APIs, AI workflows, Web3"></label>
+    </div>
+    <label><span data-i18n="original-message">Original LinkedIn / referral context (optional)</span><textarea name="source_message" rows="3" maxlength="1500" placeholder="Paste or summarize your earlier message, without private third-party details."></textarea></label>
+    <label><span data-i18n="goal">Your longer-term collaboration goal</span><textarea name="collaboration_goal" rows="3" maxlength="1000" placeholder="What kind of relationship or experience are you seeking?"></textarea></label>
     <label><span data-i18n="proposal">What could we accomplish together? *</span><textarea name="proposal" rows="5" required minlength="20" maxlength="3000" placeholder="What can you deliver, what is your first idea, and what does success look like?"></textarea></label>
     <label class="checkline"><input type="checkbox" name="contact_consent" required><span data-i18n="contact">I agree that my information may be used to assess and follow up on this collaboration request.</span></label>
     <label class="hp" aria-hidden="true">Website<input name="website" tabindex="-1" autocomplete="off"></label>
@@ -91,6 +106,20 @@
    <div class="receipt-row"><span data-i18n="next-action">Next action</span><strong id="receipt-next"></strong></div>
    <button type="button" class="btn btn-quiet" id="copy-receipt" data-i18n="copy">Copy private tracking details</button>
    <div class="feedback-inline"><h4 data-i18n="feedback-title">How was your experience?</h4><form id="feedback-form"><label><span data-i18n="rate">Rate the onboarding</span><select name="rating" required><option value="5">5 — Excellent</option><option value="4">4 — Good</option><option value="3">3 — Okay</option><option value="2">2 — Difficult</option><option value="1">1 — Poor</option></select></label><label><span data-i18n="comment">Your feedback</span><textarea name="message" required minlength="5" maxlength="1500" rows="3" placeholder="What would improve this experience?"></textarea></label><button class="btn btn-subtle" type="submit" data-i18n="feedback-submit">Send feedback</button><p id="feedback-result" role="status"></p></form></div>
+   <div class="feedback-inline">
+     <h4 id="followup-title">Add an update to your case</h4>
+     <p id="followup-description">Share a change of availability or send new information. It goes to your existing case.</p>
+     <form id="followup-form" hidden>
+       <label><span>Availability update (optional)</span><select name="availability">
+         <option value="">No change</option><option value="now">Available now</option>
+         <option value="two_weeks">Within 2 weeks</option><option value="part_time">Part-time / flexible</option>
+         <option value="project">Project-based</option><option value="exploring">Exploring</option>
+       </select></label>
+       <label><span>New information</span><textarea name="message" required minlength="5" maxlength="2000" rows="3"></textarea></label>
+       <button class="btn btn-subtle" type="submit" id="followup-submit">Send case update</button>
+       <p id="followup-result" role="status"></p>
+     </form>
+   </div>
   </section>
  </div>
  <aside class="sidebar">

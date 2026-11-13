@@ -1,0 +1,51 @@
+<!doctype html>
+<html lang="fa" dir="rtl"><head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="robots" content="noindex,nofollow"><meta name="theme-color" content="#142026">
+<title>Founder Desk · Noetfield Connect / WorkforceOS</title>
+<link rel="icon" href="/static/favicon.svg" type="image/svg+xml">
+<link rel="stylesheet" href="/static/connect-desk.css?v=2">
+<script src="/static/connect-desk.js?v=2" defer></script></head>
+<body>
+<header class="topbar"><a class="identity" href="/connect?lang=fa" aria-label="WorkforceOS Connect">
+<span class="mark">W<span>·</span></span><span><strong>WorkforceOS</strong><small>NOETFIELD CONNECT / FOUNDER DESK</small></span></a>
+<div class="header-right"><span class="real-indicator"><i></i> REAL RECORDS ONLY</span>
+<a href="/connect?lang=fa&source=linkedin" target="_blank" rel="noopener">لینک عمومی <span aria-hidden="true">↗</span></a></div></header>
+<main>
+<section class="hero"><div class="hero-kicker">OPPORTATIONS / HUMAN + AI WORKFORCE</div>
+<div class="hero-heading"><div><h1>میز عملیاتی <em>همکاران.</em></h1>
+<p>از اولین پیام LinkedIn تا تصمیم انسانی، شروع همکاری، تحویل مستند و نتیجه مستقل. هر پرونده صاحب اقدام بعدی است.</p></div>
+<button class="secondary" id="copy-public" type="button">کپی لینک ورودی <span>↗</span></button></div>
+<div class="trail"><span>ورود</span><b>←</b><span>Qualification</span><b>←</b><span>Match</span><b>←</b><span>Review</span><b>←</b><span>Assignment</span><b>←</b><span>Evidence</span><b>←</b><span>Verification</span></div>
+</section>
+<section class="access" id="access"><div class="access-head"><span class="micro">RESTRICTED / OPERATOR</span><h2>اتصال به پرونده‌های واقعی</h2><p>از کلید اپراتور فعلی Opportunity OS استفاده کنید. کلید فقط در حافظه این صفحه باقی می‌ماند.</p></div>
+<form id="access-form"><label for="operator-key">Operator key</label><div class="access-row"><input id="operator-key" type="password" required minlength="32" autocomplete="off" placeholder="OPPORTUNITY_OPERATOR_KEY"><button type="submit" class="primary">ورود به میز عملیات ←</button></div><p class="error" id="access-error" role="alert"></p></form></section>
+<section id="workspace" hidden>
+<div class="section-top"><div><span class="micro dark">LIVE TALENT PIPELINE</span><h2>پرونده‌های همکاری</h2><p>فیلترها از دیتابیس خوانده می‌شوند؛ وضعیت‌های خالی عمداً خالی نمایش داده می‌شوند.</p></div>
+<button id="refresh" type="button" class="secondary dark-button">به‌روزرسانی داده‌ها ↻</button></div>
+<div id="metrics" class="metrics"></div>
+<div class="filters">
+<div class="viewbar" id="views" role="group" aria-label="نماهای پرونده">
+<button data-view="all" class="selected">همه</button><button data-view="inbound">ورودی جدید</button><button data-view="qualified">واجد شرایط</button>
+<button data-view="shortlist">Shortlist</button><button data-view="due">نیازمند پیگیری</button><button data-view="active">همکاری فعال</button>
+<button data-view="shipped">کار تحویل‌شده</button><button data-view="verified">نتیجه تأییدشده</button></div>
+<form id="filter-form" class="filter-form">
+<label>جستجوی فرد، نقش یا مهارت<input name="q" maxlength="100" placeholder="نام / مهارت / شناسه"></label>
+<label>تخصص<select name="focus"><option value="">همه</option><option value="engineering">Engineering</option><option value="ai_automation">AI & Automation</option><option value="design">Design</option><option value="growth">Growth</option><option value="web3">Web3</option><option value="product">Product</option><option value="operations">Operations</option><option value="other">Other</option></select></label>
+<label>منبع<select name="source"><option value="">همه</option><option value="linkedin">LinkedIn</option><option value="referral">Referral</option><option value="direct">Direct</option><option value="email">Email</option><option value="website">Website</option><option value="event">Event</option><option value="community">Community</option><option value="other">Other</option></select></label>
+<label>مرحله<select name="stage"><option value="">همه</option><option value="received">Received</option><option value="qualifying">Qualifying</option><option value="matched">Matched</option><option value="handoff">Handoff</option><option value="executing">Executing</option><option value="follow_up">Follow-up</option><option value="converted">Converted</option><option value="closed">Closed</option></select></label>
+<label>زمان دسترسی<select name="availability"><option value="">همه</option><option value="now">اکنون</option><option value="two_weeks">تا دو هفته</option><option value="part_time">پاره‌وقت</option><option value="project">پروژه‌ای</option><option value="exploring">در حال بررسی</option></select></label>
+<label>کیفیت تطبیق<select name="match_quality"><option value="">همه</option><option value="not_assessed">ارزیابی‌نشده</option><option value="low">Low</option><option value="medium">Medium</option><option value="high">High</option></select></label>
+<label>مسئول<input name="owner" maxlength="140" placeholder="owner"></label>
+<button type="submit" class="primary">اعمال فیلتر</button></form></div>
+<div class="table-shell"><div class="table-head"><div><h3>صف پرونده‌ها</h3><span id="count">—</span></div><span class="proof-tag">NO SIMULATED MATCHES</span></div>
+<div class="table-scroll"><table><thead><tr><th>فرد / نقش</th><th>مهارت</th><th>منبع</th><th>مرحله</th><th>ارزیابی</th><th>ظرفیت</th><th>مسئول / اقدام</th><th>ثبت</th></tr></thead><tbody id="rows"><tr><td colspan="8">ابتدا با کلید معتبر وارد شوید.</td></tr></tbody></table></div></div>
+<p class="caveat">Shortlist و Match به معنای Assignment نیستند. لینک تحویل به‌تنهایی رسید تأیید مستقل محسوب نمی‌شود. این میز Scheduler یا Agent جدید ایجاد نمی‌کند.</p>
+</section></main>
+<aside class="drawer-overlay" id="overlay" hidden><div class="drawer" role="dialog" aria-modal="true" aria-labelledby="detail-title">
+<div class="drawer-head"><div><span class="micro dark">CASE EVIDENCE & REVIEW</span><h2 id="detail-title">پرونده</h2><p id="detail-id"></p></div><button id="close" type="button" aria-label="بستن">×</button></div>
+<div id="detail-body"><p>در حال بارگذاری…</p></div>
+</div></aside>
+<div class="toast" id="toast" role="status" hidden></div>
+<footer><span>WorkforceOS × Noetfield Connect</span><span>Controlled handoff · Verifiable work · Human oversight</span></footer>
+</body></html>

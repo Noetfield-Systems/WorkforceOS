@@ -28,6 +28,7 @@ from . import fabric_gateway as fabric
 from . import billing
 from .opportunity_os import router as opportunity_router, initialize_opportunities
 from .collaborate import router as collaboration_router, initialize_collaboration
+from .people_ops import router as people_router, initialize_people
 
 ROOT=Path(__file__).resolve().parent
 PUBLIC=ROOT.parent/"public"
@@ -58,6 +59,7 @@ async def lifetime(application):
     initialize()
     initialize_opportunities()
     initialize_collaboration()
+    initialize_people()
     if fabric.connected():
         # A read-only authenticated source probe uses an empty namespace;
         # it does NOT register a fictitious customer or create test work.
@@ -78,6 +80,7 @@ app.mount("/static",StaticFiles(directory=PUBLIC),name="static")
 app.include_router(billing.router)
 app.include_router(opportunity_router)
 app.include_router(collaboration_router)
+app.include_router(people_router)
 
 
 @app.middleware("http")
