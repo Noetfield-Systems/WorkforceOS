@@ -52,6 +52,18 @@ def initialize_collaboration():
             contact_consent boolean NOT NULL DEFAULT true,
             created_at timestamptz NOT NULL DEFAULT now()
         )""")
+        for column, declaration in {
+            "location": "text NOT NULL DEFAULT ''",
+            "languages": "text NOT NULL DEFAULT ''",
+            "time_commitment": "text NOT NULL DEFAULT ''",
+            "collaboration_model": "text NOT NULL DEFAULT ''",
+            "rate_expectation": "text NOT NULL DEFAULT ''",
+            "project_preference": "text NOT NULL DEFAULT ''",
+            "desired_role": "text NOT NULL DEFAULT ''",
+            "collaboration_goal": "text NOT NULL DEFAULT ''",
+            "source_message": "text NOT NULL DEFAULT ''",
+        }.items():
+            db.execute(f"ALTER TABLE collaboration_applications ADD COLUMN IF NOT EXISTS {column} {declaration}")
         db.execute("""CREATE INDEX IF NOT EXISTS collaboration_created_idx
                       ON collaboration_applications(created_at DESC)""")
         db.execute("""CREATE TABLE IF NOT EXISTS collaboration_events (
@@ -78,6 +90,7 @@ def initialize_collaboration():
         )""")
 
 
+@router.get("/connect")
 @router.get("/join")
 @router.get("/collaborate")
 @router.get("/work-with-us")
@@ -148,6 +161,15 @@ class CollaborationApplication(BaseModel):
     analytics_consent: bool = False
     contact_consent: bool = False
     website: str = Field(default="",max_length=150)
+    location: str = Field(default="",max_length=160)
+    languages: str = Field(default="",max_length=200)
+    time_commitment: str = Field(default="",max_length=100)
+    collaboration_model: str = Field(default="",max_length=80)
+    rate_expectation: str = Field(default="",max_length=120)
+    project_preference: str = Field(default="",max_length=500)
+    desired_role: str = Field(default="",max_length=140)
+    collaboration_goal: str = Field(default="",max_length=1000)
+    source_message: str = Field(default="",max_length=1500)
 
 
 def _https_url(value: str) -> bool:
@@ -189,7 +211,8 @@ def collaboration_apply(request: Request, body: CollaborationApplication):
                                             "community","direct","other"} else "other"
     context = (f"WorkforceOS collaboration gateway; source={source}; lane={body.lane}; "
                f"skills={body.skills.strip()[:500]}; availability={body.availability}; "
-               f"ref={body.referral_code or 'none'}; campaign={body.campaign or 'none'}")
+               f"ref={body.referral_code or 'none'}; campaign={body.campaign or 'none'}; "
+               f"original_message={body.source_message.strip()[:1000] or 'not_provided'}")
     profile = Intake(
         full_name=body.full_name.strip(), email=email,
         organization=body.organization.strip(), source=source,
@@ -206,12 +229,18 @@ def collaboration_apply(request: Request, body: CollaborationApplication):
     with database() as db:
         db.execute("""INSERT INTO collaboration_applications
             (case_id,lane,focus,skills,availability,linkedin_url,portfolio_url,
-             referral_code,campaign,visitor_session,analytics_consent,contact_consent)
-            VALUES (%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,TRUE)""",
+             referral_code,campaign,visitor_session,analytics_consent,contact_consent,
+             location,languages,time_commitment,collaboration_model,rate_expectation,
+             project_preference,desired_role,collaboration_goal,source_message)
+            VALUES (%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,TRUE,%s,%s,%s,%s,%s,%s,%s,%s,%s)""",
             (case_id,body.lane,body.focus,body.skills.strip(),
              body.availability,body.linkedin_url.strip(),body.portfolio_url.strip(),
              body.referral_code,body.campaign,body.session_id,
-             body.analytics_consent))
+             body.analytics_consent,body.location.strip(),body.languages.strip(),
+             body.time_commitment.strip(),body.collaboration_model.strip(),
+             body.rate_expectation.strip(),body.project_preference.strip(),
+             body.desired_role.strip(),body.collaboration_goal.strip(),
+             body.source_message.strip()))
         db.execute("""UPDATE opportunity_cases SET next_action=%s,
                       route_basis=%s,updated_at=now() WHERE id=%s""",
             (next_action, "Candidate-selected lane "+body.lane+"; skill focus "+body.focus+
