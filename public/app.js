@@ -445,6 +445,62 @@ function renderActivation(){
   }
  }));
 }
+/* Team Workshop: game-like navigation driven exclusively by canonical customer workspace records. */
+function workshopMilestones(){
+ const data=S.data||{},teams=data.teams||[],tickets=data.tickets||[],notes=data.notes||[];
+ const produced=tickets.filter(t=>t.model_output_ready===true);
+ const reviewed=tickets.filter(t=>t.state==="VERIFIED"); // Fabric's original human review; NOT independent verification.
+ const revision=notes.some(n=>Boolean(n.fabric_revision_id));
+ return [
+  {label:"Create a team",description:"Choose teammates and define their responsibilities.",done:teams.length>0,action:"team",symbol:"✳"},
+  {label:"Assign a mission",description:"Give a real task to a teammate.",done:tickets.length>0,action:"work",symbol:"▤"},
+  {label:"Receive a draft",description:"See actual model output, not just a queued ticket.",done:produced.length>0,action:"output",symbol:"◇"},
+  {label:"Review the result",description:"Your human review is distinct from independent proof.",done:reviewed.length>0,action:"review",symbol:"✓"},
+  {label:"Improve & repeat",description:"Send feedback that becomes a real revision job.",done:revision,action:"improve",symbol:"↗"}
+ ];
+}
+function renderWorkshop(){
+ const data=S.data||{},teams=data.teams||[],agents=data.agents||[],tickets=data.tickets||[];
+ const stages=workshopMilestones(),next=stages.find(s=>!s.done);
+ $("workshop-path").innerHTML=stages.map((stage,index)=>
+  '<button type="button" role="listitem" class="workshop-station '+(stage.done?'achieved':next===stage?'next':'')+
+  '" data-workshop-step="'+escapeHtml(stage.action)+'" title="'+escapeHtml(stage.description)+'">'+
+  '<span class="workshop-station-icon">'+(stage.done?'✓':stage.symbol)+'</span>'+
+  '<span class="workshop-station-number">STATION '+String(index+1).padStart(2,"0")+'</span><strong>'+escapeHtml(stage.label)+'</strong>'+
+  '<small>'+(stage.done?'Observed in your records':next===stage?'Next useful step':'Not yet observed')+'</small></button>'
+ ).join("");
+ const completed=stages.filter(s=>s.done).length;
+ $("workshop-count").textContent=teams.length+" team"+(teams.length===1?"":"s")+" · "+tickets.length+" source-backed tickets · "+completed+"/5 journey steps";
+ $("workshop-next").textContent=next?(next.label+" ↗"):"See your workboard ↗";
+ $("workshop-next").dataset.workshopStep=next?.action||"review";
+ $("workshop-rooms").innerHTML=teams.length?teams.map(team=>{
+  const crew=agents.filter(a=>a.team_id===team.id);
+  const jobs=tickets.filter(t=>crew.some(a=>a.id===t.agent_id));
+  const needsReview=jobs.filter(t=>t.state==="NEEDS_REVIEW").length;
+  const realOutputs=jobs.filter(t=>t.model_output_ready===true).length;
+  return '<button class="workshop-teamroom" type="button" data-workshop-team="'+escapeHtml(team.id)+'">'+
+    '<div class="workshop-room-head"><span class="workshop-room-emblem">'+escapeHtml((team.name||"Team").slice(0,1).toUpperCase())+'</span>'+
+    '<span class="workshop-room-status">'+(needsReview?needsReview+" awaiting review":jobs.length+" actual tickets")+'</span></div>'+
+    '<h3>'+escapeHtml(team.name)+'</h3><p>'+escapeHtml(team.mission||"No mission set yet.")+'</p>'+
+    '<div class="workshop-crew">'+crew.slice(0,4).map(a=>'<i title="'+escapeHtml(a.name)+'">'+escapeHtml((a.name||"?").slice(0,1).toUpperCase())+'</i>').join("")+
+    '<span>'+crew.length+' teammates · '+realOutputs+' drafts received</span></div>'+
+    '<span class="workshop-room-link">Enter team room ↗</span></button>';
+ }).join(""):'<div class="workshop-empty"><div class="workshop-empty-icon" aria-hidden="true">✳</div>'+
+    '<h3>Your first workshop room is ready to be built.</h3>'+
+    '<p>Choose a template, make the team yours, then give it useful work. No fake coworkers or demo completions.</p>'+
+    '<button type="button" class="button button-secondary" data-workshop-step="team">Create my first team ↗</button></div>';
+}
+function workshopAction(action){
+ if(action==="team")return openTeamBuilder();
+ if(action==="work")return openTicketCreator();
+ if(action==="output"||action==="review"||action==="improve"){
+  const t=(S.data?.tickets||[]).find(t=>t.model_output_ready===true);
+  if(t)return openTicketDetail(t.id);
+  return setView("work");
+ }
+ setView("work");
+}
+
 function renderSummary(){
  $("side-workspace-name").textContent=S.data.workspace.name;
  $("stat-teams").textContent=S.data.teams.length;
@@ -462,7 +518,7 @@ function renderSummary(){
 }
 function render(){
  if(!S.data)return;
- renderSummary();renderActivation();renderTeams();renderAgentGrid();renderRecent();renderWork();renderKnowledge();renderBilling();renderActivity();
+ renderSummary();renderActivation();renderWorkshop();renderTeams();renderAgentGrid();renderRecent();renderWork();renderKnowledge();renderBilling();renderActivity();
  S.templates=S.data.templates||S.templates;
  document.querySelectorAll("[data-empty-action]").forEach(b=>b.addEventListener("click",()=>{
   const action=b.dataset.emptyAction;
@@ -673,6 +729,17 @@ async function signOut(){
  notice("You're signed out.");
 }
 async function initialize(){
+ $("workshop-next").addEventListener("click",e=>workshopAction(e.currentTarget.dataset.workshopStep||"team"));
+ $("workshop-path").addEventListener("click",e=>{const step=e.target.closest("[data-workshop-step]");if(step)workshopAction(step.dataset.workshopStep)});
+ $("workshop-rooms").addEventListener("click",e=>{
+  const step=e.target.closest("[data-workshop-step]");
+  if(step)return workshopAction(step.dataset.workshopStep);
+  const room=e.target.closest("[data-workshop-team]");if(!room)return;
+  S.selectedTeam=room.dataset.workshopTeam;setView("teams");S.selectedTeam=room.dataset.workshopTeam;
+  renderAgentGrid();$("all-teammates").hidden=false;
+  $("agent-grid").scrollIntoView({block:"start",behavior:"smooth"});
+ });
+
  setInterval(pollActiveWork,6500);
  setInterval(autoContinueMissions,8500);
  document.querySelectorAll("[data-close]").forEach(b=>b.addEventListener("click",()=>hideModal(b.dataset.close)));

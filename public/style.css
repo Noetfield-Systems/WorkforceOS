@@ -355,3 +355,51 @@ button{cursor:pointer}button:disabled{cursor:not-allowed;opacity:.55}a{text-deco
 .mission-step pre{white-space:pre-wrap;overflow-wrap:anywhere;max-height:380px;overflow:auto;font:inherit;font-size:13px;line-height:1.6}
 .mission-step summary{cursor:pointer;margin-top:9px}
 @media(max-width:680px){.mission-form{grid-template-columns:minmax(0,1fr)}.mission-form .mission-wide{grid-column:auto}.mission-panel{padding:16px;border-radius:16px}}
+
+
+/* Source-backed Team Workshop. Gamification makes real work legible, never manufactures XP or receipts. */
+.workshop-world{margin:24px 0 34px;border:1px solid rgba(158,187,220,.28);border-radius:23px;background:radial-gradient(ellipse at 85% 0%,rgba(78,139,187,.1),transparent 44%),linear-gradient(155deg,#111d2d,#111a28);padding:25px;position:relative;overflow:hidden}
+.workshop-world::after{content:"";position:absolute;right:-90px;top:-140px;width:310px;height:310px;border:1px solid rgba(124,178,220,.1);border-radius:50%;pointer-events:none}
+.workshop-heading{display:flex;justify-content:space-between;gap:20px;align-items:center}
+.workshop-heading h2{font-size:clamp(24px,2.4vw,35px);line-height:1.15;margin:6px 0 10px;letter-spacing:-.035em}
+.workshop-heading h2 em{color:#a9e6cf;font-family:Georgia,serif;font-weight:400}
+.workshop-heading p{max-width:640px;font-size:12px;line-height:1.65;margin:0;color:#97aaba}
+.workshop-heading .button{white-space:nowrap;align-self:center}
+.workshop-path{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:9px;position:relative;margin:23px 0 22px}
+.workshop-station{display:flex;flex-direction:column;align-items:flex-start;gap:4px;background:#15253a;border:1px solid #2d4058;color:#a8bbd0;text-align:left;min-height:148px;padding:14px 12px;border-radius:15px;position:relative}
+.workshop-station:hover{border-color:#668cac;background:#1b314a}
+.workshop-station.achieved{border-color:#376956;background:linear-gradient(160deg,#183d37,#172b34);color:#dbf8e9}
+.workshop-station.next{border-color:#92dcb8;color:#f4fffa;box-shadow:0 0 0 1px #80bf9f3f}
+.workshop-station-icon{display:grid;place-items:center;height:36px;width:36px;border-radius:11px;background:#223b52;font-size:21px;font-weight:700;color:#a9c2df;margin-bottom:7px}
+.workshop-station.next .workshop-station-icon{background:#8de1b7;color:#123b30}
+.workshop-station.achieved .workshop-station-icon{background:#2f745f;color:#ebfff5}
+.workshop-station-number{font-size:9px;font-weight:800;letter-spacing:.1em;color:#7f9db9}
+.workshop-station strong{font-size:12px;line-height:1.35;color:inherit}
+.workshop-station small{font-size:10px;color:#9bb3cb;line-height:1.35}
+.workshop-rooms-heading{display:flex;justify-content:space-between;align-items:center;border-top:1px solid #344354;padding-top:20px;margin-bottom:14px;gap:15px}
+.workshop-rooms-heading h3{font-size:17px;margin:0;letter-spacing:-.02em}
+.workshop-rooms-heading>span{color:#8ca6b8;font-size:10px}
+.workshop-rooms{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:11px}
+.workshop-teamroom{text-align:left;display:flex;flex-direction:column;align-items:flex-start;gap:8px;background:#1b2b40;color:#e5f2ff;border-radius:16px;border:1px solid #30445d;padding:17px;min-height:210px;transition:transform .15s,border-color .15s}
+.workshop-teamroom:hover{transform:translateY(-2px);border-color:#73b09f}
+.workshop-room-head{display:flex;width:100%;align-items:center;justify-content:space-between;gap:10px}
+.workshop-room-emblem{height:42px;width:42px;display:grid;place-items:center;border-radius:12px;color:#d7eee4;font-size:20px;font-weight:800;background:#2d5659}
+.workshop-room-status{font-size:10px;color:#b2d6ca;background:#214c46;padding:5px 9px;border-radius:15px}
+.workshop-teamroom h3{margin:3px 0 0;font-size:15px;line-height:1.3}
+.workshop-teamroom p{font-size:11px;line-height:1.45;color:#9cabbf;margin:0;min-height:36px}
+.workshop-crew{display:flex;align-items:center;gap:2px;margin-top:auto}
+.workshop-crew i{height:27px;width:27px;border-radius:50%;display:grid;place-items:center;border:2px solid #1b2b40;background:#4c6385;font-size:11px;font-style:normal;font-weight:800}
+.workshop-crew i+i{margin-left:-7px}
+.workshop-crew span{font-size:10px;color:#91a6bd;margin-left:9px}
+.workshop-room-link{font-size:11px;font-weight:800;color:#a6edc8;margin-top:9px}
+.workshop-empty{grid-column:1/-1;text-align:center;border-radius:16px;border:1px dashed #55728b;padding:31px 20px;color:#c6d5e4}
+.workshop-empty-icon{height:53px;width:53px;background:#2e5253;border-radius:16px;display:grid;place-items:center;font-size:30px;margin:0 auto 15px;color:#b5f6d9}
+.workshop-empty h3{font-size:17px;margin:0 0 6px}
+.workshop-empty p{font-size:12px;color:#91abc2;max-width:500px;margin:0 auto 15px}
+.workshop-evidence{display:flex;gap:10px;align-items:flex-start;margin-top:16px;padding:12px 15px;border-radius:12px;background:#162f37;border:1px solid #31584d}
+.workshop-evidence span{color:#9ae1c3;font-size:22px;line-height:1.2}
+.workshop-evidence p{font-size:11px;color:#a6c0b6;line-height:1.55;margin:0}
+.workshop-evidence b{color:#e5f8eb}
+@media(max-width:1180px){.workshop-rooms{grid-template-columns:repeat(2,minmax(0,1fr))}.workshop-station{padding:10px;min-height:143px}}
+@media(max-width:760px){.workshop-world{padding:17px;border-radius:18px}.workshop-heading{flex-direction:column;align-items:flex-start}.workshop-heading .button{align-self:flex-start}.workshop-path{display:flex;overflow-x:auto;scroll-snap-type:x mandatory;padding-bottom:7px}.workshop-station{min-width:155px;max-width:155px;scroll-snap-align:start}.workshop-rooms{grid-template-columns:1fr}.workshop-rooms-heading{flex-wrap:wrap}.workshop-teamroom{min-height:176px}}
+@media(prefers-reduced-motion:reduce){.workshop-teamroom{transition:none}}
