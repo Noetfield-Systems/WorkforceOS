@@ -103,7 +103,10 @@ function linkRow(text,url){
 }
 function detailMarkup(c,data){
  const profile=[
- showValue("نام",c.full_name),showValue("ایمیل",c.email),showValue("نقش مورد نظر",c.desired_role),
+ showValue("نام",c.full_name),showValue("ایمیل",c.email),
+ showValue("شناسه منبع اصلی Noetfield",c.source_intake_id),
+ showValue("شناسه خصوصی درخواست در منبع",c.source_request_id),
+ showValue("نقش مورد نظر",c.desired_role),
  showValue("تخصص / مهارت‌ها",c.focus+" · "+c.skills),
  showValue("موقعیت",c.location),showValue("زبان‌های کاری",c.languages),
  showValue("ظرفیت",c.availability+" · "+c.time_commitment),

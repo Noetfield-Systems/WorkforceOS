@@ -68,6 +68,12 @@ def initialize_opportunities():
             created_at timestamptz NOT NULL DEFAULT now(),
             updated_at timestamptz NOT NULL DEFAULT now()
         )""")
+        # Additive source key: native WorkforceOS cases keep their own primary ID.
+        # A partial unique index prevents duplicate imports across concurrent retries.
+        db.execute("ALTER TABLE opportunity_cases ADD COLUMN IF NOT EXISTS source_intake_id text NOT NULL DEFAULT ''")
+        db.execute("ALTER TABLE opportunity_cases ADD COLUMN IF NOT EXISTS source_request_id text NOT NULL DEFAULT ''")
+        db.execute("""CREATE UNIQUE INDEX IF NOT EXISTS opportunities_canonical_source_idx
+                      ON opportunity_cases(source_intake_id) WHERE source_intake_id <> ''""")
         db.execute("""CREATE INDEX IF NOT EXISTS opportunities_created_idx
                       ON opportunity_cases(created_at DESC)""")
         db.execute("""CREATE INDEX IF NOT EXISTS opportunities_next_idx

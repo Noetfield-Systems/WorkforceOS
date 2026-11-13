@@ -5,6 +5,9 @@ on:
     paths:
       - "app/collaborate.py"
       - "app/people_ops.py"
+      - "app/connect_bridge.py"
+      - "app/opportunity_os.py"
+      - "tests/test_connect_bridge.py"
       - "public/collaborate.html"
       - "public/connect-desk.html"
       - ".github/workflows/connect-production-smoke.yml"
@@ -42,7 +45,18 @@ jobs:
                       raise AssertionError("operator API must not return data anonymously")
                   except HTTPError as e:
                       assert e.code==403,f"operator API security unexpected {e.code}"
-                  print("PRODUCTION_SMOKE_PASS: health=200, public_wizard=200, private_desk_page=200, desk_js=200, unauthorized_api=403; no user/case created")
+                  from urllib.request import Request
+                  import urllib.error
+                  req=Request(base+"/api/integrations/noetfield-connect",
+                              data=b'{}',method="POST",headers={
+                               "Content-Type":"application/json",
+                               "X-Workforce-Request":"workspace"})
+                  try:
+                      urlopen(req,timeout=12)
+                      raise AssertionError("bridge must not be public")
+                  except HTTPError as e:
+                      assert e.code==403,f"unauthorized import unexpected {e.code}"
+                  print("PRODUCTION_SMOKE_PASS: health=200, join=200, desk=200, private_people=403, unauthorized_bridge=403; no source record created")
                   sys.exit(0)
               except Exception as exc:
                   print(f"Attempt {attempt+1}: {exc}")

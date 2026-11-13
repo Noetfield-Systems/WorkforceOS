@@ -23,7 +23,7 @@ PUBLIC = Path(__file__).resolve().parent.parent / "public"
 QUALIFICATION = {"unreviewed", "needs_information", "qualified", "not_fit"}
 TARGETS = {"none", "workforce_os", "agent_os", "workflow_os",
            "workfeed", "company_os", "sina_founder_os"}
-PEOPLE_FIELDS = ("case_id", "full_name", "email", "organization", "source",
+PEOPLE_FIELDS = ("case_id", "source_intake_id", "source_request_id", "full_name", "email", "organization", "source",
     "source_context", "intent", "venture", "lane", "focus", "skills", "availability",
     "linkedin_url", "portfolio_url", "location", "languages", "time_commitment",
     "collaboration_model", "rate_expectation", "project_preference",
@@ -62,7 +62,7 @@ def _joined():
         LEFT JOIN collaboration_reviews r ON r.case_id=a.case_id """
 
 def _select():
-    return """SELECT a.*, c.full_name,c.email,c.organization,c.source,
+    return """SELECT a.*, c.source_intake_id,c.source_request_id,c.full_name,c.email,c.organization,c.source,
         c.source_context,c.intent,c.venture,c.owner,c.status,c.stage,
         c.collaboration,c.match_quality,c.next_action,c.next_date,
         c.assignment_reference,c.outcome,c.outcome_evidence,
@@ -103,8 +103,9 @@ def people(view: str = "all", q: str = "", focus: str = "",
         where.append("c.owner ILIKE %s");args.append("%"+owner+"%")
     if q:
         where.append("""(c.full_name ILIKE %s OR c.email ILIKE %s
-             OR a.skills ILIKE %s OR c.id ILIKE %s OR c.intent ILIKE %s)""")
-        args.extend(["%"+q+"%"]*5)
+             OR a.skills ILIKE %s OR c.id ILIKE %s OR c.intent ILIKE %s
+             OR c.source_intake_id ILIKE %s OR c.source_request_id ILIKE %s)""")
+        args.extend(["%"+q+"%"]*7)
     views={
         "inbound":"c.stage='received'",
         "due":"c.next_date <= CURRENT_DATE AND c.status NOT IN ('won','lost','archived')",
