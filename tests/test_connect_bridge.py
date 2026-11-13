@@ -132,5 +132,58 @@ class CanonicalBridgeTests(unittest.TestCase):
                          ("ai", "agent_work", "agent_owner", "engineering"))
 
 
+
+    def test_operator_handoff_is_persisted_idempotent_and_not_agent_execution(self):
+        b = self.body()
+        imported = self.client.post("/api/integrations/noetfield-connect",
+                                    json=b, headers=self.auth())
+        self.assertEqual(imported.status_code, 200, imported.text)
+        source = b["source_intake_id"]
+        read_path = "/api/integrations/noetfield-connect/cases/" + source
+        self.assertEqual(self.client.get(read_path).status_code, 403)
+        self.assertEqual(self.client.get(
+            "/api/integrations/noetfield-connect/cases/INT-MISSING0001",
+            headers=self.auth()).status_code, 404)
+        before = self.client.get(read_path, headers=self.auth())
+        self.assertEqual(before.status_code, 200, before.text)
+        self.assertEqual(before.json()["case"]["owner"], "intake_queue")
+        payload = {"source_intake_id": source, "request_id": uuid.uuid4().hex,
+                   "owner": "Workforce operator", "next_action": "Review proposal and propose a trial",
+                   "due_date": "2026-11-18", "match_quality": "medium"}
+        path = "/api/integrations/noetfield-connect/handoff"
+        self.assertEqual(self.client.post(path,json=payload).status_code,403)
+        invalid = {**payload, "owner": "intake_queue"}
+        self.assertEqual(self.client.post(path,json=invalid,headers=self.auth()).status_code,422)
+        first = self.client.post(path, json=payload, headers=self.auth())
+        self.assertEqual(first.status_code, 200, first.text)
+        self.assertTrue(first.json()["accepted"])
+        self.assertFalse(first.json()["deduped"])
+        self.assertFalse(first.json()["external_agent_executed"])
+        self.assertFalse(first.json()["independently_verified"])
+        self.assertEqual(first.json()["case"]["owner"], "Workforce operator")
+        self.assertEqual(first.json()["case"]["stage"], "qualifying")
+        self.assertEqual(first.json()["case"]["verification_state"],
+                         "NOT_INDEPENDENTLY_VERIFIED")
+        replay = self.client.post(path, json=payload, headers=self.auth())
+        self.assertEqual(replay.status_code, 200, replay.text)
+        self.assertTrue(replay.json()["deduped"])
+        after = self.client.get(read_path, headers=self.auth())
+        self.assertEqual(after.json()["case"]["next_action"], payload["next_action"])
+        with database() as db:
+            event_count = db.execute(
+                """SELECT count(*) AS total FROM opportunity_events
+                   WHERE case_id=%s AND event_type='noetfield_connect.operator_handoff'""",
+                (imported.json()["case_id"],)).fetchone()["total"]
+        self.assertEqual(event_count, 1)
+        new = {**payload, "request_id": uuid.uuid4().hex,
+               "assignment_reference": "https://github.com/example/workpacket/1"}
+        handoff = self.client.post(path,json=new,headers=self.auth())
+        self.assertEqual(handoff.status_code,200,handoff.text)
+        self.assertEqual(handoff.json()["case"]["stage"], "handoff")
+        self.assertEqual(handoff.json()["case"]["collaboration"], "handoff_recorded")
+        self.assertFalse(handoff.json()["independently_verified"])
+        self.assertFalse(handoff.json()["external_agent_executed"])
+
+
 if __name__ == "__main__":
     unittest.main()
