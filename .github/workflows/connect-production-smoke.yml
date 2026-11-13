@@ -48,7 +48,12 @@ jobs:
                   from urllib.request import Request
                   import urllib.error
                   req=Request(base+"/api/integrations/noetfield-connect",
-                              data=b'{}',method="POST",headers={
+                              data=json.dumps({"source_intake_id":"INT-UNAUTH001234",
+                                               "vector":"external-opportunities",
+                                               "contact_email":"probe@example.invalid",
+                                               "message":"Read-only unauthorized API probe; never persisted.",
+                                               "metadata":{"category":"people","consent_contact":False}}).encode(),
+                              method="POST",headers={
                                "Content-Type":"application/json",
                                "X-Workforce-Request":"workspace"})
                   try:
