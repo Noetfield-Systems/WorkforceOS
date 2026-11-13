@@ -120,6 +120,32 @@ const i18n={
  status:"وضعیت",stage:"مرحله",next:"اقدام بعدی",noReceipt:"هنوز اجرای تکمیل‌شده‌ای تأیید نشده است."
  }
 };
+
+Object.assign(i18n.en,{
+ location:"Location / time zone *",languages:"Working languages *",
+ commitment:"Weekly time capacity *","desired-role":"Preferred role",
+ model:"Collaboration model *",rate:"Compensation / rate expectations",
+ "project-preference":"Project or work preference",
+ "original-message":"Context from the original LinkedIn / referral message",
+ goal:"Long-term collaboration goal",
+ "followup-title":"Add an update to your case",
+ "followup-description":"Share a change of availability or send new information. It goes to your existing case.",
+ "followup-submit":"Send case update",
+ "followup-saved":"Your follow-up is recorded for human review."
+});
+Object.assign(i18n.fa,{
+ location:"موقعیت و منطقه زمانی *",languages:"زبان‌های کاری *",
+ commitment:"ظرفیت زمانی در هفته *","desired-role":"نقش مورد علاقه",
+ model:"مدل همکاری *",rate:"نرخ یا انتظار مالی",
+ "project-preference":"نوع کار و پروژه‌های مورد علاقه",
+ "original-message":"زمینه پیام اولیه LinkedIn یا معرفی",
+ goal:"هدف بلندمدت از همکاری",
+ "followup-title":"اطلاعات جدید به پرونده اضافه کنید",
+ "followup-description":"اگر زمان در دسترس یا اطلاعات شما تغییر کرد، همین پرونده را به‌روزرسانی کنید.",
+ "followup-submit":"ارسال پیگیری",
+ "followup-saved":"پیگیری برای بررسی انسانی در پرونده ذخیره شد."
+});
+
 const optionsFa={
  focus:{engineering:"مهندسی نرم‌افزار",ai_automation:"هوش مصنوعی و اتوماسیون",design:"طراحی / تجربه کاربری",
  growth:"رشد و فروش",web3:"وب۳ / رمزارز",operations:"عملیات",product:"محصول",other:"سایر"},
@@ -150,6 +176,30 @@ function translate(){
  }
  $("#step-heading").textContent=t("headings")[state.step];
  $("#lang").textContent=state.lang==="en"?"فارسی":"English";
+ const newOptions={
+  time_commitment:state.lang==="fa"?
+    {under_10h:"کمتر از ۱۰ ساعت", "10_20h":"۱۰ تا ۲۰ ساعت",
+     "20_40h":"۲۰ تا ۴۰ ساعت","40h_plus":"بیش از ۴۰ ساعت",flexible:"منعطف / پروژه‌ای"}:
+    {under_10h:"Under 10 hours","10_20h":"10–20 hours",
+     "20_40h":"20–40 hours","40h_plus":"40+ hours",flexible:"Flexible / project-based"},
+  collaboration_model:state.lang==="fa"?
+    {freelance:"قرارداد فریلنسری",project:"پروژه با محدوده مشخص",
+     revenue_share:"درصد از درآمد / نتیجه",co_build:"ساخت مشترک / بررسی هم‌بنیان‌گذاری",
+     volunteer:"متن‌باز / داوطلبانه",flexible:"منعطف / قابل مذاکره"}:
+    {freelance:"Paid freelance contract",project:"Fixed-scope project",
+     revenue_share:"Revenue share / performance",co_build:"Co-build / co-founder exploration",
+     volunteer:"Open-source / voluntary",flexible:"Flexible / discuss"}
+ };
+ for(const [field,map] of Object.entries(newOptions)){
+  const el=$('select[name="'+field+'"]');for(const opt of el.options){
+   if(map[opt.value])opt.textContent=map[opt.value];
+  }
+  el.options[0].textContent=t("select");
+ }
+ const fp=$("#followup-title"),fd=$("#followup-description"),fs=$("#followup-submit");
+ if(fp)fp.textContent=t("followup-title");
+ if(fd)fd.textContent=t("followup-description");
+ if(fs)fs.textContent=t("followup-submit");
 }
 function toast(message){
  const el=$("#toast");el.textContent=message;el.hidden=false;
@@ -213,6 +263,7 @@ function receipt(data){
      sessionStorage.setItem("wos_collab_token",state.token)}catch{}
  $("#track-form [name=case_id]").value=state.caseId;
  $("#track-form [name=token]").value=state.token;
+ if($("#followup-form"))$("#followup-form").hidden=false;
  $("#success").scrollIntoView({behavior:"smooth",block:"center"});
 }
 function statusText(c){
@@ -255,6 +306,20 @@ async function track(e){
    event("tracking_opened");
  }catch{$("#track-result").textContent=t("badTrack")}
 }
+async function followup(e){
+ e.preventDefault();
+ if(!state.caseId||!state.token)return;
+ const b=$("#followup-form button");b.disabled=true;
+ const f=new FormData(e.target);
+ try{
+  await api("/api/collaborate/cases/"+encodeURIComponent(state.caseId)+"/follow-up","POST",{
+    tracking_token:state.token,message:String(f.get("message")||"").trim(),
+    availability:String(f.get("availability")||"")||null
+  });
+  $("#followup-result").textContent=t("followup-saved");e.target.reset();
+ }catch(ex){$("#followup-result").textContent=t("failed")+" ("+ex.message+")";}
+ finally{b.disabled=false}
+}
 function listen(){
  $("#lang").addEventListener("click",()=>{state.lang=state.lang==="en"?"fa":"en";translate();});
  $("#hero-start").addEventListener("click",openWizard);
@@ -271,6 +336,7 @@ function listen(){
  });
  $("#application").addEventListener("submit",apply);
  $("#feedback-form").addEventListener("submit",feedback);
+ $("#followup-form").addEventListener("submit",followup);
  $("#track-form").addEventListener("submit",track);
  $("#copy-receipt").addEventListener("click",async()=>{
    const info="WorkforceOS case: "+state.caseId+"\nPrivate tracking token: "+state.token+
