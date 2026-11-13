@@ -143,12 +143,27 @@ def _prepare(body: SourceIntake) -> dict[str, str | bool]:
     }
 
 
-@router.post("/api/integrations/noetfield-connect", status_code=200)
-def import_canonical_connect(request: Request, body: SourceIntake):
+def _authorize(request: Request) -> None:
     expected = os.getenv("WORKFORCE_CONNECT_BRIDGE_KEY", "")
     presented = request.headers.get("X-Noetfield-Bridge-Key", "")
     if len(expected) < 32 or not presented or not hmac.compare_digest(expected, presented):
         raise HTTPException(403, "INTEGRATION_ACCESS_DENIED")
+
+
+@router.get("/api/integrations/noetfield-connect/health")
+def bridge_read_only_health(request: Request):
+    """Authenticated network + database handshake; never creates an applicant."""
+    _authorize(request)
+    with database() as db:
+        db.execute("SELECT 1").fetchone()
+    return {"authenticated": True, "database": "connected",
+            "mode": "consent_scoped_idempotent_source_projection",
+            "read_only": True, "source_key": "source_intake_id"}
+
+
+@router.post("/api/integrations/noetfield-connect", status_code=200)
+def import_canonical_connect(request: Request, body: SourceIntake):
+    _authorize(request)
     p = _prepare(body)
     case_id = "opp_nf_" + hashlib.sha256(body.source_intake_id.encode()).hexdigest()[:24]
     today = datetime.now(timezone.utc).date()
