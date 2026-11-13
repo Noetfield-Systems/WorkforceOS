@@ -50,6 +50,15 @@ class CanonicalBridgeTests(unittest.TestCase):
         return {**HEADERS, "X-Noetfield-Bridge-Key":
                 os.environ["WORKFORCE_CONNECT_BRIDGE_KEY"]}
 
+    def test_signed_read_only_handshake(self):
+        endpoint = "/api/integrations/noetfield-connect/health"
+        self.assertEqual(self.client.get(endpoint).status_code, 403)
+        status = self.client.get(endpoint, headers={
+            "X-Noetfield-Bridge-Key": os.environ["WORKFORCE_CONNECT_BRIDGE_KEY"]})
+        self.assertEqual(status.status_code, 200, status.text)
+        self.assertEqual(status.json()["database"], "connected")
+        self.assertTrue(status.json()["read_only"])
+
     def test_guard_consent_deduplication_and_readback(self):
         b = self.body()
         endpoint = "/api/integrations/noetfield-connect"
