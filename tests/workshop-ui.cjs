@@ -8,7 +8,8 @@ const js=fs.readFileSync(path.join(root,"public/app.js"),"utf8");
 const html=fs.readFileSync(path.join(root,"public/index.html"),"utf8");
 const css=fs.readFileSync(path.join(root,"public/style.css"),"utf8");
 new vm.Script(js);
-for(const id of ["workshop-world","workshop-path","workshop-rooms","workshop-next","workshop-count"]){
+assert.match(html,/class="workshop-world"/);
+for(const id of ["workshop-path","workshop-rooms","workshop-next","workshop-count"]){
  assert.ok(html.includes('id="'+id+'"'),"Missing workshop component "+id);
 }
 assert.ok(html.includes("v=20261112-workshop2"));
