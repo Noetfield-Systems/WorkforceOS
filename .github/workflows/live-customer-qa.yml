@@ -1,6 +1,9 @@
 name: Live synthetic customer and real-business challenge
 on:
   workflow_dispatch:
+  schedule:
+    # Verify one real backend synthetic journey every six hours, no fake customer conversion.
+    - cron: '41 2,8,14,20 * * *'
 jobs:
   live-customer:
     runs-on: ubuntu-latest
