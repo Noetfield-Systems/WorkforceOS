@@ -1,5 +1,8 @@
 name: Live synthetic customer and real-business challenge
 on:
+  push:
+    branches: [main]
+    paths: ['.github/workflows/live-customer-qa.yml']
   workflow_dispatch:
   schedule:
     # Verify one real backend synthetic journey every six hours, no fake customer conversion.
