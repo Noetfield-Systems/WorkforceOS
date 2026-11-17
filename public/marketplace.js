@@ -6,12 +6,12 @@ const $=id=>document.getElementById(id);
 const esc=v=>String(v??"").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
 const words=v=>String(v||"").replaceAll("_"," ").replace(/\b\w/g,c=>c.toUpperCase());
 const PHOTO=[
- "https://images.unsplash.com/photo-1664214050500-0e1ddba18cc8?auto=format&fit=crop&w=950&q=82",
- "https://images.unsplash.com/photo-1739323147107-bc748671f498?auto=format&fit=crop&w=950&q=82",
- "https://images.unsplash.com/photo-1729008712499-5e6b58420789?auto=format&fit=crop&w=950&q=82",
- "https://images.unsplash.com/photo-1664214050500-0e1ddba18cc8?auto=format&fit=crop&w=950&q=82",
- "https://images.unsplash.com/photo-1729008712499-5e6b58420789?auto=format&fit=crop&w=950&q=82",
- "https://images.unsplash.com/photo-1739323147107-bc748671f498?auto=format&fit=crop&w=950&q=82"
+ "https://images.unsplash.com/photo-1736647339992-b54534cef4c2?auto=format&fit=crop&w=950&q=82",
+ "https://images.unsplash.com/photo-1764711273459-4c75239ae20f?auto=format&fit=crop&w=950&q=82",
+ "https://images.unsplash.com/photo-1681836695952-1f8073a7938d?auto=format&fit=crop&w=950&q=82",
+ "https://images.unsplash.com/photo-1736647339992-b54534cef4c2?auto=format&fit=crop&w=950&q=82",
+ "https://images.unsplash.com/photo-1681836695952-1f8073a7938d?auto=format&fit=crop&w=950&q=82",
+ "https://images.unsplash.com/photo-1764711273459-4c75239ae20f?auto=format&fit=crop&w=950&q=82"
 ];
 const PRESET_META={
  research_analyst:{category:"Research",display:"Research Agent",glyph:"◎",image:0},
