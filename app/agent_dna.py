@@ -165,6 +165,32 @@ def _public_template(row):
             "profile":p,"license":"free-template",
             "published_at":row["updated_at"].isoformat()}
 
+
+def initialize_dna(database):
+    """Additive schema; no modification of legacy agent or task records."""
+    with database() as db:
+        db.execute("""CREATE TABLE IF NOT EXISTS agent_dna_profiles(
+            agent_id text PRIMARY KEY REFERENCES agents(id) ON DELETE CASCADE,
+            workspace_id text NOT NULL REFERENCES workspaces(id) ON DELETE CASCADE,
+            manifest jsonb NOT NULL,
+            revision integer NOT NULL DEFAULT 1,
+            is_public boolean NOT NULL DEFAULT false,
+            created_at timestamptz NOT NULL DEFAULT now(),
+            updated_at timestamptz NOT NULL DEFAULT now()
+        )""")
+        db.execute("""CREATE INDEX IF NOT EXISTS wos_dna_workspace_idx
+            ON agent_dna_profiles(workspace_id,updated_at DESC)""")
+        db.execute("""CREATE INDEX IF NOT EXISTS wos_dna_gallery_idx
+            ON agent_dna_profiles(updated_at DESC) WHERE is_public=true""")
+        db.execute("""CREATE TABLE IF NOT EXISTS agent_dna_revisions(
+            agent_id text NOT NULL REFERENCES agents(id) ON DELETE CASCADE,
+            workspace_id text NOT NULL REFERENCES workspaces(id) ON DELETE CASCADE,
+            revision integer NOT NULL,
+            manifest jsonb NOT NULL,
+            created_at timestamptz NOT NULL DEFAULT now(),
+            PRIMARY KEY(agent_id,revision)
+        )""")
+
 def install(app, *, database, uid, event, authentication, write, sync_agent, limits, create_ticket, ticket_input):
     """Attach API to the existing FastAPI app, inheriting its CSRF and tenant auth."""
     from fastapi.responses import JSONResponse
