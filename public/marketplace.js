@@ -40,6 +40,11 @@ const STYLE_FILTERS=["All styles","Contemporary","Historical","Industrial","Edit
 
 const S={catalog:null,gallery:null,session:null,own:null,items:[],filter:"all",style:"all",search:"",sort:"featured",
  activeArena:null,arenaTimer:null,arenaPolls:0};
+document.addEventListener("error",event=>{
+ const target=event.target;
+ if(target?.classList?.contains("agent-card-photo"))target.classList.add("unavailable");
+},true);
+
 function toast(message){const e=$("toast");e.textContent=message;e.classList.add("show");
  clearTimeout(toast.timeout);toast.timeout=setTimeout(()=>e.classList.remove("show"),5000);}
 function errorMsg(err){return String(err?.message||"Request failed").replaceAll("_"," ").replace(/\s+/g," ");}
@@ -76,7 +81,7 @@ function editLink(item){return item.type==="community"?"/agent-studio?community=
  "/agent-studio?template="+encodeURIComponent(item.id);}
 function categoryLabel(item){return item.category==="Critical Review"?"Research":item.category;}
 function agentArtwork(item){
- const portrait=item.image>=0?'<img class="agent-card-photo" alt="" loading="lazy" decoding="async" src="'+esc(PHOTO[item.image])+'">':
+ const portrait=item.image>=0?'<span class="portrait-photo-backup" aria-hidden="true">'+esc(item.display.slice(0,1))+'</span><img class="agent-card-photo" alt="" loading="lazy" decoding="async" src="'+esc(PHOTO[item.image])+'">':
  '<span class="editorial-monogram" aria-hidden="true">'+esc((item.profile?.name||item.display||"A").slice(0,1))+'</span>';
  return '<span class="art-media art-'+esc(item.vibe)+' tone-'+esc(item.color)+'">'+portrait+
  '<span class="art-corner">'+esc(item.glyph)+'</span><span class="art-caption">'+
