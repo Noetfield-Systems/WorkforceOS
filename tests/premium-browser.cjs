@@ -55,7 +55,17 @@ const scrub=(value)=>String(value||"").slice(0,350);
         "Studio did not load the template from the marketplace deep link");
     }
     if(name==="marketplace"){
-      assert((await page.locator(".agent-card").count())>=6,"official catalog missing");
+      assert((await page.locator(".agent-card").count())>=12,"specialist catalog missing");
+      const distinctImages=await page.locator(".agent-card-photo").evaluateAll(images=>
+        new Set(images.map(x=>x.getAttribute("src"))).size);
+      assert(distinctImages>=10,"marketplace still repeats the same character portraits");
+      await page.locator("[data-style='Historical']").click();
+      assert.equal(await page.locator("#market-results .agent-card").count(),1,"historical archetype filter is not connected");
+      assert((await page.locator("#market-results").innerText()).includes("Vesper"),"historical character is not a real agent");
+      await page.locator("#reset-filters").click();
+      assert((await page.locator("#market-results .agent-card").count())>=12,"reset did not restore the catalog");
+      const neutral=await page.evaluate(()=>getComputedStyle(document.body).backgroundColor);
+      assert.equal(neutral,"rgb(245, 244, 240)","site is not using restrained warm-paper v4 palette");
       const portrait=await page.locator(".agent-card-photo").first().evaluate(img=>({
         src:img.getAttribute("src"),complete:img.complete,naturalWidth:img.naturalWidth
       }));
@@ -67,6 +77,7 @@ const scrub=(value)=>String(value||"").slice(0,350);
       assert((await page.locator(".agent-card").count())>=6,"catalog filter did not recover");
     }
     if(name==="agent-detail"){
+      assert((await page.locator(".product-portrait").count())===1,"new editorial product detail is missing");
       const href=await page.locator(".detail-heading .btn-primary").getAttribute("href");
       assert(href.includes("template=research_analyst"),"agent detail did not link to exact template");
     }
