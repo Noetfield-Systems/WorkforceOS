@@ -139,7 +139,7 @@ function home(){
  '<p class="hero-lead">Specialized intelligence. Clear capabilities. Real work.</p>'+
  '<p class="hero-description">Discover ready-to-configure agents for research, sales, development, operations and more. Choose an agent, tailor its DNA, and run it inside your own workspace.</p>'+
  '<div class="hero-actions">'+button("Explore AI agents","/marketplace")+button("Build your own","/agent-studio","secondary")+'</div>'+
- '<div class="store-hero-meta"><span><strong>'+count+'</strong> verified catalog configurations</span>'+
+ '<div class="store-hero-meta"><span><strong>'+count+'</strong> official agent configurations</span>'+
  '<span><strong>12</strong> distinct AI identities</span><span><strong>1</strong> connected execution workspace</span></div></div>'+
  '<div class="hero-agent-showcase"><div class="hero-ui-heading"><span class="signal-dot"></span> AGENTS / EXPLORE</div>'+
  '<div class="hero-agent-main">'+art("research_analyst","hero-main")+'<div class="hero-agent-details"><span>RESEARCH / INTELLIGENCE</span><b>Scout</b><small>Turn an ambiguous question into a structured research brief.</small></div></div>'+
