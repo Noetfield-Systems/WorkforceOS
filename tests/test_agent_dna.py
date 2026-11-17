@@ -137,6 +137,47 @@ class AgentDNATests(unittest.TestCase):
         self.assertFalse(any(x["id"]==aid for x in
             other.get("/api/agent-dna/gallery").json()["community_templates"]))
 
+    def test_agent_arena_is_source_backed_and_never_fakes_evals(self):
+        c,csrf=self.signup()
+        a=c.post("/api/agent-dna",json={"preset_id":"sales_operator"},headers=headers(csrf))
+        b=c.post("/api/agent-dna",json={"preset_id":"research_analyst"},headers=headers(csrf))
+        self.assertEqual(a.status_code,200,a.text)
+        self.assertEqual(b.status_code,200,b.text)
+        aid=a.json()["agent_id"];bid=b.json()["agent_id"]
+        rid="arena_"+uuid.uuid4().hex
+        payload={"agent_a_id":aid,"agent_b_id":bid,"title":"Analyze an early business offer",
+            "instructions":"Propose one measurable acquisition experiment grounded in the provided facts.",
+            "request_id":rid,"run_now":True}
+        same=c.post("/api/agent-arena",json={**payload,"agent_b_id":aid},
+                    headers=headers(csrf))
+        self.assertEqual(same.status_code,400,same.text)
+        created=c.post("/api/agent-arena",json=payload,headers=headers(csrf))
+        self.assertEqual(created.status_code,200,created.text)
+        item=created.json()
+        self.assertEqual(item["comparison_state"],"WAITING_FOR_REAL_OUTPUTS")
+        self.assertIsNone(item["automated_score"])
+        self.assertFalse(item["a"]["output_ready"])
+        self.assertFalse(item["b"]["output_ready"])
+        self.assertNotEqual(item["a"]["ticket_id"],item["b"]["ticket_id"])
+        self.assertEqual(item["a"]["state"],"RUNTIME_NOT_CONNECTED")
+        self.assertEqual(item["b"]["state"],"RUNTIME_NOT_CONNECTED")
+        self.assertEqual(c.post("/api/agent-arena/"+item["id"]+"/review",
+              json={"winner":"a","notes":"Prefer the more concrete proposal."},
+              headers=headers(csrf)).status_code,409)
+        duplicate=c.post("/api/agent-arena",json=payload,headers=headers(csrf))
+        self.assertEqual(duplicate.status_code,200,duplicate.text)
+        self.assertEqual(duplicate.json()["id"],item["id"])
+        conflict=c.post("/api/agent-arena",json={**payload,"title":"A changed comparison"},
+                        headers=headers(csrf))
+        self.assertEqual(conflict.status_code,409,conflict.text)
+        rows=c.get("/api/agent-arena").json()["comparisons"]
+        self.assertEqual(sum(x["id"]==item["id"] for x in rows),1)
+        other,other_csrf=self.signup()
+        self.assertEqual(other.get("/api/agent-arena/"+item["id"]).status_code,404)
+        self.assertEqual(other.post("/api/agent-arena/"+item["id"]+"/review",
+          json={"winner":"b","notes":"An independent preference review"},
+          headers=headers(other_csrf)).status_code,404)
+
     def test_access_boundaries_invalid_profile_and_knowledge(self):
         c,csrf=self.signup()
         created=c.post("/api/agent-dna",json={"preset_id":"research_analyst"},

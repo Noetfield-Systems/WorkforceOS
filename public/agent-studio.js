@@ -5,7 +5,7 @@ const esc=v=>String(v??"").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&
 const pretty=s=>String(s||"").replaceAll("_"," ").replace(/\b\w/g,m=>m.toUpperCase());
 const S={catalog:null,session:null,agents:[],knowledge:[],id:null,preset:null,community:null,
          profile:null,original:null,revision:0,published:false,sync:"NOT_CONNECTED",
-         busy:false,lastTicket:null,lastRequest:null,pollCount:0,poll:null};
+         busy:false,lastTicket:null,lastRequest:null,pollCount:0,poll:null,arenaId:null,arenaTimer:null,arenaPollCount:0};
 const traits={
  creativity:["Creativity","Concept generation and divergent thinking"],
  critical_thinking:["Critical thinking","Skepticism, precision and evidence checking"],
@@ -162,7 +162,7 @@ async function loadAgents(){
  if(!userSignedIn())return;
  const [list,workspace]=await Promise.all([api("/api/agent-dna"),api("/api/state")]);
  S.agents=list.agents||[];S.knowledge=workspace.knowledge||[];
- drawMyAgents();
+ drawMyAgents();drawArenaOptions();
  if(S.id&&S.agents.some(a=>a.id===S.id))await openAgent(S.id);
  else if(S.agents.length)await openAgent(S.agents[0].id);
  else if(S.catalog?.presets?.length)choosePreset(S.catalog.presets[0].id);
@@ -193,7 +193,7 @@ async function saveAgent(){
   S.revision=r.revision;S.sync=r.sync_state;S.published=false;
   S.original=profileCopy(S.profile);
   const list=await api("/api/agent-dna");S.agents=list.agents||[];
-  drawMyAgents();drawPresets();markChanged();
+  drawMyAgents();drawArenaOptions();drawPresets();markChanged();
   $("revision-label").textContent="Revision "+S.revision;
   flash(S.sync==="READY"?"Agent DNA saved and synced to runtime.":"Agent DNA saved. Runtime connection: "+S.sync);
   fetchReadiness();fetchHistory();
@@ -303,6 +303,114 @@ function showRunResult(r){
  $("refresh-task").addEventListener("click",refreshRun);
 }
 function resetProfile(){if(S.original){S.profile=profileCopy(S.original);populate();markChanged();flash("Restored last saved configuration.");}}
+
+function drawArenaOptions(){
+ const options=S.agents.map(a=>'<option value="'+esc(a.id)+'">'+esc(a.name)+' · '+esc(a.role)+'</option>').join("");
+ const a=$("arena-a"),b=$("arena-b");if(!a||!b)return;
+ const previousA=a.value,previousB=b.value;
+ a.innerHTML=options;b.innerHTML=options;
+ a.value=S.agents.some(x=>x.id===previousA)?previousA:(S.id||S.agents[0]?.id||"");
+ b.value=S.agents.some(x=>x.id===previousB)?previousB:
+    (S.agents.find(x=>x.id!==a.value)?.id||a.value);
+}
+function renderArena(result){
+ const e=$("arena-results");if(!result)return;
+ const item=(label,side,agentId)=>{
+  const agent=S.agents.find(a=>a.id===agentId);
+  return '<div class="arena-side"><h4>'+esc(label)+' · '+esc(agent?.name||"Agent")+
+   '</h4><p class="arena-state">'+esc(side.state)+'</p>'+
+   (side.output?'<pre>'+esc(side.output)+'</pre>':'<p class="arena-wait">No actual source output yet.</p>')+
+   (side.source_sha256?'<div class="arena-hash">SHA-256: '+esc(side.source_sha256)+'</div>':'')+
+   '</div>';
+ };
+ const ready=result.comparison_state==="READY_FOR_HUMAN_REVIEW";
+ e.innerHTML='<p class="muted-note">Source-backed comparison · '+esc(result.comparison_state)+
+   ' · Auto-scoring is intentionally disabled</p><div class="arena-grid">'+
+   item("A",result.a,result.agent_a_id)+item("B",result.b,result.agent_b_id)+'</div>'+
+   '<div class="arena-review"><button type="button" class="pill" id="arena-refresh">Refresh source ↗</button>'+
+   (ready?'<span>Preferred result:</span>'+
+   '<button type="button" class="pill" data-winner="a">A</button>'+
+   '<button type="button" class="pill" data-winner="b">B</button>'+
+   '<button type="button" class="pill" data-winner="tie">Tie</button>':
+   '<small>Preference review unlocks after both real model outputs arrive.</small>')+
+   (result.winner?'<b>Human preference: '+esc(result.winner.toUpperCase())+'</b>':'')+'</div>';
+ $("arena-refresh").addEventListener("click",refreshArena);
+ document.querySelectorAll("[data-winner]").forEach(x=>x.addEventListener("click",()=>reviewArena(x.dataset.winner)));
+}
+async function refreshArena(){
+ if(!S.arenaId)return;
+ try{
+  const r=await api("/api/agent-arena/"+encodeURIComponent(S.arenaId));
+  renderArena(r);
+  if(r.comparison_state==="READY_FOR_HUMAN_REVIEW"&&S.arenaTimer){
+   clearInterval(S.arenaTimer);S.arenaTimer=null;
+  }
+ }catch(e){flash(detailText(e))}
+}
+async function runArena(ev){
+ ev.preventDefault();
+ if(!userSignedIn()){flash("Sign in to run live comparisons.");return}
+ if(S.agents.length<2){flash("Create two distinct agents first.");return}
+ const a=$("arena-a").value,b=$("arena-b").value;
+ if(a===b){flash("Choose two different agents.");return}
+ const button=$("arena-run-button");button.disabled=true;
+ try{
+  const r=await api("/api/agent-arena","POST",{
+   agent_a_id:a,agent_b_id:b,title:$("arena-title").value.trim(),
+   instructions:$("arena-instructions").value.trim(),
+   request_id:"arena_"+crypto.randomUUID(),run_now:true
+  });
+  S.arenaId=r.id;S.arenaPollCount=0;
+  renderArena(r);
+  if(S.arenaTimer)clearInterval(S.arenaTimer);
+  S.arenaTimer=setInterval(async()=>{
+   if(++S.arenaPollCount>18){clearInterval(S.arenaTimer);S.arenaTimer=null;return}
+   await refreshArena();
+  },8000);
+  flash("Both source tasks submitted. No results are invented.");
+ }catch(e){flash(detailText(e))}
+ finally{button.disabled=false}
+}
+async function reviewArena(winner){
+ if(!S.arenaId)return;
+ const notes=prompt("Why do you prefer this outcome? Your feedback is recorded as human preference, not independent verification.");
+ if(notes===null)return;
+ if(notes.trim().length<8){flash("Write a specific reason of at least 8 characters.");return}
+ try{
+  await api("/api/agent-arena/"+encodeURIComponent(S.arenaId)+"/review","POST",{winner,notes:notes.trim()});
+  await refreshArena();flash("Human preference saved; no automated score claimed.");
+ }catch(e){flash(detailText(e))}
+}
+function exportDNA(){
+ if(!S.profile){flash("Choose an agent to export.");return}
+ const p=profileCopy(S.profile);
+ p.knowledge_ids=[];p.requested_tools=[];
+ const data=JSON.stringify({schema:"workforce-agent-dna/2",profile:p,license:"user-owned-portable-template"},null,2);
+ const url=URL.createObjectURL(new Blob([data],{type:"application/json"}));
+ const a=document.createElement("a");a.href=url;
+ a.download=(p.name||"agent").toLowerCase().replace(/[^a-z0-9-]/g,"-").slice(0,42)+"-agent-dna.json";
+ document.body.appendChild(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(url),1000);
+ flash("Sanitized character template exported (no knowledge IDs or tool requests).");
+}
+async function importDNA(event){
+ const file=event.target.files?.[0];event.target.value="";
+ if(!file)return;
+ if(file.size>14000){flash("Import a JSON Agent DNA template under 14 KB.");return}
+ try{
+  const data=JSON.parse(await file.text());
+  if(data.schema!=="workforce-agent-dna/2"||!data.profile||
+     typeof data.profile.name!=="string"||typeof data.profile.mission!=="string"){
+    throw Error("INVALID_PORTABLE_DNA_FORMAT");
+  }
+  if(S.id&&!confirm("Load this portable character into the current editor? Existing saved settings remain unchanged until Save DNA."))return;
+  const base=S.catalog.presets[0].profile;
+  S.profile={...profileCopy(base),...data.profile,traits:{...base.traits,...(data.profile.traits||{})}};
+  S.profile.knowledge_ids=[];S.profile.requested_tools=[];
+  populate();markChanged();activateTab("identity");
+  flash("Imported into editor. Review, then save as a new revision.");
+ }catch(e){flash("Import failed: "+detailText(e))}
+}
+
 async function init(){
  try{
   const [catalog,session]=await Promise.all([api("/api/agent-dna/catalog"),api("/api/session")]);
@@ -326,4 +434,7 @@ $("reset-button").addEventListener("click",resetProfile);
 $("publish-button").addEventListener("click",publish);
 $("check-readiness").addEventListener("click",fetchReadiness);
 $("run-form").addEventListener("submit",submitRun);
+$("arena-form").addEventListener("submit",runArena);
+$("export-dna").addEventListener("click",exportDNA);
+$("import-dna").addEventListener("change",importDNA);
 init();

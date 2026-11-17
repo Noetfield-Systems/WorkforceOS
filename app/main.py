@@ -969,4 +969,4 @@ def opportunity_os_website():
 # Agent DNA uses the existing session/CSRF, tenant quotas, task dispatch and Fabric bridge.
 install_agent_dna(app, database=database, uid=uid, event=event,
     authentication=_authentication, write=_write, sync_agent=_sync_agent,
-    limits=_limits, create_ticket=create_ticket, ticket_input=TicketInput)
+    limits=_limits, create_ticket=create_ticket, ticket_detail=ticket_detail, ticket_input=TicketInput)
