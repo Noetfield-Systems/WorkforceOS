@@ -51,7 +51,7 @@ function prepare(){
  });
  S.items=[...presets,...community];
 }
-function imageStyle(item){return '--agent-photo:url("'+PHOTO[item.image%PHOTO.length]+'")';}
+function imageStyle(item){return "--agent-photo:url("+PHOTO[item.image%PHOTO.length]+")";}
 function button(label,href,variant="primary"){return '<a class="btn btn-'+variant+'" href="'+esc(href)+'">'+label+' <span class="arrow" aria-hidden="true">↗</span></a>';}
 function editLink(item){return item.type==="community"?"/agent-studio?community="+encodeURIComponent(item.id):
  "/agent-studio?template="+encodeURIComponent(item.id);}
@@ -233,7 +233,7 @@ function detail(){
  '<div class="detail-art" style="'+imageStyle(item)+'"><span class="detail-orbit"></span><div class="detail-art-label"><span>AGENT DNA</span><span>WORKFORCEOS / '+esc(p.name).toUpperCase()+'</span></div></div>'+
  '<aside class="detail-buy"><span class="pill gold-pill">◇ AVAILABLE TEMPLATE</span><h3>Free</h3><p class="status-text">Clone the profile, then customize for your work.</p>'+
  '<ul><li>Configurable behavioral identity</li><li>'+skills.length+' listed skill specializations</li><li>Private workspace ownership</li><li>Versioned Agent DNA</li><li>Real task execution via Fabric</li></ul>'+
- button("Customize & Save",editLink(item))+button("Test in the Studio","/agent-studio?template="+encodeURIComponent(item.type==="preset"?item.id:"research_analyst")+"&tab=laboratory","secondary")+
+ button("Customize & Save",editLink(item))+button("Test in the Studio",editLink(item)+"&tab=laboratory","secondary")+
  '<p class="status-notice">Free profile template; not a paid subscription or a verified performance claim.</p></aside></div></section>'+
  '<div class="wrap"><nav class="detail-tabs" aria-label="Page sections"><a href="#overview">Overview</a><a href="#capabilities">Capabilities</a><a href="#how">Setup</a><a href="#output">Sample outputs</a><a href="#compare">Compare</a></nav></div>'+
  '<div class="wrap detail-content-grid" id="overview"><section class="surface"><h3>Agent <em>overview.</em></h3><p>'+mission+'</p>'+
