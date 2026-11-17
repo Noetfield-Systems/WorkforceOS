@@ -108,7 +108,7 @@ function orbVisual(){return '<div class="scene-visual" aria-hidden="true"><div c
  '<div class="holo-agent holo-three" style="--card-photo:url('+PHOTO[2]+')"><small>PRODUCT / 03</small></div>'+
  '<div class="scene-platform"></div><div class="scene-scanline"></div><div class="scene-mini-label">AGENT INTELLIGENCE / ACTIVE DESIGN</div></div>';}
 function scene({kind,title,subtitle,description,kicker,buttons,footnotes="",breadcrumbs=""}){
- const imagery=kind==="arena"?PHOTO[10]:kind==="creators"?PHOTO[3]:kind==="pricing"?PHOTO[8]:PHOTO[2];
+ const imagery=kind==="arena"?PHOTO[2]:kind==="creators"?PHOTO[3]:kind==="pricing"?PHOTO[8]:PHOTO[1];
  return '<section class="editorial-masthead cinema-scene scene-'+esc(kind)+'"><div class="wrap scene-stage">'+
  '<div class="scene-copy">'+(breadcrumbs||"")+'<span class="kicker">'+esc(kicker||"WORKFORCEOS / AGENT WORKFORCE")+'</span>'+
  '<h1>'+title+'</h1>'+(subtitle?'<p class="masthead-subtitle">'+subtitle+'</p>':"")+
