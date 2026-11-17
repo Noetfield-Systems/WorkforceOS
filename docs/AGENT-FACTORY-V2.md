@@ -65,3 +65,12 @@ Later add creator commissions and usage-based compute from original measured cos
 North-star metric: verified useful agent output per active workspace per week.
 Secondary: first-agent creation completion, first real run, week-1 return, eval pass rate, accepted customer deliverables, cost per accepted result, conversion to subscription.
 Do not claim Stripe checkout as live without signed webhook readback or public agent listings as paid sales.
+
+
+## v2.1 Agent Arena and portable templates (candidate)
+- POST /api/agent-arena dispatches the same written task to two distinct tenant-owned agents via the original /api/tickets path, retaining original task IDs and existing knowledge bindings.
+- GET /api/agent-arena/:id reads back both actual model outputs and SHA-256 hashes when present; queued and missing outputs stay explicit.
+- POST /api/agent-arena/:id/review records only a human preference after both outputs exist. There is no automatic model score or independent verification claim.
+- Unique tenant-owned comparison request IDs make comparison creation idempotent; cross-tenant requests return 404.
+- Portable JSON exports remove private knowledge IDs and requested tool metadata; imports load locally and require saving to persist.
+- A/B model evaluation remains customer-driven; formal continuous, scored eval suites are still future scope.
