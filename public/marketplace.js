@@ -58,7 +58,8 @@ function editLink(item){return item.type==="community"?"/agent-studio?community=
 function categoryLabel(item){return item.category==="Critical Review"?"Research":item.category;}
 function card(item,i,tag=""){
  const skills=(item.profile.skills||[]).slice(0,2);
- return '<article class="agent-card"><a href="/agents/'+encodeURIComponent(item.id)+'" class="card-art" style="'+imageStyle(item)+'" aria-label="View '+esc(item.display)+'">'+
+ return '<article class="agent-card"><a href="/agents/'+encodeURIComponent(item.id)+'" class="card-art" aria-label="View '+esc(item.display)+'">'+
+  '<img class="agent-card-photo" alt="" loading="lazy" decoding="async" src="'+esc(PHOTO[item.image%PHOTO.length])+'">'+
   (tag?'<span class="card-top-badge">'+esc(tag)+'</span>':'')+
   '<span class="card-index">'+(item.type==="preset"?"STARTER EDITION":"COMMUNITY TEMPLATE")+'</span>'+
   '<span class="card-glyph">'+esc(item.glyph)+'</span></a>'+
