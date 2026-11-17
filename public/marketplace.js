@@ -231,7 +231,7 @@ function detail(){
  '<h1>'+esc(item.display)+'</h1><div class="lead">'+esc(p.role)+'</div><p>'+mission+'</p>'+
  '<div class="scene-actions">'+button("Customize this Agent",editLink(item))+
  button("Browse marketplace","/marketplace","secondary")+'</div></div>'+
- '<div class="detail-art" style="'+imageStyle(item)+'"><span class="detail-orbit"></span><div class="detail-art-label"><span>AGENT DNA</span><span>WORKFORCEOS / '+esc(p.name).toUpperCase()+'</span></div></div>'+
+ '<div class="detail-art"><img class="detail-photo" alt="" loading="eager" decoding="async" src="'+esc(PHOTO[item.image%PHOTO.length])+'"><span class="detail-orbit"></span><div class="detail-art-label"><span>AGENT DNA</span><span>WORKFORCEOS / '+esc(p.name).toUpperCase()+'</span></div></div>'+
  '<aside class="detail-buy"><span class="pill gold-pill">◇ AVAILABLE TEMPLATE</span><h3>Free</h3><p class="status-text">Clone the profile, then customize for your work.</p>'+
  '<ul><li>Configurable behavioral identity</li><li>'+skills.length+' listed skill specializations</li><li>Private workspace ownership</li><li>Versioned Agent DNA</li><li>Real task execution via Fabric</li></ul>'+
  button("Customize & Save",editLink(item))+button("Test in the Studio",editLink(item)+"&tab=laboratory","secondary")+
