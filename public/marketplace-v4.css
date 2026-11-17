@@ -456,3 +456,12 @@ h1 em,h2 em,h3 em,.serif-italic{color:#8e6a45}
  .hero-gallery{height:280px}
  .hero-gallery-note{font-size:9px}
 }
+
+
+.portrait-photo-backup{position:absolute;inset:0;display:grid;place-items:center;
+ font:normal 100px var(--serif);color:#adb4ac;letter-spacing:-5px;
+ background:linear-gradient(140deg,#e7e7e1,#d9e0da)}
+.art-media img.unavailable{display:none}
+.art-media img:not(.unavailable){position:absolute;z-index:1}
+.art-media::after{z-index:2}
+.art-caption,.art-corner{z-index:3}
