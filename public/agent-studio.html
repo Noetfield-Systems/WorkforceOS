@@ -111,6 +111,19 @@
             </form>
             <div id="run-status" class="run-status" aria-live="polite"><p class="muted-note">No task submitted from this studio yet.</p></div>
             <p class="inline-note">Queued is not completed. Model output is not independently verified; view the original record before claiming an outcome.</p>
+            <div class="arena-module">
+              <div class="arena-heading"><span class="count-chip">AGENT ARENA / LIVE A–B TEST</span><h3>Same mission. <em>Different minds.</em></h3><p>Run an identical assignment with two distinct saved agents. Inspect actual source outputs side by side and record your own preference.</p></div>
+              <form id="arena-form">
+                <div class="field-grid two">
+                  <label>CHALLENGER A <select id="arena-a" required></select></label>
+                  <label>CHALLENGER B <select id="arena-b" required></select></label>
+                </div>
+                <label class="field">COMPARISON TASK <input id="arena-title" minlength="3" maxlength="140" required placeholder="Propose an actionable B2B launch plan"></label>
+                <label class="field">IDENTICAL INSTRUCTIONS <textarea id="arena-instructions" minlength="8" maxlength="4500" required rows="4" placeholder="Analyze the opportunity with evidence, practical steps and measurable success criteria."></textarea></label>
+                <button class="primary-button" id="arena-run-button" type="submit">Start real A/B test <span>↗</span></button>
+              </form>
+              <div id="arena-results" class="arena-results"><p class="muted-note">No comparison started during this session.</p></div>
+            </div>
           </section>
 
           <section class="panel" id="tab-marketplace" hidden>
@@ -118,6 +131,10 @@
             <div class="publish-block">
               <div><span class="eyebrow">PUBLIC TEMPLATE</span><h3 id="publish-title">Publish an agent DNA</h3><p>A public template reveals its character settings, mission, backstory and skills. Private knowledge references and requested tools are excluded.</p></div>
               <button id="publish-button" class="small-action" type="button">Publish free template ↗</button>
+            </div>
+            <div class="portable-module">
+              <div><span class="eyebrow">PORTABLE CHARACTER DNA</span><h3>Take your agent anywhere.</h3><p>Export a sanitized JSON template or import one into the editor. Private knowledge IDs and tool requests never enter portable exports.</p></div>
+              <div class="portable-actions"><button type="button" id="export-dna" class="small-action">Export JSON ↗</button><label class="import-trigger">Import JSON <input type="file" id="import-dna" accept=".json,application/json"></label></div>
             </div>
             <div class="subheading"><span>DISCOVER & REMIX</span><small>Community templates</small></div>
             <div id="gallery" class="gallery"></div>
