@@ -15,7 +15,7 @@ const pages=[
  ["/agent-studio?template=sales_operator","agent-studio",".dna-cinematic-hero"],
  ["/arena","arena",".arena-surface"],
  ["/creators","creators",".creator-journey"],
- ["/pricing","pricing",".pricing-grid"]
+ ["/pricing","pricing",".workflow-steps"]
 ];
 const scrub=(value)=>String(value||"").slice(0,350);
 (async()=>{
@@ -51,44 +51,47 @@ const scrub=(value)=>String(value||"").slice(0,350);
     assert(horizontal.scrollWidth<=horizontal.clientWidth+5,
       viewportName+" "+url+" horizontal overflow "+JSON.stringify(horizontal));
     if(name==="agent-studio"){
+      assert((await page.locator(".portrait .agent-visual-svg").count())===1,"Studio preview is not an AI entity");
+      assert((await page.locator("#studio-hero-art .agent-visual-svg").count())===1,"Studio hero is not an original AI entity");
       assert.equal(await page.locator("#name").inputValue(),"Nova",
         "Studio did not load the template from the marketplace deep link");
     }
     if(name==="marketplace"){
       assert((await page.locator(".agent-card").count())>=12,"specialist catalog missing");
-      const distinctImages=await page.locator(".agent-card-photo").evaluateAll(images=>
-        new Set(images.map(x=>x.getAttribute("src"))).size);
-      assert(distinctImages>=10,"marketplace still repeats the same character portraits");
+      const svgCount=await page.locator(".agent-card .agent-visual-svg").count();
+      assert(svgCount>=12,"the marketplace is not rendering twelve original AI agent vectors");
+      const identities=await page.locator(".agent-card .agent-visual-svg").evaluateAll(
+        svgs=>svgs.map(svg=>svg.querySelector("text")?.textContent||"")
+      );
+      const distinctSVG=await page.locator(".agent-card .agent-visual-svg").evaluateAll(
+        svgs=>new Set(svgs.map(svg=>svg.innerHTML)).size
+      );
+      assert(distinctSVG>=12,"AI characters are duplicated instead of having individual visual identities");
+      assert.equal(await page.locator(".agent-card img").count(),0,"stock photos returned to the marketplace");
       await page.locator("[data-style='Historical']").click();
-      assert.equal(await page.locator("#market-results .agent-card").count(),1,"historical archetype filter is not connected");
-      assert((await page.locator("#market-results").innerText()).includes("Vesper"),"historical character is not a real agent");
+      assert.equal(await page.locator("#market-results .agent-card").count(),1,"historical filter not connected");
+      assert((await page.locator("#market-results").innerText()).includes("Vesper"),"Vesper is not a real listing");
       await page.locator("#reset-filters").click();
-      assert((await page.locator("#market-results .agent-card").count())>=12,"reset did not restore the catalog");
+      assert((await page.locator("#market-results .agent-card").count())>=12,"reset did not restore agent catalog");
       const neutral=await page.evaluate(()=>getComputedStyle(document.body).backgroundColor);
-      assert.equal(neutral,"rgb(245, 244, 240)","site is not using restrained warm-paper v4 palette");
-      // Screenshot tools do not always scroll the page, so explicitly trigger all
-      // lazy portraits before checking visual completeness.
-      await page.locator(".agent-card-photo").evaluateAll(images=>images.forEach(i=>i.loading="eager"));
-      await page.waitForFunction(()=>[...document.querySelectorAll(".agent-card-photo")].every(i=>i.complete),{timeout:20000});
-      const imageStatuses=await page.locator(".agent-card-photo").evaluateAll(images=>images.map(img=>({
-        src:img.getAttribute("src"),naturalWidth:img.naturalWidth
-      })));
-      console.log("IMAGE_STATUS",viewportName,JSON.stringify(imageStatuses));
-      assert(imageStatuses.filter(i=>i.naturalWidth>0).length>=10,"too many editorial images unavailable");
-      const portrait=await page.locator(".agent-card-photo").first().evaluate(img=>({
-        src:img.getAttribute("src"),complete:img.complete,naturalWidth:img.naturalWidth
-      }));
-      assert(portrait.src?.includes("images.unsplash.com/photo-"),"Agent portrait image asset missing from card");
-      console.log("PORTRAIT_IMAGE",viewportName,JSON.stringify(portrait));
+      assert.equal(neutral,"rgb(244, 246, 245)","v5 neutral storefront palette not active");
+      const externalPhotos=await page.evaluate(()=>performance.getEntriesByType("resource").filter(
+        item=>item.name.includes("images.unsplash.com")).map(item=>item.name));
+      assert.deepEqual(externalPhotos,[],"photographic stock imagery loaded in the AI marketplace");
+      console.log("AGENT_VECTOR_QA",viewportName,JSON.stringify({svgCount,distinctSVG,identities:identities.slice(0,4)}));
       await page.locator("#market-query").fill("this-result-does-not-exist-471");
       await page.locator(".empty-card").waitFor({state:"visible",timeout:3000});
       await page.locator("#clear-filter").click();
       assert((await page.locator(".agent-card").count())>=6,"catalog filter did not recover");
     }
     if(name==="agent-detail"){
-      assert((await page.locator(".product-portrait").count())===1,"new editorial product detail is missing");
+      assert((await page.locator(".product-portrait .agent-visual-svg").count())===1,"agent detail is not vector-based");
       const href=await page.locator(".detail-heading .btn-primary").getAttribute("href");
       assert(href.includes("template=research_analyst"),"agent detail did not link to exact template");
+    }
+    if(name==="home"||name==="marketplace"||name==="agent-detail"){
+      assert.equal(await page.locator("#content img").count(),0,"stock image used on a core marketplace page");
+      assert.equal(await page.locator(".price-card").count(),0,"generic subscription cards leaked into the marketplace");
     }
     assert.deepEqual(errors,[],viewportName+" "+url+" frontend errors: "+errors.map(scrub).join(" | "));
     await page.evaluate(()=>window.scrollTo(0,0));
