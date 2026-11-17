@@ -42,6 +42,7 @@ jobs:
       - name: Frontend JS syntax
         run: |
           node --check public/app.js
+          node --check public/agent-studio.js
           node --check public/collaborate.js
           node --check public/collaborate-desk.js
           node --check public/connect-desk.js

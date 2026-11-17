@@ -1,0 +1,155 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <meta name="theme-color" content="#111a19">
+  <meta name="description" content="Create, customize, test and share your own specialized AI teammates with WorkforceOS Agent DNA Studio.">
+  <title>Agent DNA Studio — WorkforceOS</title>
+  <link rel="icon" href="/static/favicon.svg" type="image/svg+xml">
+  <link rel="stylesheet" href="/static/agent-studio.css">
+  <script defer src="/static/agent-studio.js"></script>
+</head>
+<body>
+  <div class="shell">
+    <header class="topbar">
+      <a class="brand" href="/" aria-label="WorkforceOS home"><span class="brand-mark">w<span>.</span></span><span>workforce<span class="brand-os">OS</span></span></a>
+      <div class="top-center"><span class="top-eyebrow">BUILD / SHAPE / DEPLOY</span><span class="slash">/</span><strong>Agent DNA Studio</strong><span class="edition">V2</span></div>
+      <div class="top-right"><span id="connection" class="connection">Checking workspace</span><a class="workspace-link" href="/">My workspace ↗</a></div>
+    </header>
+
+    <main class="studio">
+      <aside class="rail" aria-label="Agent library">
+        <div class="rail-heading"><span class="eyebrow">YOUR CREATIONS</span><strong>AI characters<span class="sup"> / 01</span></strong><p>Give intelligence a distinct identity, purpose and working style.</p></div>
+        <button id="new-agent" class="create-cta" type="button"><span class="plus">+</span><span>Build an agent</span><span>↗</span></button>
+        <div class="section-label">MY AGENTS <span id="my-count">0</span></div>
+        <div id="my-agents" class="agent-list"><p class="muted-note">Sign in to view your agents.</p></div>
+        <div class="section-label section-label-spaced">STARTING CHARACTERS <span>06</span></div>
+        <div id="presets" class="agent-list"></div>
+        <div class="rail-foot">
+          <div class="small-star">✳</div>
+          <strong>Built for actual work.</strong>
+          <p>Your configurations live in your workspace. Model runs use the existing connected runtime; no imaginary execution.</p>
+        </div>
+      </aside>
+
+      <section class="workbench">
+        <div class="workbench-head">
+          <div><span class="eyebrow"><span class="eyebrow-dot"></span> YOUR PERSONAL INTELLIGENCE LAB</span><h1>Make intelligence <em>yours.</em></h1><p>One model is just the beginning. Shape the thinking, character and capabilities of the agent behind it.</p></div>
+          <div class="design-state"><span>01 /</span><strong id="current-heading">Choose an agent</strong><small id="revision-label">Not yet configured</small></div>
+        </div>
+
+        <div class="tabs" role="tablist" aria-label="Agent configuration">
+          <button type="button" class="tab active" data-tab="identity">01 <span>Identity</span></button>
+          <button type="button" class="tab" data-tab="character">02 <span>Character</span></button>
+          <button type="button" class="tab" data-tab="capabilities">03 <span>Capabilities</span></button>
+          <button type="button" class="tab" data-tab="laboratory">04 <span>Test lab</span></button>
+          <button type="button" class="tab" data-tab="marketplace">05 <span>Library</span></button>
+        </div>
+
+        <div class="panels">
+          <section class="panel active" id="tab-identity">
+            <div class="panel-heading"><span class="count-chip">01 / IDENTITY</span><h2>Who are we <em>creating?</em></h2><p>Start with a purpose. Everything else should serve it.</p></div>
+            <div class="field-grid two">
+              <label>AGENT NAME <input id="name" maxlength="90" minlength="2" placeholder="e.g. Nova" autocomplete="off"></label>
+              <label>PROFESSIONAL ROLE <input id="role" maxlength="90" minlength="3" placeholder="e.g. Growth operator" autocomplete="off"></label>
+            </div>
+            <label class="field">CORE MISSION <textarea id="mission" maxlength="900" minlength="12" rows="4" placeholder="What does this agent exist to accomplish?"></textarea><small>A precise mission improves task delegation and evaluation.</small></label>
+            <label class="field">CHARACTER BACKSTORY <span class="optional">OPTIONAL / FICTIONAL</span><textarea id="backstory" maxlength="500" rows="3" placeholder="An optional fictional persona and perspective — not a claim of real qualifications."></textarea></label>
+            <div class="subheading"><span>COMMUNICATION SIGNATURE</span><small>Choose a dominant style</small></div>
+            <div class="tone-grid" id="tones">
+              <button type="button" data-tone="professional"><span>◇</span><b>Professional</b><small>Direct, precise</small></button>
+              <button type="button" data-tone="friendly"><span>✳</span><b>Friendly</b><small>Warm, patient</small></button>
+              <button type="button" data-tone="analytical"><span>◎</span><b>Analytical</b><small>Evidence-first</small></button>
+              <button type="button" data-tone="bold"><span>↗</span><b>Bold</b><small>Decisive, driven</small></button>
+              <button type="button" data-tone="playful"><span>✦</span><b>Playful</b><small>Imaginative</small></button>
+            </div>
+          </section>
+
+          <section class="panel" id="tab-character" hidden>
+            <div class="panel-heading"><span class="count-chip">02 / PERSONALITY</span><h2>A distinct <em>character.</em></h2><p>Personality settings become explicit behavioral instructions, not a model temperature claim.</p></div>
+            <div id="trait-controls" class="trait-controls"></div>
+            <div class="subheading"><span>VALUES & WORK ETHIC</span><small>Choose what matters most</small></div>
+            <div id="values" class="pill-choices"></div>
+            <p class="inline-note">These values shape response style but never override factual accuracy, workspace access controls or runtime permissions.</p>
+          </section>
+
+          <section class="panel" id="tab-capabilities" hidden>
+            <div class="panel-heading"><span class="count-chip">03 / CAPABILITIES</span><h2>Useful by <em>design.</em></h2><p>Give the agent a skill profile, context and a working contract.</p></div>
+            <div class="subheading"><span>SKILL LIBRARY</span><small>Instruction-based specializations</small></div>
+            <div id="skills" class="skill-grid"></div>
+            <div class="subheading"><span>OPERATING CONTRACT</span><small>Bounded by runtime permissions</small></div>
+            <label class="field">AUTONOMY <select id="autonomy">
+              <option value="advice">Advisor — consultation only</option>
+              <option value="draft">Creator — drafts and plans</option>
+              <option value="approved">Operator — proposed actions require approval</option>
+              <option value="bounded">Bounded operator — only runtime-authorized actions</option>
+            </select></label>
+            <label class="field">MODEL PREFERENCE <select id="model_preference">
+              <option value="economy">Economy — prefer cost efficiency</option>
+              <option value="balanced">Balanced — cost / capability</option>
+              <option value="quality">Quality — prefer deeper reasoning</option>
+            </select><small>Preference is stored. Per-agent HDIR routing is not yet connected.</small></label>
+            <div class="subheading"><span>PRIVATE KNOWLEDGE</span><small>Up to four sources per run</small></div>
+            <div id="knowledge-list" class="pill-choices"><span class="muted-note">Connect your workspace to select references.</span></div>
+            <div class="subheading"><span>REQUEST INTEGRATIONS</span><small>Not granted until connected</small></div>
+            <div id="requested-tools" class="pill-choices"></div>
+            <p class="inline-note warning">Tool requests are profile metadata only. They do not grant API credentials, browser actions or access to your other accounts.</p>
+          </section>
+
+          <section class="panel" id="tab-laboratory" hidden>
+            <div class="panel-heading"><span class="count-chip">04 / TEST LAB</span><h2>Test the <em>real agent.</em></h2><p>Submit actual work to the existing Fabric runtime and inspect the recorded status.</p></div>
+            <div class="test-head">
+              <div><span class="eyebrow">CONFIGURATION READINESS</span><h3>Checks before you run</h3></div>
+              <button type="button" class="small-action" id="check-readiness">Check configuration ↗</button>
+            </div>
+            <div id="readiness" class="checklist"><p class="muted-note">Select a saved agent to inspect readiness.</p></div>
+            <form id="run-form">
+              <label class="field">TASK NAME <input id="test-title" minlength="3" maxlength="140" required placeholder="Research five customer objections"></label>
+              <label class="field">WHAT SHOULD THIS AGENT DO? <textarea id="test-instructions" rows="5" minlength="8" maxlength="4500" required placeholder="Give the agent a concrete assignment with clear success criteria."></textarea></label>
+              <button type="submit" id="run-button" class="primary-button">Run real task <span>↗</span></button>
+            </form>
+            <div id="run-status" class="run-status" aria-live="polite"><p class="muted-note">No task submitted from this studio yet.</p></div>
+            <p class="inline-note">Queued is not completed. Model output is not independently verified; view the original record before claiming an outcome.</p>
+          </section>
+
+          <section class="panel" id="tab-marketplace" hidden>
+            <div class="panel-heading"><span class="count-chip">05 / CREATOR LIBRARY</span><h2>Share what <em>you build.</em></h2><p>Discover starter identities and opt-in community templates. Payments and paid listings are not yet enabled.</p></div>
+            <div class="publish-block">
+              <div><span class="eyebrow">PUBLIC TEMPLATE</span><h3 id="publish-title">Publish an agent DNA</h3><p>A public template reveals its character settings, mission, backstory and skills. Private knowledge references and requested tools are excluded.</p></div>
+              <button id="publish-button" class="small-action" type="button">Publish free template ↗</button>
+            </div>
+            <div class="subheading"><span>DISCOVER & REMIX</span><small>Community templates</small></div>
+            <div id="gallery" class="gallery"></div>
+            <div class="subheading"><span>VERSION HISTORY</span><small>Restore as a new revision</small></div>
+            <div id="revision-history" class="version-list"><p class="muted-note">Saved revisions will appear here.</p></div>
+          </section>
+        </div>
+
+        <footer class="workbench-footer">
+          <div><span class="save-dot"></span><strong id="save-state">No changes</strong><small id="save-hint">Edits remain local until saved</small></div>
+          <div class="footer-buttons"><button id="reset-button" type="button" class="secondary-button">Revert edits</button><button id="save-button" type="button" class="primary-button">Save DNA <span>↗</span></button></div>
+        </footer>
+      </section>
+
+      <aside class="preview-rail" aria-label="Live identity preview">
+        <div class="preview-top"><span class="eyebrow">LIVE CHARACTER PROFILE</span><span id="preview-index">DNA / 001</span></div>
+        <div class="portrait"><div class="portrait-light"></div><div class="portrait-ring"></div><div class="portrait-mark" id="portrait-mark">N</div><div class="portrait-bottom">YOUR INTELLIGENCE <span>✳</span> YOUR RULES</div></div>
+        <div class="preview-card">
+          <div class="preview-intro"><span class="preview-status">● CONFIGURATION PREVIEW</span><h2 id="preview-name">Nova</h2><p id="preview-role">Specialist agent</p></div>
+          <div class="preview-divider"></div>
+          <div class="preview-label">PRIMARY PURPOSE</div><p id="preview-mission" class="preview-mission">Build an agent to begin shaping its mission.</p>
+          <div class="preview-label">BEHAVIORAL SIGNATURE</div>
+          <div id="preview-traits" class="preview-traits"></div>
+          <div class="preview-label">SELECTED SKILLS</div><div id="preview-skills" class="preview-tags"></div>
+          <div class="preview-divider"></div>
+          <div class="meta-row"><span>CONFIG REVISION</span><strong id="preview-revision">DRAFT</strong></div>
+          <div class="meta-row"><span>RUNTIME STATUS</span><strong id="preview-runtime">NOT VERIFIED</strong></div>
+        </div>
+        <p class="preview-disclaimer">A live preview of saved configuration, not evidence of model quality or execution.</p>
+      </aside>
+    </main>
+  </div>
+  <div id="toast" class="toast" role="status" aria-live="polite"></div>
+</body>
+</html>
