@@ -77,7 +77,7 @@ const scrub=(value)=>String(value||"").slice(0,350);
       ));
       console.log("CINEMATIC_CHARACTER_LOAD",viewportName,JSON.stringify(photos));
       assert.equal(new Set(photos.map(p=>p.url)).size,12,"marketplace character photos are duplicated");
-      assert(photos.filter(p=>p.width>0).length>=9,"too many cinematic character photos failed to load");
+      assert.equal(photos.filter(p=>p.width>0).length,12,"all twelve cinematic agent portraits must load");
       await page.locator("[data-style='Historical']").click();
       assert.equal(await page.locator("#market-results .agent-card").count(),1,"historical filter not connected");
       assert((await page.locator("#market-results").innerText()).includes("Vesper"),"Vesper is not a real listing");
@@ -103,8 +103,13 @@ const scrub=(value)=>String(value||"").slice(0,350);
       assert.equal(await page.locator(".price-card").count(),0,"generic subscription cards leaked into the marketplace");
     }
     assert.deepEqual(errors,[],viewportName+" "+url+" frontend errors: "+errors.map(scrub).join(" | "));
+    // Filters, search and reset replace card DOM nodes: load the final rendered
+    // assets again before screenshot, not the stale images asserted above.
     await page.locator(".agent-character-photo").evaluateAll(images=>images.forEach(img=>img.loading="eager"));
-    await page.waitForTimeout(280);
+    await page.waitForFunction(()=>{
+      const imgs=[...document.querySelectorAll(".agent-character-photo")];
+      return imgs.length>0&&imgs.every(img=>img.complete&&img.naturalWidth>0);
+    },null,{timeout:30000});
     await page.evaluate(()=>window.scrollTo(0,0));
     await page.waitForTimeout(180);
     await page.screenshot({path:path.join(output,viewportName+"-"+name+".png"),fullPage:true,
