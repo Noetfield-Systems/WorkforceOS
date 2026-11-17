@@ -213,8 +213,12 @@
      event.target.classList.add("image-error");
  },true);
  document.addEventListener("load",event=>{
-   if(event.target?.classList?.contains("agent-character-photo")&&event.target.naturalWidth>0)
-     event.target.classList.remove("image-error");
+   const img=event.target;
+   if(!img?.classList?.contains("agent-character-photo")||img.naturalWidth===0)return;
+   img.classList.remove("image-error");
+   if(typeof img.decode==="function"){
+     img.decode().then(()=>img.classList.add("image-decoded")).catch(()=>{});
+   }else img.classList.add("image-decoded");
  },true);
  root.WorkforceAgentArt={svg,media,has:id=>Object.prototype.hasOwnProperty.call(colors,id),ids:Object.keys(colors)};
 
