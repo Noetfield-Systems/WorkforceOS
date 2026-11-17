@@ -110,6 +110,15 @@ const scrub=(value)=>String(value||"").slice(0,350);
       const imgs=[...document.querySelectorAll(".agent-character-photo")];
       return imgs.length>0&&imgs.every(img=>img.complete&&img.naturalWidth>0);
     },null,{timeout:30000});
+    const mediaState=await page.locator(".agent-character-photo").evaluateAll(imgs=>imgs.map(img=>({
+      agent:img.closest("[data-agent-art]")?.getAttribute("data-agent-art")||"hero",
+      complete:img.complete,width:img.naturalWidth,display:getComputedStyle(img).display,
+      visibility:getComputedStyle(img).visibility,opacity:getComputedStyle(img).opacity,
+      error:img.classList.contains("image-error"),rectWidth:Math.round(img.getBoundingClientRect().width)
+    })));
+    console.log("VISIBLE_CHARACTERS",viewportName,name,JSON.stringify(mediaState));
+    assert(mediaState.every(x=>!x.error&&x.display!=="none"&&x.visibility!=="hidden"&&Number(x.opacity)>0&&x.rectWidth>0),
+      "character images are loaded but some remain visually hidden: "+JSON.stringify(mediaState.filter(x=>x.error||x.display==="none"||x.visibility==="hidden")));
     await page.evaluate(()=>window.scrollTo(0,0));
     await page.waitForTimeout(180);
     await page.screenshot({path:path.join(output,viewportName+"-"+name+".png"),fullPage:true,
