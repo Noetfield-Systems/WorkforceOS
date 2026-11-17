@@ -6,6 +6,7 @@ authorization. Tools requested by users are NEVER granted by this module.
 from __future__ import annotations
 import copy
 import json
+import hashlib
 from typing import Literal
 
 from fastapi import Depends, HTTPException
@@ -106,6 +107,18 @@ class CreateAgent(BaseModel):
 class PublishInput(BaseModel):
     public:bool
 
+class ArenaInput(BaseModel):
+    agent_a_id:str=Field(min_length=8,max_length=60)
+    agent_b_id:str=Field(min_length=8,max_length=60)
+    title:str=Field(min_length=3,max_length=140)
+    instructions:str=Field(min_length=8,max_length=4500)
+    request_id:str=Field(min_length=16,max_length=90,pattern=r"^[a-zA-Z0-9_-]{16,90}$")
+    run_now:bool=True
+
+class ArenaReview(BaseModel):
+    winner:Literal["a","b","tie"]
+    notes:str=Field(min_length=8,max_length=2000)
+
 class RunInput(BaseModel):
     title:str=Field(min_length=3,max_length=140)
     instructions:str=Field(min_length=8,max_length=4500)
@@ -190,8 +203,26 @@ def initialize_dna(database):
             created_at timestamptz NOT NULL DEFAULT now(),
             PRIMARY KEY(agent_id,revision)
         )""")
+        db.execute("""CREATE TABLE IF NOT EXISTS agent_dna_arena(
+            id text PRIMARY KEY,
+            workspace_id text NOT NULL REFERENCES workspaces(id) ON DELETE CASCADE,
+            agent_a_id text NOT NULL REFERENCES agents(id),
+            agent_b_id text NOT NULL REFERENCES agents(id),
+            ticket_a_id text NOT NULL REFERENCES tickets(id),
+            ticket_b_id text NOT NULL REFERENCES tickets(id),
+            request_id text NOT NULL,
+            title text NOT NULL,
+            instructions text NOT NULL,
+            winner text,
+            review_notes text,
+            reviewed_at timestamptz,
+            created_at timestamptz NOT NULL DEFAULT now(),
+            UNIQUE(workspace_id,request_id)
+        )""")
+        db.execute("""CREATE INDEX IF NOT EXISTS wos_dna_arena_tenant_idx
+            ON agent_dna_arena(workspace_id,created_at DESC)""")
 
-def install(app, *, database, uid, event, authentication, write, sync_agent, limits, create_ticket, ticket_input):
+def install(app, *, database, uid, event, authentication, write, sync_agent, limits, create_ticket, ticket_detail, ticket_input):
     """Attach API to the existing FastAPI app, inheriting its CSRF and tenant auth."""
     from fastapi.responses import JSONResponse
 
@@ -377,6 +408,107 @@ def install(app, *, database, uid, event, authentication, write, sync_agent, lim
         ticket=ticket_input(agent_id=agent_id,title=body.title,instructions=body.instructions,
                             request_id=body.request_id,run_now=body.run_now,knowledge_ids=ids)
         return await create_ticket(ticket,account)
+
+
+    async def _arena_item(row,account):
+        first=await ticket_detail(row["ticket_a_id"],account)
+        second=await ticket_detail(row["ticket_b_id"],account)
+        def extracted(item):
+            task=(item.get("runtime") or {}).get("task") or {}
+            output=task.get("output") or ""
+            return {"ticket_id":item["ticket"]["id"],
+                    "state":task.get("status") or item["ticket"]["state"],
+                    "output":output or None,"output_ready":bool(output),
+                    "source_sha256":hashlib.sha256(output.encode()).hexdigest() if output else None,
+                    "verification":"NOT_INDEPENDENTLY_VERIFIED"}
+        a=extracted(first);b=extracted(second)
+        return {"id":row["id"],"agent_a_id":row["agent_a_id"],
+                "agent_b_id":row["agent_b_id"],"title":row["title"],
+                "instructions":row["instructions"],
+                "a":a,"b":b,"winner":row["winner"],"review_notes":row["review_notes"],
+                "created_at":row["created_at"].isoformat(),
+                "reviewed_at":row["reviewed_at"].isoformat() if row["reviewed_at"] else None,
+                "comparison_state":"READY_FOR_HUMAN_REVIEW" if a["output_ready"] and b["output_ready"] else "WAITING_FOR_REAL_OUTPUTS",
+                "automated_score":None,"review_type":"HUMAN_PREFERENCE_NOT_INDEPENDENT_VERIFICATION"}
+
+    @app.get("/api/agent-arena")
+    def list_arena(account=Depends(authentication)):
+        with database() as db:
+            rows=db.execute("""SELECT id,agent_a_id,agent_b_id,title,winner,created_at
+                FROM agent_dna_arena WHERE workspace_id=%s ORDER BY created_at DESC LIMIT 40""",
+                (account["workspace_id"],)).fetchall()
+        return {"comparisons":[{"id":r["id"],"title":r["title"],"winner":r["winner"],
+                "agent_a_id":r["agent_a_id"],"agent_b_id":r["agent_b_id"],
+                "created_at":r["created_at"].isoformat()} for r in rows]}
+
+    @app.post("/api/agent-arena")
+    async def compare(body:ArenaInput,account=Depends(write)):
+        tenant=account["workspace_id"]
+        if body.agent_a_id==body.agent_b_id:
+            raise HTTPException(status_code=400,detail="SELECT_TWO_DISTINCT_AGENTS")
+        with database() as db:
+            lookup(account,body.agent_a_id,db)
+            lookup(account,body.agent_b_id,db)
+            existing=db.execute("""SELECT * FROM agent_dna_arena
+                WHERE workspace_id=%s AND request_id=%s""",(tenant,body.request_id)).fetchone()
+            if existing:
+                if (existing["agent_a_id"]!=body.agent_a_id or
+                    existing["agent_b_id"]!=body.agent_b_id or
+                    existing["title"]!=body.title or existing["instructions"]!=body.instructions):
+                    raise HTTPException(status_code=409,detail="REQUEST_ID_REUSED")
+                return await _arena_item(existing,account)
+            count=db.execute("SELECT count(*) n FROM tickets WHERE workspace_id=%s",
+                             (tenant,)).fetchone()["n"]
+            if count+2>limits(tenant)["tickets"]:
+                raise HTTPException(status_code=409,detail="TASK_LIMIT_REACHED")
+        tasks=[]
+        for agent_id,suffix in ((body.agent_a_id,"_a"),(body.agent_b_id,"_b")):
+            with database() as db:
+                record=db.execute("""SELECT manifest FROM agent_dna_profiles
+                    WHERE workspace_id=%s AND agent_id=%s""",(tenant,agent_id)).fetchone()
+            ids=record["manifest"].get("knowledge_ids",[]) if record else []
+            ticket=ticket_input(agent_id=agent_id,title=body.title,instructions=body.instructions,
+                                request_id=body.request_id+suffix,run_now=body.run_now,
+                                knowledge_ids=ids)
+            tasks.append(await create_ticket(ticket,account))
+        with database() as db:
+            arena_id=uid()
+            db.execute("""INSERT INTO agent_dna_arena(
+                id,workspace_id,agent_a_id,agent_b_id,ticket_a_id,ticket_b_id,request_id,title,instructions)
+                VALUES (%s,%s,%s,%s,%s,%s,%s,%s,%s)
+                ON CONFLICT(workspace_id,request_id) DO NOTHING""",
+                (arena_id,tenant,body.agent_a_id,body.agent_b_id,
+                 tasks[0]["id"],tasks[1]["id"],body.request_id,body.title,body.instructions))
+            row=db.execute("""SELECT * FROM agent_dna_arena WHERE workspace_id=%s AND request_id=%s""",
+                (tenant,body.request_id)).fetchone()
+            event(db,tenant,"agent_dna.arena.created",row["id"])
+        return await _arena_item(row,account)
+
+    @app.get("/api/agent-arena/{arena_id}")
+    async def arena_detail(arena_id:str,account=Depends(authentication)):
+        with database() as db:
+            row=db.execute("""SELECT * FROM agent_dna_arena WHERE workspace_id=%s AND id=%s""",
+                (account["workspace_id"],arena_id)).fetchone()
+        if not row:raise HTTPException(status_code=404,detail="COMPARISON_NOT_FOUND")
+        return await _arena_item(row,account)
+
+    @app.post("/api/agent-arena/{arena_id}/review")
+    async def review_comparison(arena_id:str,body:ArenaReview,account=Depends(write)):
+        tenant=account["workspace_id"]
+        with database() as db:
+            row=db.execute("""SELECT * FROM agent_dna_arena WHERE workspace_id=%s AND id=%s""",
+                (tenant,arena_id)).fetchone()
+        if not row:raise HTTPException(status_code=404,detail="COMPARISON_NOT_FOUND")
+        detail=await _arena_item(row,account)
+        if detail["comparison_state"]!="READY_FOR_HUMAN_REVIEW":
+            raise HTTPException(status_code=409,detail="REAL_OUTPUTS_REQUIRED_FOR_COMPARISON")
+        with database() as db:
+            db.execute("""UPDATE agent_dna_arena
+                SET winner=%s,review_notes=%s,reviewed_at=now()
+                WHERE workspace_id=%s AND id=%s""",(body.winner,body.notes.strip(),tenant,arena_id))
+            event(db,tenant,"agent_dna.arena.reviewed",arena_id,body.winner)
+        return {"id":arena_id,"winner":body.winner,
+                "review_type":"HUMAN_PREFERENCE_NOT_INDEPENDENT_VERIFICATION"}
 
     @app.get("/api/agent-dna/{agent_id}/readiness")
     def readiness(agent_id:str,account=Depends(authentication)):
