@@ -269,46 +269,62 @@ function filterCards(){
 function detail(){
  const slug=decodeURIComponent(location.pathname.slice("/agents/".length));
  const item=S.items.find(x=>x.id===slug);
- if(!item){notFound("Agent not found","This template may have been unpublished or is not available in the public library.");return}
- const p=item.profile;
- document.title=item.display+" — Agent Profile | WorkforceOS";
- const skills=p.skills||[];
- const mission=esc(p.mission||p.role);
+ if(!item){notFound("Agent not found","This character may have been unpublished or is no longer in the public library.");return}
+ const p=item.profile,skills=p.skills||[],traits=p.traits||{};
+ document.title=item.display+" — "+item.subtitle+" | WorkforceOS";
+ const media=item.image>=0?'<img alt="" loading="eager" src="'+esc(PHOTO[item.image])+'">':
+  '<div class="editorial-monogram large">'+esc(item.display.slice(0,1))+'</div>';
  $("content").innerHTML=
- '<section class="detail-hero"><div class="wrap detail-stage"><div class="detail-heading">'+
- '<nav class="breadcrumb" aria-label="Breadcrumb"><a href="/">WorkforceOS</a> › <a href="/marketplace">Marketplace</a> › <span>'+esc(item.display)+'</span></nav>'+
- '<span class="kicker">AGENT PROFILE / '+esc(categoryLabel(item)).toUpperCase()+'</span>'+
- '<h1>'+esc(item.display)+'</h1><div class="lead">'+esc(p.role)+'</div><p>'+mission+'</p>'+
- '<div class="scene-actions">'+button("Customize this Agent",editLink(item))+
- button("Browse marketplace","/marketplace","secondary")+'</div></div>'+
- '<div class="detail-art"><img class="detail-photo" alt="" loading="eager" decoding="async" src="'+esc(PHOTO[item.image%PHOTO.length])+'"><span class="detail-orbit"></span><div class="detail-art-label"><span>AGENT DNA</span><span>WORKFORCEOS / '+esc(p.name).toUpperCase()+'</span></div></div>'+
- '<aside class="detail-buy"><span class="pill gold-pill">◇ AVAILABLE TEMPLATE</span><h3>Free</h3><p class="status-text">Clone the profile, then customize for your work.</p>'+
- '<ul><li>Configurable behavioral identity</li><li>'+skills.length+' listed skill specializations</li><li>Private workspace ownership</li><li>Versioned Agent DNA</li><li>Real task execution via Fabric</li></ul>'+
- button("Customize & Save",editLink(item))+button("Test in the Studio",editLink(item)+"&tab=laboratory","secondary")+
- '<p class="status-notice">Free profile template; not a paid subscription or a verified performance claim.</p></aside></div></section>'+
- '<div class="wrap"><nav class="detail-tabs" aria-label="Page sections"><a href="#overview">Overview</a><a href="#capabilities">Capabilities</a><a href="#how">Setup</a><a href="#output">Sample outputs</a><a href="#compare">Compare</a></nav></div>'+
- '<div class="wrap detail-content-grid" id="overview"><section class="surface"><h3>Agent <em>overview.</em></h3><p>'+mission+'</p>'+
- '<div class="detail-facts"><div><span>Role</span><b>'+esc(p.role)+'</b></div><div><span>Category</span><b>'+esc(item.category)+'</b></div>'+
- '<div><span>Profile creator</span><b>'+(item.type==="preset"?"WorkforceOS":"Community creator")+'</b></div><div><span>Access</span><b>Free template</b></div>'+
- '<div><span>Communication</span><b>'+esc(words(p.tone||"professional"))+'</b></div><div><span>Publication</span><b>'+(item.type==="preset"?"Curated":"Opt-in public")+'</b></div></div></section>'+
- '<section class="surface" id="capabilities"><h3>What this agent <em>can do.</em></h3><div class="cap-grid">'+skills.map((s,i)=>
- '<div class="cap-tile"><span>'+["◎","⌁","◇","↗","✧","▤"][i%6]+'</span><b>'+esc(words(s))+'</b><small>Skill guidance is applied through the agent instruction profile.</small></div>').join("")+'</div></section>'+
- '<section class="surface" id="how"><h3>Setup in <em>3 steps.</em></h3><ol class="step-list"><li><span class="step-no">1</span><div><b>Start with this DNA</b><small>Open the studio and clone the starter profile.</small></div></li>'+
- '<li><span class="step-no">2</span><div><b>Make it your own</b><small>Set the mission, values, skills and private knowledge.</small></div></li>'+
- '<li><span class="step-no">3</span><div><b>Save and give it work</b><small>Run a real task and inspect the returned status.</small></div></li></ol>'+
- '<div class="details-side-note">Tool permissions and model routing are available only when supported by the connected runtime.</div></section></div>'+
- '<section class="section wrap" id="output">'+sectionHead("AGENT DELIVERY","A useful result is <em>the real product.</em>",
- "Illustrative document layout — not a fabricated agent execution or claimed benchmark.")+
- '<div class="sample-row">'+["Structured research brief","Actionable work plan","Decision-ready summary"].map((t,i)=>
- '<article class="sample-output"><div><span class="kicker">ILLUSTRATIVE FORMAT / '+String(i+1).padStart(2,"0")+'</span><h3>'+t+'</h3></div>'+
- '<div class="sample-mock"><div class="sample-line"></div><div class="sample-line medium"></div><div class="sample-line short"></div><div class="sample-chart">'+[28,49,39,72,60].map(h=>'<i style="height:'+h+'%"></i>').join("")+'</div></div></article>').join("")+'</div></section>'+
- '<div class="wrap" id="compare">'+pano("Two minds. One challenge.<br><em>See what works.</em>",
- "Create two agents and compare their real work on one identical assignment. Human review stays separate from independent verification.",
- "/arena","Enter the Arena","scenic")+'</div>'+
- '<section class="section wrap">'+sectionHead("BUILD MORE INTELLIGENCE","The right teammate, <em>right now.</em>",
- "Discover more specialist profiles in our growing library.")+
- '<div class="agent-grid">'+cards(S.items.filter(x=>x.id!==item.id).slice(0,4))+'</div></section>';
+ '<section class="product-hero"><div class="wrap"><nav class="breadcrumb" aria-label="Breadcrumb"><a href="/">Home</a><span>›</span><a href="/marketplace">Marketplace</a><span>›</span><span>'+esc(item.display)+'</span></nav>'+
+ '<div class="detail-stage"><div class="detail-heading"><span class="kicker">'+esc(item.category).toUpperCase()+' / '+esc(item.character).toUpperCase()+' CHARACTER</span>'+
+ '<h1>'+esc(item.display)+'</h1><h2>'+esc(item.subtitle)+'</h2>'+
+ '<p class="product-deck">'+esc(p.mission)+'</p>'+
+ '<div class="product-signature"><span class="mini-rule"></span>'+esc(item.signature)+'</div>'+
+ '<div class="product-hero-actions">'+button("Customize this agent",editLink(item))+button("Browse alternatives","/marketplace","secondary")+'</div>'+
+ '<div class="product-metadata"><span>Created by WorkforceOS'+(item.type==="community"?" community":"")+'</span><span>·</span><span>Original character profile</span></div></div>'+
+ '<div class="product-portrait art-'+esc(item.vibe)+' tone-'+esc(item.color)+'">'+media+
+ '<span class="image-editorial-caption">'+esc(item.character)+' · Editorial illustration</span></div>'+
+ '<aside class="detail-buy"><span class="kicker">AGENT DNA / ORIGINAL</span>'+
+ '<div class="detail-price">Free <small>to customize</small></div>'+
+ '<p>Start with this character profile in your own workspace. Nothing is purchased or activated on-chain.</p>'+
+ '<div class="detail-props"><div><span>Specializations</span><b>'+skills.length+'</b></div>'+
+ '<div><span>Communication</span><b>'+esc(words(p.tone))+'</b></div>'+
+ '<div><span>Agent type</span><b>'+esc(item.character)+'</b></div>'+
+ '<div><span>Availability</span><b>Template</b></div></div>'+
+ button("Use this character",editLink(item))+
+ '<p class="aside-fineprint">Personalize the mission, skills, knowledge and behavior. Runtime permissions remain tied to your account.</p></aside></div></div></section>'+
+ '<div class="wrap"><nav class="detail-tabs" aria-label="Agent profile sections"><a href="#overview">Overview</a><a href="#skills">Skills</a><a href="#personality">Personality</a><a href="#workflow">Workflow</a><a href="#verification">Evaluation</a></nav></div>'+
+ '<section class="section wrap profile-overview" id="overview"><div class="profile-section-heading"><span class="kicker">01 / A DISTINCT PROFESSIONAL IDENTITY</span>'+
+ '<h2>Meet the <em>mind behind the role.</em></h2></div>'+
+ '<div class="profile-content-grid"><article class="profile-story"><h3>What '+esc(item.display)+' does.</h3><p>'+esc(p.mission)+'</p>'+
+ '<div class="profile-quote">“'+esc(item.signature)+'”</div>'+
+ '<p>'+esc(p.backstory||"A practical specialist with a focused mission and a defined way of working. You can adapt the character to your own needs.")+'</p></article>'+
+ '<article class="profile-competencies" id="skills"><h3>Specialized capabilities</h3><div class="competency-grid">'+skills.map((skill,i)=>
+ '<div class="competency-item"><span>'+String(i+1).padStart(2,"0")+'</span><b>'+esc(words(skill))+'</b><p>Instruction-based specialization. Actual tool access depends on the connected runtime.</p></div>').join("")+
+ '</div></article></div></section>'+
+ '<section class="wrap profile-character" id="personality"><div><span class="kicker">02 / BEHAVIORAL CONTRACT</span><h2>More than<br><em>a name.</em></h2>'+
+ '<p>Agent DNA specifies how the specialist communicates, evaluates uncertainty and approaches the task. These are adjustable preferences, not measured accuracy scores.</p>'+
+ button("Edit this DNA",editLink(item),"secondary")+'</div>'+
+ '<div class="trait-table">'+Object.entries(traits).map(([key,val])=>
+ '<div class="trait-line"><span>'+esc(words(key))+'</span><div class="trait-track"><i style="width:'+Number(val)+'%"></i></div><b>'+Number(val)+'/100</b></div>').join("")+
+ '<div class="trait-values"><span>Values</span><b>'+esc((p.values||[]).map(words).join(" · ")||"Honesty · Accuracy")+'</b></div></div></section>'+
+ '<section class="section wrap" id="workflow">'+sectionHead("03 / THE CUSTOMER JOURNEY","Simple to start.<br><em>Meaningful to improve.</em>")+
+ '<div class="explain-grid"><article class="explain-card"><span>01</span><h3>Choose the character.</h3><p>Open this exact specialist in the Agent DNA Studio. Its identity and specialization are already configured.</p></article>'+
+ '<article class="explain-card"><span>02</span><h3>Make the work yours.</h3><p>Adjust personality, mission and selected knowledge. Save a private, versioned copy.</p></article>'+
+ '<article class="explain-card"><span>03</span><h3>Run a real assignment.</h3><p>Submit a source-backed task. Inspect its true status and model output rather than a demo response.</p></article></div></section>'+
+ '<section class="wrap evaluation-honesty" id="verification"><div><span class="kicker">04 / EVALUATION</span><h2>What counts is<br><em>the actual output.</em></h2><p>We do not display made-up ratings, benchmark percentages, subscription counts or customer testimonials. Use the Arena to compare two genuine task results.</p>'+
+ button("Open Agent Arena","/arena")+'</div><div class="evaluation-spec"><span>EXAMPLE QUALITY REVIEW · NOT A LIVE SCORE</span>'+
+ '<div class="review-row"><b>Task completed?</b><span>Read source status</span></div>'+
+ '<div class="review-row"><b>Requirements satisfied?</b><span>Review delivered artifact</span></div>'+
+ '<div class="review-row"><b>Sources supported?</b><span>Check evidence</span></div>'+
+ '<div class="review-row"><b>Result useful?</b><span>Record human preference</span></div></div></section>'+
+ '<section class="section wrap">'+sectionHead("05 / DISCOVER MORE","The right perspective<br><em>changes the outcome.</em>")+
+ '<div class="agent-grid editorial-related">'+cards(S.items.filter(x=>x.id!==item.id).slice(0,4))+'</div></section>'+
+ '<div class="wrap" style="padding-bottom:80px">'+pano("Make this specialist<br><em>your own.</em>",
+ "A distinct voice, a defined profession, a personal workspace, and a real task behind every result.",
+ editLink(item),"Customize Agent DNA","scenic")+'</div>';
 }
+
 function reviewableOutput(side,label){
  return '<article class="arena-agent-output"><span class="kicker">'+label+' / SOURCE TASK</span>'+
  '<h3>'+esc((S.own?.agents||[]).find(x=>x.id===side.agent_id)?.name||label)+'</h3>'+
