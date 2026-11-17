@@ -38,7 +38,7 @@ const PRESET_META={
 const CAT=[{id:"all",label:"All disciplines"},{id:"Research",label:"Research"},{id:"Sales",label:"Sales"},{id:"Engineering",label:"Engineering"},{id:"Creative",label:"Creative"},{id:"Learning",label:"Learning"},{id:"Community",label:"Community"},{id:"Finance",label:"Finance"},{id:"Operations",label:"Operations"},{id:"Support",label:"Support"},{id:"Strategy",label:"Strategy"}];
 const STYLE_FILTERS=["All styles","Contemporary","Historical","Industrial","Editorial","Technical","Investigative","Minimalist","Humanist","Social","Modern classic","Documentary"];
 
-const S={catalog:null,gallery:null,session:null,own:null,items:[],filter:"all",search:"",sort:"featured",
+const S={catalog:null,gallery:null,session:null,own:null,items:[],filter:"all",style:"all",search:"",sort:"featured",
  activeArena:null,arenaTimer:null,arenaPolls:0};
 function toast(message){const e=$("toast");e.textContent=message;e.classList.add("show");
  clearTimeout(toast.timeout);toast.timeout=setTimeout(()=>e.classList.remove("show"),5000);}
@@ -103,15 +103,16 @@ function orbVisual(){return '<div class="scene-visual" aria-hidden="true"><div c
  '<div class="holo-agent holo-three" style="--card-photo:url('+PHOTO[2]+')"><small>PRODUCT / 03</small></div>'+
  '<div class="scene-platform"></div><div class="scene-scanline"></div><div class="scene-mini-label">AGENT INTELLIGENCE / ACTIVE DESIGN</div></div>';}
 function scene({kind,title,subtitle,description,kicker,buttons,footnotes="",breadcrumbs=""}){
- return '<section class="cinema-scene scene-'+kind+'"><div class="wrap scene-stage">'+
- '<div class="scene-copy">'+(breadcrumbs||'')+'<div class="eyebrow">'+esc(kicker||"THE WORKFORCEOS EXPERIENCE")+'</div>'+
- '<h1>'+title+'</h1>'+
- (subtitle?'<p class="lead">'+subtitle+'</p>':'')+
- (description?'<p class="scene-description">'+description+'</p>':'')+
- (buttons?'<div class="scene-actions">'+buttons+'</div>':'')+
- (footnotes?'<div class="scene-footnotes">'+footnotes+'</div>':'')+
- '</div>'+orbVisual()+'</div></section>';
-}
+ const imagery=kind==="arena"?PHOTO[10]:kind==="creators"?PHOTO[3]:kind==="pricing"?PHOTO[8]:PHOTO[2];
+ return '<section class="editorial-masthead cinema-scene scene-'+esc(kind)+'"><div class="wrap scene-stage">'+
+ '<div class="scene-copy">'+(breadcrumbs||"")+'<span class="kicker">'+esc(kicker||"WORKFORCEOS / AGENT WORKFORCE")+'</span>'+
+ '<h1>'+title+'</h1>'+(subtitle?'<p class="masthead-subtitle">'+subtitle+'</p>':"")+
+ (description?'<p class="scene-description">'+description+'</p>':"")+
+ (buttons?'<div class="scene-actions">'+buttons+'</div>':"")+
+ (footnotes?'<div class="scene-footnotes">'+footnotes+'</div>':"")+'</div>'+
+ '<div class="editorial-hero-art"><img alt="" loading="eager" src="'+esc(imagery)+'">'+
+ '<div class="hero-art-credit">WORKFORCEOS / ORIGINAL AGENT COLLECTION</div></div></div></section>';
+
 function sectionHead(kicker,title,desc="",link=""){
  return '<div class="section-intro"><div class="text"><span class="kicker">'+kicker+'</span><h2>'+title+'</h2>'+
  (desc?'<p>'+desc+'</p>':'')+'</div>'+(link?'<div class="edge-note">'+link+'</div>':'')+'</div>';
@@ -145,104 +146,126 @@ function pricingCards(preview=false){
  (preview?'':'<p class="trust-note">The existing workspace enforces plan capacity. Paid checkout becomes active only where Stripe billing is configured; no payment is implied by a page view.</p>');
 }
 function home(){
- document.title="WorkforceOS — Build, Deploy & Discover AI Agents";
- const featured=[...S.items.filter(x=>x.type==="preset"),...S.items.filter(x=>x.type==="community")];
+ document.title="WorkforceOS — Discover agents built for real work";
+ const featured=["sales_operator","research_analyst","product_engineer","creative_partner","archive_researcher","financial_analyst"]
+   .map(id=>S.items.find(x=>x.id===id)).filter(Boolean);
+ const count=(S.catalog?.presets||[]).length;
+ const publicCount=(S.gallery?.community_templates||[]).length;
  $("content").innerHTML=
- scene({kind:"home",kicker:"WORKFORCEOS / THE AGENT ECONOMY",title:"The <em>Agent</em><br>Marketplace.",
-  subtitle:"Intelligence, beautifully made for real work.",
-  description:"Discover expert AI teammates. Shape their character, knowledge and skills. Give them meaningful work, compare real results, and make something distinctly yours.",
-  buttons:button("Explore Marketplace","/marketplace")+button("Build Your Agent","/agent-studio","secondary"),
-  footnotes:'<span><strong>◇</strong> Discover specialist agents</span><span><strong>⌁</strong> Customize your AI DNA</span><span><strong>↗</strong> Deploy through real tasks</span>'})+
- '<div class="wrap"><div class="stat-strip"><span><b>'+S.items.filter(x=>x.type==="preset").length.toLocaleString()+'</b> curated starting characters</span><span><b>'+S.items.filter(x=>x.type==="community").length.toLocaleString()+'</b> public creator templates</span><span><b>01</b> connected workforce platform</span></div></div>'+
- '<section class="section wrap" id="featured">'+sectionHead("01 / THE COLLECTION","Meet your next <em>great teammate.</em>","The best agents do more than talk. They have a clear role, a distinctive way of thinking and a job to finish.",
- '<a class="inline-link" href="/marketplace">Explore all profiles <span class="arrow">↗</span></a>')+
- '<div class="agent-grid">'+cards(featured.slice(0,4))+'</div></section>'+
- '<div class="line-rule wrap"></div>'+
- '<section class="section wrap">'+sectionHead("02 / DIFFERENT BY DESIGN","More than a prompt.<br><em>A complete AI workforce.</em>",
- "One workspace for identity, private context, task execution, evaluation and distribution.")+motif()+'</section>'+
- '<section class="wrap dual-scenes" aria-label="Explore core experiences">'+
- '<article class="dual-scene"><div><span class="kicker">DISCOVER & DEPLOY</span><h3>The Agent<br><em>Marketplace.</em></h3>'+
- '<p>Research specialists, business operators, creative partners and a growing community library.</p>'+button("Explore agents","/marketplace")+'</div></article>'+
- '<article class="dual-scene creation"><div><span class="kicker">CREATE & CUSTOMIZE</span><h3>Make intelligence<br><em>your own.</em></h3>'+
- '<p>A character, a working style, a mission and a knowledge base — built around you.</p>'+button("Open Agent Studio","/agent-studio")+'</div></article>'+
- '</section>'+
- '<section class="section wrap">'+sectionHead("03 / A CONTINUOUS LOOP","Build. <em>Test.</em> Improve.",
- "Design the agent, run an actual assignment, compare the results and refine the next revision.")+
- '<div class="explain-grid">'+
- '<article class="explain-card"><span>01</span><h3>Give it a soul.</h3><p>Choose tone, values, expertise and working preferences. Save a portable, versioned Agent DNA.</p></article>'+
- '<article class="explain-card"><span>02</span><h3>Give it a mission.</h3><p>Connect relevant knowledge. Launch real work through the established Fabric runtime — with visible status.</p></article>'+
- '<article class="explain-card"><span>03</span><h3>See what works.</h3><p>Use the Arena to run the same task with two agents. Inspect real drafts and record human preference.</p></article>'+
- '</div></section>'+
- '<div class="wrap">'+pano("From an idea to a<br><em>working AI teammate.</em>",
- "Shape a bespoke AI worker with Agent DNA, specialist skills, private context, real tasks and the freedom to iterate.",
- "/agent-studio","Build your agent","alt")+'</div>'+
- '<section class="section wrap">'+sectionHead("04 / FOR CREATORS","Your expertise is <em>the product.</em>",
- "Publish a free character template, share your working style and let other teams create their own independent version.")+
- '<div class="dual-scenes"><article class="dual-scene creation"><div><span class="kicker">CHARACTER CRAFT</span><h3>Design something<br>worth remembering.</h3><p>Personality, skills, values and a professional purpose — crafted in the studio.</p>'+button("Create an agent","/agent-studio")+'</div></article>'+
- '<article class="dual-scene arena-scene"><div><span class="kicker">COMPARE REAL WORK</span><h3>The strongest ideas<br>survive the <em>Arena.</em></h3><p>Put two agents on the same brief and inspect source-backed outputs before deciding.</p>'+button("Enter the Arena","/arena")+'</div></article></div>'+
- '</section>'+
- '<div class="line-rule wrap"></div>'+
- '<section class="section wrap" id="pricing">'+sectionHead("05 / SIMPLE CAPACITY PLANS","Begin free. <em>Build your workforce.</em>",
- "Start with a few agents, then unlock more teams and tasks as work grows.",'<a class="inline-link" href="/pricing">Compare every plan ↗</a>')+
- pricingCards(true)+'</section>'+
- '<div class="wrap" style="padding-bottom:80px">'+pano("Build. Publish.<br><em>Keep improving.</em>",
- "The first chapter of a creator-driven AI economy: real capabilities, transparent feedback and independently owned agents.",
- "/creators","Explore the creator program","statue")+'</div>';
+ '<section class="editorial-masthead scene-home" aria-label="WorkforceOS Agent Marketplace">'+
+ '<div class="wrap editorial-hero-layout"><div class="hero-copy"><span class="kicker">THE WORKFORCEOS AGENT MARKETPLACE</span>'+
+ '<h1>Meet the right mind<br>for <em>the work.</em></h1>'+
+ '<p class="hero-lead">AI agents with a point of view, a profession, and a purpose.</p>'+
+ '<p class="hero-description">Discover distinctive specialists. Choose how they think, what they know, and how they work. Then give them a real task.</p>'+
+ '<div class="hero-actions">'+button("Explore agents","/marketplace")+button("Create your own","/agent-studio","secondary")+'</div>'+
+ '<div class="hero-facts"><span><b>'+count+'</b> curated starting characters</span><span><b>'+publicCount+'</b> public creator templates</span><span><b>01</b> connected workspace</span></div>'+
+ '</div><div class="hero-gallery" aria-hidden="true">'+
+ '<div class="hero-gallery-primary"><img src="'+esc(PHOTO[0])+'" alt="" loading="eager"><span>01 / The commercial strategist</span></div>'+
+ '<div class="hero-gallery-secondary"><img src="'+esc(PHOTO[6])+'" alt="" loading="eager"><span>02 / The historical archivist</span></div>'+
+ '<div class="hero-gallery-tertiary"><img src="'+esc(PHOTO[2])+'" alt="" loading="eager"><span>03 / The systems maker</span></div>'+
+ '<div class="hero-gallery-note"><span class="large-dot">●</span> PEOPLE-INSPIRED. PURPOSE-BUILT.</div></div></div></section>'+
+ '<section class="trust-rule wrap"><span>Identity is personal.</span><span>Expertise is practical.</span><span>Execution is measurable.</span></section>'+
+ '<section class="section wrap" id="featured">'+sectionHead("01 / CURATED SPECIALISTS",
+ 'Not avatars. <em>Working characters.</em>',
+ 'A deliberate mix of contemporary professionals, analytical thinkers, archival minds and technical makers.',
+ '<a class="inline-link" href="/marketplace">View the full collection <span class="arrow">↗</span></a>')+
+ '<div class="agent-grid editorial-home-grid">'+cards(featured)+'</div></section>'+
+ '<section class="editorial-manifesto wrap"><div class="manifesto-statement"><span class="kicker">WHAT MAKES AN AGENT DIFFERENT?</span>'+
+ '<h2>The character changes<br><em>how the work gets done.</em></h2>'+
+ '<p>Mission, professional domain, communication style, critical thinking, knowledge and permitted tools — not another costume on the same chatbot.</p>'+
+ '<a class="inline-link" href="/agent-studio">Explore Agent DNA <span class="arrow">↗</span></a></div>'+
+ '<div class="manifesto-grid">'+[
+ ["01","A defined mission","An explicit outcome, rather than an open-ended conversation."],
+ ["02","A working personality","Distinct levels of initiative, empathy, directness and critical scrutiny."],
+ ["03","A specialist toolkit","Curated instructions, your knowledge and tools your workspace has actually authorized."],
+ ["04","Evidence of execution","Source task IDs, real output and human evaluations, not invented rankings."]
+ ].map(x=>'<article><span>'+x[0]+'</span><h3>'+x[1]+'</h3><p>'+x[2]+'</p></article>').join("")+'</div></section>'+
+ '<section class="section wrap">'+sectionHead("02 / FIND YOUR KIND OF INTELLIGENCE",
+ 'Different eras. <em>Different perspectives.</em>',
+ 'Browse by character and profession rather than a wall of interchangeable faces.')+
+ '<div class="archetype-grid">'+[
+ {label:"The contemporary professional",tag:"BUSINESS / CONVERSATION",id:"sales_operator",image:PHOTO[0]},
+ {label:"The archival thinker",tag:"HISTORY / EVIDENCE",id:"archive_researcher",image:PHOTO[6]},
+ {label:"The hands-on builder",tag:"ENGINEERING / SYSTEMS",id:"product_engineer",image:PHOTO[2]},
+ {label:"The editorial creative",tag:"DESIGN / IMAGINATION",id:"creative_partner",image:PHOTO[3]}
+ ].map(x=>'<a class="archetype-card" href="/agents/'+x.id+'"><img alt="" loading="lazy" src="'+esc(x.image)+'"><div><small>'+x.tag+'</small><h3>'+x.label+'</h3><span>Explore character ↗</span></div></a>').join("")+'</div></section>'+
+ '<section class="wrap editorial-cta-pair">'+
+ '<article class="editorial-feature feature-creation"><span class="kicker">AGENT DNA STUDIO</span><h2>Build a specialist<br>with <em>your signature.</em></h2><p>Choose traits, values, skills and knowledge. Save every revision and test against a real assignment.</p>'+
+ button("Design an agent","/agent-studio")+'</article>'+
+ '<article class="editorial-feature feature-evaluation"><span class="kicker">THE WORKFORCEOS ARENA</span><h2>Opinions are easy.<br><em>Proof takes work.</em></h2><p>Run two agents on the same assignment and compare what the runtime actually returned.</p>'+
+ button("Compare outputs","/arena","secondary")+'</article></section>'+
+ '<section class="section wrap">'+sectionHead("03 / THE CREATOR ECONOMY",
+ 'From expertise <em>to something shareable.</em>',
+ 'Publish a free agent template others can remix. Creator pricing, checkout and earnings are shown only after real commercial services are connected.')+
+ '<div class="creator-editorial-banner"><div><span class="kicker">ORIGINAL INTELLIGENCE, IN YOUR OWN WORKSPACE</span><h2>Make a character.<br>Give it a profession.</h2>'+
+ '<p>Bring the thing you know best to a growing library of specialists. No fake sales figures. No fictional testimonials.</p>'+
+ button("Explore the creator studio","/creators")+'</div><div class="creator-banner-art" aria-hidden="true"><img src="'+esc(PHOTO[3])+'" alt="" loading="lazy"></div></div></section>'+
+ '<section class="section wrap compact-pricing">'+sectionHead("04 / CAPACITY PLANS",
+ 'Start with one agent. <em>Grow into a team.</em>',
+ 'Transparent workspace limits, source-backed tasks and plans that grow with real use.',
+ '<a class="inline-link" href="/pricing">Compare plans ↗</a>')+
+ pricingCards(true)+'</section>';
 }
+
 function browse(){
- document.title="Browse Agent Marketplace — WorkforceOS";
+ document.title="Agent Marketplace — Find a specialist | WorkforceOS";
+ const total=S.items.length;
  $("content").innerHTML=
- scene({kind:"browse",kicker:"THE WORKFORCEOS COLLECTION",title:"Discover your<br><em>next agent.</em>",
- subtitle:"BROWSE / CUSTOMIZE / PUT TO WORK",
- description:"A curated collection of official starter agents and free templates shared by real creators. Explore by job, skills or purpose.",
- buttons:button("Open Agent Studio","/agent-studio")+button("Learn about creators","/creators","secondary")})+
- '<section class="wrap catalog-section"><div class="catalog-layout"><aside class="filter-sidebar" aria-label="Marketplace filters"><h3>Browse Marketplace</h3>'+
- '<div class="section-caption"><span>AGENT CATEGORIES</span><span id="category-total">'+S.items.length+'</span></div>'+
+ '<section class="editorial-masthead scene-browse"><div class="wrap browse-hero-grid">'+
+ '<div><span class="kicker">THE WORKFORCEOS COLLECTION / '+total+' AVAILABLE TEMPLATES</span>'+
+ '<h1>Find your next<br><em>specialist.</em></h1><p>Purpose-built AI characters for actual business work. Explore a profession, choose a working style and customize the agent in your own workspace.</p>'+
+ '<div class="hero-actions">'+button("Create an agent","/agent-studio")+button("How it works","/#featured","secondary")+'</div></div>'+
+ '<div class="browse-hero-art" aria-hidden="true"><img src="'+esc(PHOTO[1])+'" alt="" loading="eager"><span>THE EVIDENCE COLLECTION</span></div></div></section>'+
+ '<section class="wrap marketplace-layout-shell"><div class="marketplace-section-head"><div><span class="kicker">BROWSE / DISCOVER / CUSTOMIZE</span><h2>Browse the <em>collection.</em></h2></div>'+
+ '<p>Real starter agents and creator-published character templates. No invented ratings, customers or revenue.</p></div>'+
+ '<div class="catalog-layout"><aside class="filter-sidebar" aria-label="Marketplace filters">'+
+ '<div class="sidebar-title"><h3>Filters</h3><button type="button" id="reset-filters">Reset</button></div>'+
+ '<div class="section-caption">DISCIPLINE</div>'+
  '<div class="filter-choices" id="category-filter">'+CAT.map((c,i)=>'<button class="filter-item '+(i===0?"active":"")+'" type="button" data-category="'+esc(c.id)+'" aria-pressed="'+(i===0)+'"><span>'+esc(c.label)+'</span><span>'+S.items.filter(x=>c.id==="all"||x.category.toLowerCase()===c.id.toLowerCase()).length+'</span></button>').join("")+'</div>'+
- '<p class="filter-note">Only available official templates and explicitly published community profiles are shown. Ratings and sales are not invented.</p></aside>'+
- '<div><div class="results-toolbar"><label class="market-search" for="market-query"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><circle cx="10.5" cy="10.5" r="7"/><path d="m16 16 5 5"/></svg><input id="market-query" type="search" placeholder="Search agents, skills, creators or use cases…" aria-label="Search agent marketplace"></label>'+
- '<select class="market-select" id="market-sort" aria-label="Sort agents"><option value="featured">Featured first</option><option value="name">Name A–Z</option><option value="recent">Recently published</option></select></div>'+
- '<p class="result-count" id="result-count">Loading published profiles…</p><div id="market-results" class="agent-grid"></div></div></div></section>'+
- '<div class="wrap">'+pano("Specialists for the work<br><em>that really matters.</em>",
- "Research, marketing, product development and business operations — compose your own workforce from useful starting points.",
- "/agent-studio","Create a specialist","scenic")+'</div>'+
- '<section class="section wrap">'+sectionHead("CURATED COLLECTIONS","Find the right <em>direction.</em>",
- "Begin with a domain and personalize the agent around your own goals.")+
- '<div class="curated-row"><div><span class="kicker">KNOWLEDGE WORK</span><h3>Find the signal.</h3><p>Research, analysis and precise communication.</p></div>'+
- '<div class="curated-cards"><a href="/agents/research_analyst" class="curated-tile" style="--tile-photo:var(--photo-statue)"><b>Research & Analysis</b><small>Evidence-first</small></a>'+
- '<a href="/agents/sales_operator" class="curated-tile"><b>Sales & Partnerships</b><small>Customer-focused</small></a>'+
- '<a href="/agents/product_engineer" class="curated-tile" style="--tile-photo:var(--photo-atrium)"><b>Product & Engineering</b><small>Build and review</small></a>'+
- '<a href="/agents/creative_partner" class="curated-tile" style="--tile-photo:var(--photo-woman)"><b>Creative & Content</b><small>Ideas and execution</small></a></div></div>'+
- '<div class="curated-row"><div><span class="kicker">PEOPLE & TEAMS</span><h3>Build together.</h3><p>Organize the work between humans and AI teammates.</p></div>'+
- '<div class="curated-cards"><a href="/agents/community_builder" class="curated-tile" style="--tile-photo:var(--photo-atrium)"><b>Community</b><small>Onboarding and growth</small></a>'+
- '<a href="/agents/personal_guide" class="curated-tile" style="--tile-photo:var(--photo-statue)"><b>Personal Learning</b><small>Think and learn</small></a>'+
- '<a href="/arena" class="curated-tile" style="--tile-photo:var(--photo-glass)"><b>Agent Arena</b><small>Compare real outputs</small></a>'+
- '<a href="/creators" class="curated-tile" style="--tile-photo:var(--photo-woman)"><b>Creator Library</b><small>Publish and remix</small></a></div></div></section>'+
- '<div class="wrap" style="padding-bottom:80px">'+pano("A new standard for<br><em>human + AI collaboration.</em>",
- "Move beyond a one-time prompt. Give agents a purpose, a workspace and real work that can be inspected.",
- "/agent-studio","Design your own","alt")+'</div>';
+ '<div class="section-caption">CHARACTER STYLE</div><div class="filter-choices style-filters" id="character-filter">'+STYLE_FILTERS.map((sty,i)=>'<button class="filter-item '+(i===0?"active":"")+'" type="button" data-style="'+esc(i===0?"all":sty)+'" aria-pressed="'+(i===0)+'"><span>'+esc(sty)+'</span></button>').join("")+'</div>'+
+ '<p class="filter-note">Character artwork is conceptual. Each listing links to a real configuration in the Agent DNA Studio.</p></aside>'+
+ '<div class="catalog-main"><div class="results-toolbar"><label class="market-search" for="market-query"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><circle cx="10.5" cy="10.5" r="7"/><path d="m16 16 5 5"/></svg>'+
+ '<input id="market-query" type="search" placeholder="Search a profession, skill or character…" aria-label="Search the agent marketplace"></label>'+
+ '<select id="market-sort" class="market-select" aria-label="Sort the collection"><option value="featured">Curated order</option><option value="name">Name A–Z</option><option value="recent">Recently shared</option></select></div>'+
+ '<div class="results-heading"><p class="result-count" id="result-count">'+total+' agent templates</p><span>AVAILABLE NOW / FREE TEMPLATES</span></div>'+
+ '<div id="market-results" class="agent-grid"></div></div></div></section>'+
+ '<section class="section wrap"><div class="collection-rule"><span class="kicker">EDITORIAL COLLECTIONS</span><h2>Choose by <em>the kind of thinking.</em></h2></div>'+
+ '<div class="collections-list">'+[
+ ["Research & intelligence","Observe, verify, synthesize.","research_analyst",PHOTO[1],"RESEARCH"],
+ ["Strategy & commerce","Decide, negotiate, act.","sales_operator",PHOTO[0],"BUSINESS"],
+ ["Creative & communication","Write, create, connect.","creative_partner",PHOTO[3],"CREATIVE"]
+ ].map(x=>'<a class="collection-strip" href="/agents/'+x[2]+'"><div class="collection-image"><img src="'+esc(x[3])+'" alt="" loading="lazy"></div>'+
+ '<div><small>'+x[4]+'</small><h3>'+x[0]+'</h3><p>'+x[1]+'</p></div><span>Explore ↗</span></a>').join("")+'</div></section>'+
+ '<div class="wrap" style="padding-bottom:80px">'+pano("Every specialist starts with<br><em>a purpose.</em>",
+ "Browse, personalize, save and run your first real task. The entire process stays inside your own WorkforceOS workspace.",
+ "/agent-studio","Create your specialist","scenic")+'</div>';
+ const reset=()=>{S.filter="all";S.style="all";S.search="";$("market-query").value="";
+  document.querySelectorAll("[data-category],[data-style]").forEach(b=>{const ok=(b.dataset.category||b.dataset.style)==="all";b.classList.toggle("active",ok);b.setAttribute("aria-pressed",String(ok))});
+  filterCards();};
  $("market-query").addEventListener("input",e=>{S.search=e.target.value.toLowerCase().trim();filterCards()});
  $("market-sort").addEventListener("change",e=>{S.sort=e.target.value;filterCards()});
- document.querySelectorAll("[data-category]").forEach(b=>b.addEventListener("click",()=>{
-  S.filter=b.dataset.category;
-  document.querySelectorAll("[data-category]").forEach(x=>{x.classList.toggle("active",x===b);x.setAttribute("aria-pressed",String(x===b))});
+ $("reset-filters").addEventListener("click",reset);
+ document.querySelectorAll("[data-category],[data-style]").forEach(b=>b.addEventListener("click",()=>{
+  const isCategory=b.hasAttribute("data-category"),key=isCategory?"category":"style";
+  if(isCategory)S.filter=b.dataset.category;else S.style=b.dataset.style;
+  document.querySelectorAll("[data-"+key+"]").forEach(x=>{const yes=x===b;x.classList.toggle("active",yes);x.setAttribute("aria-pressed",String(yes))});
   filterCards();
  }));
  filterCards();
 }
 function filterCards(){
- let selected=S.items.filter(x=>(S.filter==="all"||x.category.toLowerCase()===S.filter.toLowerCase())&&(
- !S.search||[x.display,x.category,x.profile.name,x.profile.role,x.profile.mission,...(x.profile.skills||[])].join(" ").toLowerCase().includes(S.search)));
+ let selected=S.items.filter(x=>(S.filter==="all"||x.category.toLowerCase()===S.filter.toLowerCase())&&
+ (!S.style||S.style==="all"||x.character===S.style)&&
+ (!S.search||[x.display,x.subtitle,x.character,x.signature,x.category,x.profile.name,x.profile.role,x.profile.mission,...(x.profile.skills||[])].join(" ").toLowerCase().includes(S.search)));
  if(S.sort==="name")selected.sort((a,b)=>a.display.localeCompare(b.display));
  if(S.sort==="recent")selected.sort((a,b)=>(b.published_at||"").localeCompare(a.published_at||""));
- $("result-count").textContent=selected.length+" available "+(selected.length===1?"template":"templates")+
- (S.filter!=="all"?" · "+S.filter:"")+" · Public library";
+ $("result-count").textContent=selected.length+" available "+(selected.length===1?"agent":"agents")+
+ (S.filter!=="all"?" in "+S.filter:"")+(S.style&&S.style!=="all"?" · "+S.style:"");
  $("market-results").innerHTML=selected.length?cards(selected):
- '<div class="empty-card"><span class="kicker">NOTHING MATCHES YET</span><h3>Try a different search.</h3><p>Your criteria found no published profiles.</p><button type="button" class="btn btn-secondary" id="clear-filter">Clear filters ↗</button></div>';
- $("clear-filter")?.addEventListener("click",()=>{S.filter="all";S.search="";$("market-query").value="";
- document.querySelectorAll("[data-category]").forEach(b=>{let yes=b.dataset.category==="all";b.classList.toggle("active",yes);b.setAttribute("aria-pressed",String(yes))});
- filterCards();});
+ '<div class="empty-card"><span class="kicker">NO MATCHES</span><h3>Try a different brief.</h3><p>There is no published profile matching these filters.</p><button type="button" class="btn btn-secondary" id="clear-filter">Reset filters ↗</button></div>';
+ $("clear-filter")?.addEventListener("click",()=>{$("reset-filters").click()});
 }
+
 function detail(){
  const slug=decodeURIComponent(location.pathname.slice("/agents/".length));
  const item=S.items.find(x=>x.id===slug);
