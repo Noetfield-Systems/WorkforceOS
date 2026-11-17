@@ -419,6 +419,25 @@ async function init(){
   if(userSignedIn())await loadAgents();
   else choosePreset(S.catalog.presets[0].id);
   await refreshGallery();
+  // Marketplace deep links are first-class creation journeys, not dead CTA screens.
+  const qs=new URLSearchParams(location.search);
+  if(qs.has("template")){
+    const requested=qs.get("template");
+    if(S.catalog.presets.some(p=>p.id===requested))choosePreset(requested);
+  }else if(qs.has("community")){
+    const gallery=await api("/api/agent-dna/gallery");
+    const shared=(gallery.community_templates||[]).find(p=>p.id===qs.get("community"));
+    if(shared){
+      S.community=shared.id;S.preset=null;
+      setProfile(shared.profile,null,0,false,"NOT_CONNECTED");
+      flash("Community character loaded. Customize, then create your own version.");
+    }else flash("This public template is no longer available.");
+  }else if(qs.has("agent")&&userSignedIn()){
+    if(S.agents.some(a=>a.id===qs.get("agent")))await openAgent(qs.get("agent"));
+  }
+  if(["identity","character","capabilities","laboratory","marketplace"].includes(qs.get("tab"))){
+    activateTab(qs.get("tab"));
+  }
  }catch(e){flash("Studio initialization: "+detailText(e));$("connection").textContent="Connection unavailable";}
 }
 document.querySelectorAll("[data-tab]").forEach(b=>b.addEventListener("click",()=>activateTab(b.dataset.tab)));
@@ -437,4 +456,11 @@ $("run-form").addEventListener("submit",submitRun);
 $("arena-form").addEventListener("submit",runArena);
 $("export-dna").addEventListener("click",exportDNA);
 $("import-dna").addEventListener("change",importDNA);
+document.querySelectorAll("[data-open-studio-tab]").forEach(button=>button.addEventListener("click",()=>{
+  activateTab(button.dataset.openStudioTab);
+  document.querySelector(".workbench")?.scrollIntoView({behavior:"smooth",block:"start"});
+}));
+document.querySelector(".dna-hero-primary")?.addEventListener("click",()=>{
+  activateTab("identity");
+});
 init();
