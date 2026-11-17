@@ -11,13 +11,13 @@ const PHOTO=[
  "https://images.unsplash.com/photo-1531297484001-80022131f5a1?auto=format&fit=crop&w=950&q=82",
  "https://images.unsplash.com/photo-1524504388940-b1c1722653e1?auto=format&fit=crop&w=950&q=82",
  "https://images.unsplash.com/photo-1580489944761-15a19d654956?auto=format&fit=crop&w=950&q=82",
- "https://images.unsplash.com/photo-1529156069898-49953e39b3ac?auto=format&fit=crop&w=950&q=82",
+ "https://images.unsplash.com/photo-1522071820081-009f0129c71c?auto=format&fit=crop&w=950&q=82",
  "https://images.unsplash.com/photo-1507842217343-583bb7270b66?auto=format&fit=crop&w=950&q=82",
- "https://images.unsplash.com/photo-1486406146926-c627a92ad1ab?auto=format&fit=crop&w=950&q=82",
- "https://images.unsplash.com/photo-1497366811353-6870744d04b2?auto=format&fit=crop&w=950&q=82",
- "https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?auto=format&fit=crop&w=950&q=82",
- "https://images.unsplash.com/photo-1500648767791-00dcc994a43e?auto=format&fit=crop&w=950&q=82",
- "https://images.unsplash.com/photo-1473496169904-658ba7c44d8a?auto=format&fit=crop&w=950&q=82"
+ "https://images.unsplash.com/photo-1507679799987-c73779587ccf?auto=format&fit=crop&w=950&q=82",
+ "https://images.unsplash.com/photo-1581092795360-fd1ca04f0952?auto=format&fit=crop&w=950&q=82",
+ "https://images.unsplash.com/photo-1494790108377-be9c29b29330?auto=format&fit=crop&w=950&q=82",
+ "https://images.unsplash.com/photo-1539571696357-5a69c17a67c6?auto=format&fit=crop&w=950&q=82",
+ "https://images.unsplash.com/photo-1469474968028-56623f02e42e?auto=format&fit=crop&w=950&q=82"
 ];
 // A visual archetype is editorial art direction, never a claim that the photographed
 // person is an agent, its developer, a customer, or an actual historical advisor.
