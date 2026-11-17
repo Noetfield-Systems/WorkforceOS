@@ -6,22 +6,38 @@ const $=id=>document.getElementById(id);
 const esc=v=>String(v??"").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
 const words=v=>String(v||"").replaceAll("_"," ").replace(/\b\w/g,c=>c.toUpperCase());
 const PHOTO=[
- "https://images.unsplash.com/photo-1736647339992-b54534cef4c2?auto=format&fit=crop&w=950&q=82",
- "https://images.unsplash.com/photo-1764711273459-4c75239ae20f?auto=format&fit=crop&w=950&q=82",
- "https://images.unsplash.com/photo-1681836695952-1f8073a7938d?auto=format&fit=crop&w=950&q=82",
- "https://images.unsplash.com/photo-1736647339992-b54534cef4c2?auto=format&fit=crop&w=950&q=82",
- "https://images.unsplash.com/photo-1681836695952-1f8073a7938d?auto=format&fit=crop&w=950&q=82",
- "https://images.unsplash.com/photo-1764711273459-4c75239ae20f?auto=format&fit=crop&w=950&q=82"
+ "https://images.unsplash.com/photo-1560250097-0b93528c311a?auto=format&fit=crop&w=950&q=82",
+ "https://images.unsplash.com/photo-1497633762265-9d179a990aa6?auto=format&fit=crop&w=950&q=82",
+ "https://images.unsplash.com/photo-1531297484001-80022131f5a1?auto=format&fit=crop&w=950&q=82",
+ "https://images.unsplash.com/photo-1524504388940-b1c1722653e1?auto=format&fit=crop&w=950&q=82",
+ "https://images.unsplash.com/photo-1580489944761-15a19d654956?auto=format&fit=crop&w=950&q=82",
+ "https://images.unsplash.com/photo-1529156069898-49953e39b3ac?auto=format&fit=crop&w=950&q=82",
+ "https://images.unsplash.com/photo-1507842217343-583bb7270b66?auto=format&fit=crop&w=950&q=82",
+ "https://images.unsplash.com/photo-1486406146926-c627a92ad1ab?auto=format&fit=crop&w=950&q=82",
+ "https://images.unsplash.com/photo-1497366811353-6870744d04b2?auto=format&fit=crop&w=950&q=82",
+ "https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?auto=format&fit=crop&w=950&q=82",
+ "https://images.unsplash.com/photo-1500648767791-00dcc994a43e?auto=format&fit=crop&w=950&q=82",
+ "https://images.unsplash.com/photo-1473496169904-658ba7c44d8a?auto=format&fit=crop&w=950&q=82"
 ];
+// A visual archetype is editorial art direction, never a claim that the photographed
+// person is an agent, its developer, a customer, or an actual historical advisor.
 const PRESET_META={
- research_analyst:{category:"Research",display:"Research Agent",glyph:"◎",image:0},
- sales_operator:{category:"Sales",display:"Sales Agent",glyph:"↗",image:1},
- product_engineer:{category:"Engineering",display:"Product Engineer",glyph:"⌘",image:2},
- creative_partner:{category:"Creative",display:"Creative Agent",glyph:"✧",image:3},
- personal_guide:{category:"Learning",display:"Personal Guide",glyph:"◇",image:4},
- community_builder:{category:"Community",display:"Community Builder",glyph:"✳",image:5}
+ sales_operator:{category:"Sales",display:"Nova",subtitle:"The Deal Strategist",character:"Contemporary",vibe:"portrait",color:"clay",glyph:"↗",image:0,signature:"Confident · Direct · Commercial"},
+ research_analyst:{category:"Research",display:"Scout",subtitle:"The Evidence Detective",character:"Investigative",vibe:"archive",color:"slate",glyph:"⌕",image:1,signature:"Analytical · Skeptical · Thorough"},
+ product_engineer:{category:"Engineering",display:"Milo",subtitle:"The Systems Maker",character:"Technical",vibe:"industrial",color:"steel",glyph:"⌘",image:2,signature:"Exact · Practical · Methodical"},
+ creative_partner:{category:"Creative",display:"Lumi",subtitle:"The Creative Director",character:"Editorial",vibe:"portrait",color:"rose",glyph:"✳",image:3,signature:"Expressive · Original · Thoughtful"},
+ personal_guide:{category:"Learning",display:"Ari",subtitle:"The Learning Mentor",character:"Humanist",vibe:"portrait",color:"sand",glyph:"◇",image:4,signature:"Patient · Warm · Inquisitive"},
+ community_builder:{category:"Community",display:"Echo",subtitle:"The Community Host",character:"Social",vibe:"reportage",color:"blue",glyph:"◎",image:5,signature:"Welcoming · Organized · Relational"},
+ archive_researcher:{category:"Research",display:"Vesper",subtitle:"The Historical Archivist",character:"Historical",vibe:"archive",color:"sepia",glyph:"✦",image:6,signature:"Contextual · Careful · Scholarly"},
+ financial_analyst:{category:"Finance",display:"Ledger",subtitle:"The Quantitative Analyst",character:"Minimalist",vibe:"architectural",color:"stone",glyph:"≡",image:7,signature:"Precise · Numerical · Cautious"},
+ operations_director:{category:"Operations",display:"Atlas",subtitle:"The Operations Lead",character:"Industrial",vibe:"industrial",color:"ochre",glyph:"▦",image:8,signature:"Dependable · Systematic · Decisive"},
+ customer_advocate:{category:"Support",display:"Sol",subtitle:"The Customer Advocate",character:"Contemporary",vibe:"portrait",color:"lavender",glyph:"◉",image:9,signature:"Patient · Attentive · Helpful"},
+ strategy_advisor:{category:"Strategy",display:"Vale",subtitle:"The Strategic Counsel",character:"Modern classic",vibe:"portrait",color:"charcoal",glyph:"⌁",image:10,signature:"Critical · Decisive · Focused"},
+ field_observer:{category:"Research",display:"Rook",subtitle:"The Field Observer",character:"Documentary",vibe:"reportage",color:"olive",glyph:"↗",image:11,signature:"Observant · Curious · Resourceful"}
 };
-const CAT=[{id:"all",label:"All agents"},{id:"Research",label:"Research"},{id:"Sales",label:"Sales"},{id:"Engineering",label:"Engineering"},{id:"Creative",label:"Creative"},{id:"Learning",label:"Learning"},{id:"Community",label:"Community"},{id:"Operations",label:"Operations"},{id:"Finance",label:"Finance"},{id:"Support",label:"Support"}];
+const CAT=[{id:"all",label:"All disciplines"},{id:"Research",label:"Research"},{id:"Sales",label:"Sales"},{id:"Engineering",label:"Engineering"},{id:"Creative",label:"Creative"},{id:"Learning",label:"Learning"},{id:"Community",label:"Community"},{id:"Finance",label:"Finance"},{id:"Operations",label:"Operations"},{id:"Support",label:"Support"},{id:"Strategy",label:"Strategy"}];
+const STYLE_FILTERS=["All styles","Contemporary","Historical","Industrial","Editorial","Technical","Investigative","Minimalist","Humanist","Social","Modern classic","Documentary"];
+
 const S={catalog:null,gallery:null,session:null,own:null,items:[],filter:"all",search:"",sort:"featured",
  activeArena:null,arenaTimer:null,arenaPolls:0};
 function toast(message){const e=$("toast");e.textContent=message;e.classList.add("show");
@@ -38,38 +54,49 @@ async function api(path,method="GET",body){
  return json;
 }
 function prepare(){
- const presets=(S.catalog?.presets||[]).map((x,i)=>{
-  const meta=PRESET_META[x.id]||{display:x.profile?.role||"AI Agent",category:"Other",glyph:"◇",image:i%PHOTO.length};
-  return {id:x.id,type:"preset",profile:x.profile,category:meta.category,display:meta.display,glyph:meta.glyph,image:meta.image,
-          published_at:null};
+ const official=(S.catalog?.presets||[]).map((x,i)=>{
+   const meta=PRESET_META[x.id]||{category:"General",display:x.profile.name,subtitle:x.profile.role,character:"Original",vibe:"abstract",color:"slate",glyph:"◇",image:-1};
+   return {id:x.id,type:"preset",profile:x.profile,category:meta.category,display:meta.display,
+     subtitle:meta.subtitle,character:meta.character,vibe:meta.vibe,color:meta.color,
+     signature:meta.signature||"Purpose-built · Customizable",glyph:meta.glyph,image:meta.image};
  });
- const community=(S.gallery?.community_templates||[]).map((x,i)=>{
-  const first=(x.profile?.skills||[])[0]||"Custom";
-  const cat=words(first);
-  return {id:x.id,type:"community",profile:x.profile,category:cat,display:x.profile.name,
-          glyph:"✧",image:i%PHOTO.length,published_at:x.published_at||null};
+ const community=(S.gallery?.community_templates||[]).map(x=>{
+   const skill=(x.profile?.skills||[])[0]||"Custom";
+   return {id:x.id,type:"community",profile:x.profile,category:words(skill),
+     display:x.profile.name,subtitle:x.profile.role,character:"Community original",
+     vibe:"abstract",color:"slate",signature:"Shared · Customizable",glyph:"◇",image:-1,
+     published_at:x.published_at||null};
  });
- S.items=[...presets,...community];
+ S.items=[...official,...community];
 }
-function imageStyle(item){return "--agent-photo:url("+PHOTO[item.image%PHOTO.length]+")";}
+
+function imageStyle(item){return item.image>=0?"--agent-photo:url("+PHOTO[item.image]+")":"";}
 function button(label,href,variant="primary"){return '<a class="btn btn-'+variant+'" href="'+esc(href)+'">'+label+' <span class="arrow" aria-hidden="true">↗</span></a>';}
 function editLink(item){return item.type==="community"?"/agent-studio?community="+encodeURIComponent(item.id):
  "/agent-studio?template="+encodeURIComponent(item.id);}
 function categoryLabel(item){return item.category==="Critical Review"?"Research":item.category;}
+function agentArtwork(item){
+ const portrait=item.image>=0?'<img class="agent-card-photo" alt="" loading="lazy" decoding="async" src="'+esc(PHOTO[item.image])+'">':
+ '<span class="editorial-monogram" aria-hidden="true">'+esc((item.profile?.name||item.display||"A").slice(0,1))+'</span>';
+ return '<span class="art-media art-'+esc(item.vibe)+' tone-'+esc(item.color)+'">'+portrait+
+ '<span class="art-corner">'+esc(item.glyph)+'</span><span class="art-caption">'+
+ esc(item.character)+' / '+(item.type==="preset"?"STUDIO ORIGINAL":"COMMUNITY")+'</span></span>';
+}
 function card(item,i,tag=""){
  const skills=(item.profile.skills||[]).slice(0,2);
- return '<article class="agent-card"><a href="/agents/'+encodeURIComponent(item.id)+'" class="card-art" aria-label="View '+esc(item.display)+'">'+
-  '<img class="agent-card-photo" alt="" loading="lazy" decoding="async" src="'+esc(PHOTO[item.image%PHOTO.length])+'">'+
-  (tag?'<span class="card-top-badge">'+esc(tag)+'</span>':'')+
-  '<span class="card-index">'+(item.type==="preset"?"STARTER EDITION":"COMMUNITY TEMPLATE")+'</span>'+
-  '<span class="card-glyph">'+esc(item.glyph)+'</span></a>'+
-  '<div class="card-body"><span class="card-category">'+esc(categoryLabel(item))+' / '+(item.type==="preset"?"Official starter":"Creator edition")+'</span>'+
+ return '<article class="agent-card" data-archetype="'+esc(item.character)+'" data-agent-id="'+esc(item.id)+'">'+
+  '<a class="card-art" href="/agents/'+encodeURIComponent(item.id)+'" aria-label="View '+esc(item.display)+' — '+esc(item.subtitle)+'">'+agentArtwork(item)+
+  (tag?'<span class="card-top-badge">'+esc(tag)+'</span>':'')+'</a>'+
+  '<div class="card-body"><div class="card-topline"><span class="card-category">'+esc(item.category)+
+  '</span><span class="edition-label">'+(item.type==="preset"?"WORKFORCEOS ORIGINAL":"COMMUNITY TEMPLATE")+'</span></div>'+
   '<h3><a href="/agents/'+encodeURIComponent(item.id)+'">'+esc(item.display)+'</a></h3>'+
+  '<span class="card-role">'+esc(item.subtitle)+'</span>'+
   '<p>'+esc(item.profile.mission||item.profile.role)+'</p>'+
   '<div class="card-tags">'+skills.map(x=>'<span class="pill">'+esc(words(x))+'</span>').join("")+'</div>'+
-  '<div class="card-foot"><span>◇ Free template</span><a href="'+esc(editLink(item))+'">Customize ↗</a></div></div></article>';
+  '<div class="card-foot"><span>Free to customize</span><a href="'+esc(editLink(item))+'">Use this agent <span aria-hidden="true">↗</span></a></div></div></article>';
 }
-function cards(items,limit=items.length){return items.slice(0,limit).map((item,i)=>card(item,i,i===0?"CURATED STARTER":"")).join("");}
+function cards(items,limit=items.length){return items.slice(0,limit).map((item,i)=>card(item,i,"")).join("");}
+
 function orbVisual(){return '<div class="scene-visual" aria-hidden="true"><div class="orbital-halo"></div><div class="globe"><div class="globe-spark"></div></div>'+
  '<div class="holo-agent holo-one" style="--card-photo:url('+PHOTO[0]+')"><small>RESEARCH / 01</small></div>'+
  '<div class="holo-agent holo-two" style="--card-photo:url('+PHOTO[1]+')"><small>SALES / 02</small></div>'+
