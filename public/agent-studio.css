@@ -218,7 +218,7 @@ label small{display:block;color:#82988a;font-size:11px;letter-spacing:0;font-wei
 .dna-scene-orbit::before{content:"";position:absolute;inset:14%;border-radius:50%;border:1px solid #a8efd2a3;box-shadow:0 0 24px #afecb74e}
 .dna-scene-glass{pointer-events:none;position:absolute;right:1%;top:8%;width:38%;height:80%;border:1px solid #99d5ae66;transform:perspective(880px) rotateY(-6deg);border-radius:15px;background:linear-gradient(135deg,#4dc28821,#02190c22),repeating-linear-gradient(90deg,transparent 0 58px,#9bffb112 59px 60px);box-shadow:0 0 42px #2d985122,inset 0 0 54px #73ffb021}
 .dna-scene-light{pointer-events:none;position:absolute;right:17%;top:10%;width:170px;height:170px;border-radius:50%;background:radial-gradient(circle,#a0f3bd70,#2dab955a 26%,#0f503ca2 57%,transparent 72%);box-shadow:0 0 100px #65eeab55}
-.dna-scene-portrait{pointer-events:none;position:absolute;right:7.5%;top:8%;width:25%;height:84%;border:1px solid #a1e3ba88;border-radius:12px;background-image:linear-gradient(0deg,#0b2119ee,transparent 58%),linear-gradient(110deg,#16754f36,#d9bb8533),url("https://images.unsplash.com/photo-1664214050500-0e1ddba18cc8?auto=format&fit=crop&w=850&q=80");background-size:cover;background-position:center 30%;box-shadow:0 15px 50px #0009,0 0 35px #4ccd8f33;transform:perspective(780px) rotateY(-8deg);display:flex;justify-content:space-between;align-items:flex-end;padding:15px;gap:10px}
+.dna-scene-portrait{pointer-events:none;position:absolute;right:7.5%;top:8%;width:25%;height:84%;border:1px solid #a1e3ba88;border-radius:12px;background-image:linear-gradient(0deg,#0b2119ee,transparent 58%),linear-gradient(110deg,#16754f36,#d9bb8533),url("https://images.unsplash.com/photo-1736647339992-b54534cef4c2?auto=format&fit=crop&w=850&q=80");background-size:cover;background-position:center 30%;box-shadow:0 15px 50px #0009,0 0 35px #4ccd8f33;transform:perspective(780px) rotateY(-8deg);display:flex;justify-content:space-between;align-items:flex-end;padding:15px;gap:10px}
 .dna-scene-portrait span{font-size:9px;letter-spacing:1.4px;color:#d5edc8;text-shadow:0 1px 8px #000}
 .dna-hero-content{position:relative;z-index:2;width:min(calc(100% - 70px),1490px);margin-inline:auto;padding:60px 0 62px;max-width:1490px}
 .dna-hero-content>*{max-width:600px}
@@ -238,7 +238,7 @@ label small{display:block;color:#82988a;font-size:11px;letter-spacing:0;font-wei
 .rail{background:#0d1a14}
 .workbench{background:linear-gradient(165deg,#0b1914,#101d18)}
 .preview-card{background:linear-gradient(160deg,#1d3a29,#10241c)}
-.portrait{height:245px;background-image:linear-gradient(0deg,#081b11d9,transparent 64%),url("https://images.unsplash.com/photo-1664214050500-0e1ddba18cc8?auto=format&fit=crop&w=800&q=80");background-size:cover;background-position:center 24%;border:1px solid #83c08a}
+.portrait{height:245px;background-image:linear-gradient(0deg,#081b11d9,transparent 64%),url("https://images.unsplash.com/photo-1736647339992-b54534cef4c2?auto=format&fit=crop&w=800&q=80");background-size:cover;background-position:center 24%;border:1px solid #83c08a}
 .portrait-mark{font-size:96px;color:#baf3c649;opacity:.4;position:absolute;right:17px;top:22px;text-shadow:0 0 15px #3fea9e66}
 .portrait-light{border-color:#d3bf8c88;box-shadow:0 0 45px #ddc68144;width:180px;height:180px}
 .portrait-ring{border-color:#e2c8868a}
@@ -252,7 +252,7 @@ label small{display:block;color:#82988a;font-size:11px;letter-spacing:0;font-wei
 .studio-editorial-panel{min-height:315px;border:1px solid #7da47e77;border-radius:15px;overflow:hidden;padding:38px;display:flex;align-items:flex-end;position:relative;background:#10251a}
 .studio-editorial-panel::before{content:"";position:absolute;inset:0;background-image:linear-gradient(0deg,#07170cfa,#08191586 45%,#091b1011),var(--editorial-photo);background-size:cover;background-position:center;filter:saturate(.7) brightness(.85)}
 .studio-editorial-panel.discovery{--editorial-photo:url("https://images.unsplash.com/photo-1753808636872-6add5c6a0284?auto=format&fit=crop&w=1300&q=82")}
-.studio-editorial-panel.evaluation{--editorial-photo:url("https://images.unsplash.com/photo-1729008712499-5e6b58420789?auto=format&fit=crop&w=1300&q=82")}
+.studio-editorial-panel.evaluation{--editorial-photo:url("https://images.unsplash.com/photo-1681836695952-1f8073a7938d?auto=format&fit=crop&w=1300&q=82")}
 .studio-editorial-panel>div{position:relative;z-index:2;max-width:390px}
 .studio-editorial-panel span{font-size:10px;letter-spacing:1.9px;color:#dfc78d}
 .studio-editorial-panel h3{font:normal clamp(27px,3vw,38px)/1.1 Georgia,serif;letter-spacing:-.9px;margin:11px 0}
