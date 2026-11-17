@@ -56,8 +56,11 @@ const scrub=(value)=>String(value||"").slice(0,350);
     }
     if(name==="marketplace"){
       assert((await page.locator(".agent-card").count())>=6,"official catalog missing");
-      const portrait=await page.locator(".card-art").first().evaluate(el=>getComputedStyle(el).getPropertyValue("--agent-photo"));
-      assert(portrait.includes("images.unsplash.com/photo-"),"Agent portrait background asset missing from card");
+      const portrait=await page.locator(".agent-card-photo").first().evaluate(img=>({
+        src:img.getAttribute("src"),complete:img.complete,naturalWidth:img.naturalWidth
+      }));
+      assert(portrait.src?.includes("images.unsplash.com/photo-"),"Agent portrait image asset missing from card");
+      console.log("PORTRAIT_IMAGE",viewportName,JSON.stringify(portrait));
       await page.locator("#market-query").fill("this-result-does-not-exist-471");
       await page.locator(".empty-card").waitFor({state:"visible",timeout:3000});
       await page.locator("#clear-filter").click();
