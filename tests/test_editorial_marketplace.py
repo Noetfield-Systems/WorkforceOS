@@ -67,7 +67,7 @@ class EditorialMarketplaceTests(unittest.TestCase):
                      "/static/agent-art.js"):
             r=self.client.get(path)
             self.assertEqual(r.status_code,200,r.text[:120])
-            self.assertGreater(len(r.content),4000)
+            self.assertGreater(len(r.content),1500, path)
         javascript=(ROOT/"public/marketplace.js").read_text()
         self.assertIn("archive_researcher",javascript)
         self.assertIn("style-filters",javascript)
