@@ -173,5 +173,44 @@
   return '<svg xmlns="http://www.w3.org/2000/svg" class="agent-visual-svg" role="img" aria-label="'+(options?.ariaLabel||"Original abstract AI agent illustration")+'" viewBox="0 0 600 430" preserveAspectRatio="xMidYMid slice" style="width:'+w+';height:100%">'+
     unique+background+g(figure(key,accent,light),'stroke-linecap="round" stroke-linejoin="round"')+'</svg>';
  }
- root.WorkforceAgentArt={svg,has:id=>Object.prototype.hasOwnProperty.call(colors,id),ids:Object.keys(colors)};
+ const characters={
+   // Curated free-to-use Unsplash artwork. Editorial renderings depict a visual
+   // persona, NOT a real hardware product, provider or independent agent result.
+   sales_operator:{photo:"photo-1767716134775-6787d0def70c",tone:"apricot",focus:"center 35%",caption:"THE NEGOTIATOR"},
+   research_analyst:{photo:"photo-1771515220905-ba0784fb7522",tone:"steel",focus:"center 36%",caption:"THE OBSERVER"},
+   product_engineer:{photo:"photo-1737644467636-6b0053476bb2",tone:"silver",focus:"center 39%",caption:"THE BUILDER"},
+   creative_partner:{photo:"photo-1638957319391-9b81b996afca",tone:"rose",focus:"center 45%",caption:"THE MAKER"},
+   personal_guide:{photo:"photo-1703668929798-67cab2e41f6b",tone:"butter",focus:"center 47%",caption:"THE MENTOR"},
+   community_builder:{photo:"photo-1768400730812-039f5971185d",tone:"violet",focus:"center 42%",caption:"THE CONNECTOR"},
+   archive_researcher:{photo:"photo-1654009603731-20b6d7536002",tone:"sepia",focus:"center 50%",caption:"THE ARCHIVIST"},
+   financial_analyst:{photo:"photo-1750096319146-6310519b5af2",tone:"cobalt",focus:"center 48%",caption:"THE ANALYST"},
+   operations_director:{photo:"photo-1760931969401-9bd6ee902798",tone:"copper",focus:"center 42%",caption:"THE OPERATOR"},
+   customer_advocate:{photo:"photo-1768323286305-2fa2ad91c3cf",tone:"mint",focus:"center 42%",caption:"THE HELPER"},
+   strategy_advisor:{photo:"photo-1750192524484-36450bbb1dd6",tone:"ink",focus:"center 45%",caption:"THE COUNSEL"},
+   field_observer:{photo:"photo-1712971724897-a9ae95e0ec44",tone:"sage",focus:"center 50%",caption:"THE SCOUT"}
+ };
+ function media(id,options={}){
+   const key=safe(id),entry=characters[key],context=safe(options.context||"card");
+   const label=entry?entry.caption:"CUSTOM AGENT";
+   const backup=svg(key,{context:"fallback-"+context,ariaLabel:"Original digital agent identity"});
+   const fallback='<span class="agent-media-fallback" aria-hidden="true">'+backup+'</span>';
+   if(!entry)return '<div class="agent-character-art agent-character-custom">'+fallback+
+     '<span class="agent-char-label">ORIGINAL / AGENT DNA</span></div>';
+   const quality=context.startsWith("hero")||context==="product"||context==="studio-hero"?1000:750;
+   const img="https://images.unsplash.com/"+entry.photo+"?auto=format&fit=crop&w="+quality+"&q=88";
+   return '<div class="agent-character-art agent-tone-'+entry.tone+' agent-id-'+key+
+     '" data-agent-art="'+key+'">'+fallback+
+     '<img class="agent-character-photo" src="'+img+'" alt="" decoding="async" loading="'+
+     (options.priority?"eager":"lazy")+'" fetchpriority="'+(options.priority?"high":"auto")+
+     '" style="object-position:'+entry.focus+'">'+
+     '<span class="agent-character-vignette" aria-hidden="true"></span>'+
+     '<span class="agent-character-light" aria-hidden="true"></span>'+
+     '<span class="agent-char-label">'+label+'</span>'+
+     '<span class="agent-char-index">W / '+String(Object.keys(characters).indexOf(key)+1).padStart(2,"0")+'</span></div>';
+ }
+ document.addEventListener("error",event=>{
+   if(event.target?.classList?.contains("agent-character-photo"))event.target.classList.add("image-error");
+ },true);
+ root.WorkforceAgentArt={svg,media,has:id=>Object.prototype.hasOwnProperty.call(colors,id),ids:Object.keys(colors)};
+
 })(window);
