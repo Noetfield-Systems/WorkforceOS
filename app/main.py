@@ -106,7 +106,7 @@ async def headers(request:Request,call_next):
     response.headers["Referrer-Policy"]="no-referrer"
     response.headers["Permissions-Policy"]="camera=(), microphone=(), geolocation=()"
     response.headers["Content-Security-Policy"]=(
-        "default-src 'self'; style-src 'self'; script-src 'self'; img-src 'self' data:; "
+        "default-src 'self'; style-src 'self'; script-src 'self'; img-src 'self' data: https://images.unsplash.com; "
         "connect-src 'self'; frame-ancestors 'none'; form-action 'self'; base-uri 'none'; "
         "object-src 'none'")
     return response
@@ -212,6 +212,27 @@ def health():
 
 
 @app.get("/")
+def marketplace_home():
+    # Public brand home; existing authenticated customer SPA remains at /app.
+    return FileResponse(PUBLIC/"marketplace.html",media_type="text/html",
+        headers={"Cache-Control":"no-cache"})
+
+
+@app.get("/marketplace")
+@app.get("/marketplace/")
+@app.get("/arena")
+@app.get("/arena/")
+@app.get("/creators")
+@app.get("/creators/")
+@app.get("/pricing")
+@app.get("/pricing/")
+@app.get("/agents/{slug}")
+def marketplace_pages():
+    # Shared cinematic design shell; the browser only renders real public catalog data.
+    return FileResponse(PUBLIC/"marketplace.html",media_type="text/html",
+        headers={"Cache-Control":"no-cache"})
+
+
 @app.get("/app")
 def website():
     return FileResponse(PUBLIC/"index.html",media_type="text/html",
