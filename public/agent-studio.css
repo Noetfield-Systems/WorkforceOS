@@ -200,3 +200,96 @@ label small{display:block;color:#82988a;font-size:11px;letter-spacing:0;font-wei
 .import-trigger{position:relative;overflow:hidden;border:1px solid #546b55;color:#dbe9d8;background:#26372b;padding:11px 15px;font-size:12px;font-weight:750;border-radius:9px;cursor:pointer;white-space:nowrap}
 .import-trigger input{position:absolute;inset:0;opacity:0;cursor:pointer;margin:0!important}
 @media(max-width:850px){.portable-module{flex-direction:column;align-items:stretch}.arena-grid{grid-template-columns:1fr}}
+
+
+/* Agent DNA Studio — premium public-marketplace design integration (2026-11-17).
+   Photo assets from Unsplash, abstract orbital graphics from CSS; all functions remain source-backed. */
+.topbar{height:72px;padding-inline:clamp(16px,3vw,44px);background:rgba(4,15,12,.95);backdrop-filter:blur(16px);position:relative;z-index:10}
+.studio-site-nav{display:flex;gap:25px;align-items:center;justify-content:center;min-width:0}
+.studio-site-nav a{font-size:12px;font-weight:700;color:#b8cbba;text-decoration:none;white-space:nowrap;border-bottom:2px solid transparent;padding:23px 0 21px;line-height:1}
+.studio-site-nav a:hover,.studio-site-nav a[aria-current=page]{color:#f2f8ec}
+.studio-site-nav a[aria-current=page]{border-color:#a0ebba}
+.brand-mark{border-radius:6px;width:36px;height:34px;background:#8aefb0;color:#0b2118;box-shadow:0 0 19px #73ffbb27}
+.brand-os{color:#c3cfc7}
+.dna-cinematic-hero{position:relative;min-height:400px;overflow:hidden;isolation:isolate;background:linear-gradient(90deg,#06140fec 0%,#06120eec 31%,#0b21189f 60%,#10251942 100%),url("https://images.unsplash.com/photo-1717524384771-caba6984a180?auto=format&fit=crop&w=2000&q=85") center 40%/cover}
+.dna-cinematic-hero::before{content:"";position:absolute;inset:0;background:linear-gradient(0deg,#081410f1,transparent 26%),radial-gradient(circle at 68% 49%,#4bbf8866,transparent 34%);z-index:-1}
+.dna-cinematic-hero::after{content:"";position:absolute;inset:0;opacity:.23;background:repeating-linear-gradient(0deg,transparent 0 8px,#cfffe108 9px 10px);pointer-events:none}
+.dna-scene-orbit{pointer-events:none;position:absolute;right:12%;top:-48%;height:610px;width:610px;border:3px solid #deca9673;border-radius:50%;transform:rotateX(74deg) rotate(-10deg);box-shadow:0 0 36px #e4c57b66,inset 0 0 28px #afebc754}
+.dna-scene-orbit::before{content:"";position:absolute;inset:14%;border-radius:50%;border:1px solid #a8efd2a3;box-shadow:0 0 24px #afecb74e}
+.dna-scene-glass{pointer-events:none;position:absolute;right:1%;top:8%;width:38%;height:80%;border:1px solid #99d5ae66;transform:perspective(880px) rotateY(-6deg);border-radius:15px;background:linear-gradient(135deg,#4dc28821,#02190c22),repeating-linear-gradient(90deg,transparent 0 58px,#9bffb112 59px 60px);box-shadow:0 0 42px #2d985122,inset 0 0 54px #73ffb021}
+.dna-scene-light{pointer-events:none;position:absolute;right:17%;top:10%;width:170px;height:170px;border-radius:50%;background:radial-gradient(circle,#a0f3bd70,#2dab955a 26%,#0f503ca2 57%,transparent 72%);box-shadow:0 0 100px #65eeab55}
+.dna-scene-portrait{pointer-events:none;position:absolute;right:7.5%;top:8%;width:25%;height:84%;border:1px solid #a1e3ba88;border-radius:12px;background-image:linear-gradient(0deg,#0b2119ee,transparent 58%),linear-gradient(110deg,#16754f36,#d9bb8533),url("https://images.unsplash.com/photo-1736647339992-b54534cef4c2?auto=format&fit=crop&w=850&q=80");background-size:cover;background-position:center 30%;box-shadow:0 15px 50px #0009,0 0 35px #4ccd8f33;transform:perspective(780px) rotateY(-8deg);display:flex;justify-content:space-between;align-items:flex-end;padding:15px;gap:10px}
+.dna-scene-portrait span{font-size:9px;letter-spacing:1.4px;color:#d5edc8;text-shadow:0 1px 8px #000}
+.dna-hero-content{position:relative;z-index:2;width:min(calc(100% - 70px),1490px);margin-inline:auto;padding:60px 0 62px;max-width:1490px}
+.dna-hero-content>*{max-width:600px}
+.dna-hero-eyebrow{font-size:10px;font-weight:800;color:#dfcb96;letter-spacing:2.5px}
+.dna-hero-content h1{font:normal clamp(50px,5.5vw,80px)/1.05 Georgia,serif;letter-spacing:-2.5px;margin:13px 0 9px}
+.dna-hero-content h1 em{color:#a9f0be;font-weight:400}
+.dna-hero-content h2{font:normal 20px/1.3 -apple-system,BlinkMacSystemFont,Arial,sans-serif;letter-spacing:.3px;color:#f7ead3;margin:0}
+.dna-hero-content p{font-size:13px;color:#c5d6c6;line-height:1.8;max-width:500px;margin:17px 0 21px}
+.dna-hero-actions{display:flex;gap:10px;align-items:center;flex-wrap:wrap}
+.dna-hero-actions a,.dna-hero-actions button{display:inline-flex;align-items:center;justify-content:center;border:1px solid #a1d6aa;border-radius:999px;padding:11px 21px;font-size:12px;font-weight:800;text-decoration:none;min-height:41px}
+.dna-hero-primary{background:#a7ebbd;color:#092115}
+.dna-hero-secondary{background:#071d16bb;color:#ecf4e5}
+.dna-hero-highlights{display:flex;gap:21px;flex-wrap:wrap;margin-top:24px;color:#e9e0c6;font-size:10px}
+.dna-hero-highlights span{white-space:nowrap}
+.studio{border-top:1px solid #51775b}
+.preview-rail{background:linear-gradient(180deg,#14251b,#0e1c16)}
+.rail{background:#0d1a14}
+.workbench{background:linear-gradient(165deg,#0b1914,#101d18)}
+.preview-card{background:linear-gradient(160deg,#1d3a29,#10241c)}
+.portrait{height:245px;background-image:linear-gradient(0deg,#081b11d9,transparent 64%),url("https://images.unsplash.com/photo-1736647339992-b54534cef4c2?auto=format&fit=crop&w=800&q=80");background-size:cover;background-position:center 24%;border:1px solid #83c08a}
+.portrait-mark{font-size:96px;color:#baf3c649;opacity:.4;position:absolute;right:17px;top:22px;text-shadow:0 0 15px #3fea9e66}
+.portrait-light{border-color:#d3bf8c88;box-shadow:0 0 45px #ddc68144;width:180px;height:180px}
+.portrait-ring{border-color:#e2c8868a}
+.portrait-bottom{z-index:3;color:#f3f8e8}
+.studio-editorial-finale{padding:68px clamp(16px,4vw,64px) 28px;background:#07130f;border-top:1px solid #3e6149}
+.editorial-section-head{text-align:center;max-width:900px;margin:0 auto 28px}
+.editorial-section-head>span{font-size:10px;letter-spacing:2.5px;color:#cfb580;font-weight:750}
+.editorial-section-head h2{font:normal clamp(33px,4.2vw,53px)/1.1 Georgia,serif;margin:13px 0;letter-spacing:-1.6px}
+.editorial-section-head em,.studio-editorial-panel em{color:#a3e9b6;font-weight:400}
+.studio-editorial-cards{display:grid;grid-template-columns:1fr 1fr;gap:18px;max-width:1470px;margin:auto}
+.studio-editorial-panel{min-height:315px;border:1px solid #7da47e77;border-radius:15px;overflow:hidden;padding:38px;display:flex;align-items:flex-end;position:relative;background:#10251a}
+.studio-editorial-panel::before{content:"";position:absolute;inset:0;background-image:linear-gradient(0deg,#07170cfa,#08191586 45%,#091b1011),var(--editorial-photo);background-size:cover;background-position:center;filter:saturate(.7) brightness(.85)}
+.studio-editorial-panel.discovery{--editorial-photo:url("https://images.unsplash.com/photo-1753808636872-6add5c6a0284?auto=format&fit=crop&w=1300&q=82")}
+.studio-editorial-panel.evaluation{--editorial-photo:url("https://images.unsplash.com/photo-1681836695952-1f8073a7938d?auto=format&fit=crop&w=1300&q=82")}
+.studio-editorial-panel>div{position:relative;z-index:2;max-width:390px}
+.studio-editorial-panel span{font-size:10px;letter-spacing:1.9px;color:#dfc78d}
+.studio-editorial-panel h3{font:normal clamp(27px,3vw,38px)/1.1 Georgia,serif;letter-spacing:-.9px;margin:11px 0}
+.studio-editorial-panel p{font-size:12px;color:#cdddc8;max-width:380px;line-height:1.65;margin:0 0 15px}
+.studio-editorial-panel a{display:inline-flex;padding:9px 16px;border-radius:100px;background:#b5edbc;color:#0f2518;font-size:11px;font-weight:800;text-decoration:none}
+.studio-next-footer{display:flex;justify-content:center;flex-wrap:wrap;gap:26px;max-width:1470px;margin:35px auto 0;padding-top:20px;border-top:1px solid #34543d}
+.studio-next-footer a{font-size:11px;color:#a8c4a7;text-decoration:none}
+.studio-next-footer a:hover{color:#c9f5ca}
+@media(max-width:1080px){
+ .studio-site-nav{gap:12px}
+ .studio-site-nav a{font-size:10px}
+ .dna-hero-content{width:calc(100% - 42px)}
+ .dna-scene-portrait{right:2%;width:28%}
+ .dna-hero-content>*{max-width:500px}
+}
+@media(max-width:730px){
+ .topbar{height:auto;min-height:65px;flex-wrap:wrap;padding:12px 16px}
+ .top-right{margin-left:auto}
+ .studio-site-nav{order:3;flex-basis:100%;justify-content:space-between;overflow:auto;gap:20px}
+ .studio-site-nav a{padding:10px 0}
+ .dna-cinematic-hero{min-height:605px}
+ .dna-hero-content{padding:34px 0}
+ .dna-hero-content>*{max-width:none}
+ .dna-hero-content h1{font-size:47px}
+ .dna-hero-content h2{font-size:17px}
+ .dna-hero-content p{font-size:12px;max-width:500px}
+ .dna-hero-highlights{gap:9px 15px}
+ .dna-scene-portrait{top:auto;bottom:20px;height:205px;right:7%;width:43%}
+ .dna-scene-orbit{top:auto;bottom:-190px;right:6%;width:350px;height:350px}
+ .dna-scene-glass{top:auto;bottom:10px;height:210px;right:3%;width:75%}
+ .dna-scene-light{top:auto;bottom:20px}
+ .studio-editorial-cards{grid-template-columns:1fr}
+ .studio-editorial-panel{min-height:270px;padding:24px}
+}
+@media(max-width:390px){
+ .studio-site-nav a{font-size:9px}
+ .dna-hero-content h1{font-size:39px}
+ .dna-scene-portrait{width:49%}
+ .dna-hero-actions a,.dna-hero-actions button{font-size:10px;padding:10px 14px}
+}

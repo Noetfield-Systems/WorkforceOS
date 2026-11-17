@@ -621,7 +621,9 @@ async function openTicketDetail(id,background=false){
 async function afterLogin(response){
  S.authenticated=true;S.csrf=response.csrf;S.user=response.account;
  hideModal("auth-modal");showScreen(true);
- await refresh();setView("overview");
+ await refresh();
+ const deepView=new URLSearchParams(location.search).get("view");
+ setView(VALID_VIEWS.includes(deepView)?deepView:"overview");
  if(S.pendingSignupTemplate){const t=S.pendingSignupTemplate;S.pendingSignupTemplate=null;openTeamBuilder(t);}
 }
 async function submitAuth(event){
@@ -784,10 +786,17 @@ async function initialize(){
  try{
   const [session,templates]=await Promise.all([api("/api/session"),api("/api/templates")]);
   S.templates=templates.templates||[];
+  const query=new URLSearchParams(location.search);
   if(session.authenticated){
    S.csrf=session.csrf;S.user=session.account;
    showScreen(true);await refresh();
-  }else showScreen(false);
+   if(VALID_VIEWS.includes(query.get("view")))setView(query.get("view"));
+  }else{
+   showScreen(false);
+   if(query.has("signin")||query.get("view")==="billing"){
+     switchAuth("login");showModal("auth-modal");
+   }
+  }
  }catch(err){
   showScreen(false);notice("The workspace connection is unavailable. You can still explore the product.");
  }
