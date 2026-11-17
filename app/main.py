@@ -31,6 +31,7 @@ from .collaborate import router as collaboration_router, initialize_collaboratio
 from .people_ops import router as people_router, initialize_people
 from .connect_bridge import router as connect_bridge_router
 from .people_intelligence import router as people_intelligence_router
+from .agent_dna import initialize_dna, install as install_agent_dna
 
 ROOT=Path(__file__).resolve().parent
 PUBLIC=ROOT.parent/"public"
@@ -62,6 +63,7 @@ async def lifetime(application):
     initialize_opportunities()
     initialize_collaboration()
     initialize_people()
+    initialize_dna(database)
     if fabric.connected():
         # A read-only authenticated source probe uses an empty namespace;
         # it does NOT register a fictitious customer or create test work.
@@ -214,6 +216,13 @@ def health():
 def website():
     return FileResponse(PUBLIC/"index.html",media_type="text/html",
         headers={"Cache-Control":"no-cache"})
+
+
+@app.get("/agent-studio")
+@app.get("/agent-studio/")
+def agent_studio_page():
+    return FileResponse(PUBLIC/"agent-studio.html",media_type="text/html",
+                        headers={"Cache-Control":"no-cache"})
 
 
 @app.get("/partners")
@@ -955,3 +964,9 @@ async def advance_mission(mission_id:str,account=Depends(_write)):
 def opportunity_os_website():
     return FileResponse(PUBLIC/"opportunity-os.html",media_type="text/html",
                         headers={"Cache-Control":"no-cache"})
+
+
+# Agent DNA uses the existing session/CSRF, tenant quotas, task dispatch and Fabric bridge.
+install_agent_dna(app, database=database, uid=uid, event=event,
+    authentication=_authentication, write=_write, sync_agent=_sync_agent,
+    limits=_limits, create_ticket=create_ticket, ticket_input=TicketInput)
