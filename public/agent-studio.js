@@ -15,6 +15,33 @@ const traits={
 };
 const toolLabels={web:"Web research",crm:"CRM access",github:"GitHub",calendar:"Calendar",email:"Email"};
 
+const CHARACTER_ART={
+ Nova:"photo-1560250097-0b93528c311a",
+ Scout:"photo-1497633762265-9d179a990aa6",
+ Milo:"photo-1531297484001-80022131f5a1",
+ Lumi:"photo-1524504388940-b1c1722653e1",
+ Ari:"photo-1580489944761-15a19d654956",
+ Echo:"photo-1529156069898-49953e39b3ac",
+ Vesper:"photo-1507842217343-583bb7270b66",
+ Ledger:"photo-1486406146926-c627a92ad1ab",
+ Atlas:"photo-1497366811353-6870744d04b2",
+ Sol:"photo-1573496359142-b8d87734a5a2",
+ Vale:"photo-1500648767791-00dcc994a43e",
+ Rook:"photo-1473496169904-658ba7c44d8a"
+};
+function portraitFor(profile){
+ const first=String(profile?.name||"").split(/\s+/)[0];
+ const photo=CHARACTER_ART[first];
+ const portrait=$("portrait-mark")?.parentElement;
+ if(!portrait)return;
+ portrait.style.backgroundImage=photo?
+  "linear-gradient(0deg,rgba(26,38,33,.38),transparent 62%),url(https://images.unsplash.com/"+photo+"?auto=format&fit=crop&w=850&q=80)":
+  "linear-gradient(125deg,#d5d9d3,#e9e8e1)";
+ portrait.style.backgroundSize="cover";
+ portrait.style.backgroundPosition="center 28%";
+}
+
+
 function flash(message){const el=$("toast");el.textContent=message;el.classList.add("visible");
  clearTimeout(flash.timer);flash.timer=setTimeout(()=>el.classList.remove("visible"),4700);}
 function detailText(err){return String(err?.message||"REQUEST_FAILED").replaceAll("_"," ");}
@@ -62,6 +89,7 @@ function updatePreview(){
  $("preview-role").textContent=p.role||"Choose a role";
  $("preview-mission").textContent=p.mission||"Define a core mission.";
  $("portrait-mark").textContent=(p.name||"A").charAt(0).toUpperCase();
+ portraitFor(p);
  $("preview-revision").textContent=S.id?"V"+S.revision:"DRAFT";
  $("preview-runtime").textContent=S.sync;
  $("preview-traits").innerHTML=Object.entries(p.traits||{}).map(([key,value])=>
