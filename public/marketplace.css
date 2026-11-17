@@ -9,9 +9,9 @@
  --serif:Georgia,"Times New Roman",serif;--sans:Inter,ui-sans-serif,-apple-system,BlinkMacSystemFont,"Segoe UI",Arial,sans-serif;
  --photo-atrium:url("https://images.unsplash.com/photo-1717524384771-caba6984a180?auto=format&fit=crop&w=2400&q=85");
  --photo-glass:url("https://images.unsplash.com/photo-1753808636872-6add5c6a0284?auto=format&fit=crop&w=2000&q=85");
- --photo-statue:url("https://images.unsplash.com/photo-1729008712499-5e6b58420789?auto=format&fit=crop&w=1100&q=83");
- --photo-woman:url("https://images.unsplash.com/photo-1664214050500-0e1ddba18cc8?auto=format&fit=crop&w=1000&q=83");
- --photo-man:url("https://images.unsplash.com/photo-1739323147107-bc748671f498?auto=format&fit=crop&w=1000&q=83");
+ --photo-statue:url("https://images.unsplash.com/photo-1681836695952-1f8073a7938d?auto=format&fit=crop&w=1100&q=83");
+ --photo-woman:url("https://images.unsplash.com/photo-1736647339992-b54534cef4c2?auto=format&fit=crop&w=1000&q=83");
+ --photo-man:url("https://images.unsplash.com/photo-1764711273459-4c75239ae20f?auto=format&fit=crop&w=1000&q=83");
 }
 *{box-sizing:border-box}
 html{scroll-behavior:smooth;scroll-padding-top:84px}
