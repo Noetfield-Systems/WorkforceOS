@@ -209,7 +209,12 @@
      '<span class="agent-char-index">W / '+String(Object.keys(characters).indexOf(key)+1).padStart(2,"0")+'</span></div>';
  }
  document.addEventListener("error",event=>{
-   if(event.target?.classList?.contains("agent-character-photo"))event.target.classList.add("image-error");
+   if(event.target?.classList?.contains("agent-character-photo")&&event.target.naturalWidth===0)
+     event.target.classList.add("image-error");
+ },true);
+ document.addEventListener("load",event=>{
+   if(event.target?.classList?.contains("agent-character-photo")&&event.target.naturalWidth>0)
+     event.target.classList.remove("image-error");
  },true);
  root.WorkforceAgentArt={svg,media,has:id=>Object.prototype.hasOwnProperty.call(colors,id),ids:Object.keys(colors)};
 
