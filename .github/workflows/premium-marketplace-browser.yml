@@ -1,0 +1,68 @@
+name: Premium marketplace browser acceptance
+on:
+  pull_request:
+    paths:
+      - "public/marketplace*"
+      - "public/agent-studio*"
+      - "app/main.py"
+      - "tests/premium-browser.cjs"
+      - ".github/workflows/premium-marketplace-browser.yml"
+  push:
+    branches: ["main"]
+    paths:
+      - "public/marketplace*"
+      - "public/agent-studio*"
+      - "app/main.py"
+      - "tests/premium-browser.cjs"
+jobs:
+  browser-acceptance:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    services:
+      postgres:
+        image: postgres:16
+        env:
+          POSTGRES_USER: wos
+          POSTGRES_PASSWORD: test
+          POSTGRES_DB: workforce_test
+        ports: ["5432:5432"]
+        options: >-
+          --health-cmd "pg_isready -U wos -d workforce_test"
+          --health-interval 5s --health-timeout 5s --health-retries 10
+    env:
+      DATABASE_URL: postgresql://wos:test@127.0.0.1:5432/workforce_test
+      ENVIRONMENT: development
+      MARKER: public-real-catalog-only
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+      - name: Install app dependencies and browser
+        run: |
+          pip install -r requirements.txt
+          npm install --no-save --no-package-lock playwright@1.56.1
+          npx playwright install --with-deps chromium
+      - name: Launch current repository web app
+        run: |
+          nohup uvicorn app.main:app --host 127.0.0.1 --port 8088 > /tmp/workforce-web.log 2>&1 &
+          for i in $(seq 1 30); do
+            if curl -fsS http://127.0.0.1:8088/health; then break; fi
+            sleep 1
+          done
+          curl -fsS http://127.0.0.1:8088/api/agent-dna/catalog > /tmp/agent-catalog.json
+      - name: Render and validate all public pages at desktop and mobile
+        run: node tests/premium-browser.cjs
+      - name: Upload real browser screenshots
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: premium-marketplace-screenshots
+          path: artifacts/premium-marketplace/
+          if-no-files-found: ignore
+      - name: Attach app logs on failure
+        if: failure()
+        run: cat /tmp/workforce-web.log || true
