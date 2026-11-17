@@ -495,3 +495,12 @@ p{margin:0}
  .curated-cards{min-width:0;max-width:100%}
  .agent-grid{min-width:0;max-width:100%}
 }
+
+/* Semantic image layers for agent portraits, with editorial gradient and safe fallback. */
+.card-art{display:block;position:relative}
+.agent-card-photo{position:absolute;inset:0;z-index:0;width:100%;height:100%;object-fit:cover;object-position:center 29%;filter:saturate(.62) contrast(1.08) sepia(.08);opacity:.9;transition:transform .55s ease}
+.agent-card:hover .agent-card-photo{transform:scale(1.055)}
+.card-art::before{z-index:0;background-image:linear-gradient(0deg,#0a1e16fa,#10402a3d 70%,#07352121)}
+.card-art::after{z-index:0;box-shadow:inset 0 -40px 40px #071d15ad,inset 0 0 25px #05120d65}
+.detail-photo{display:block;position:absolute;inset:0;width:100%;height:100%;object-fit:cover;object-position:center 25%;filter:saturate(.75) contrast(1.07);opacity:.91}
+.detail-art::after{pointer-events:none}
