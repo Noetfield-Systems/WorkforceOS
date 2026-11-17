@@ -117,6 +117,7 @@ function scene({kind,title,subtitle,description,kicker,buttons,footnotes="",brea
  (footnotes?'<div class="scene-footnotes">'+footnotes+'</div>':"")+'</div>'+
  '<div class="editorial-hero-art"><img alt="" loading="eager" src="'+esc(imagery)+'">'+
  '<div class="hero-art-credit">WORKFORCEOS / ORIGINAL AGENT COLLECTION</div></div></div></section>';
+}
 
 function sectionHead(kicker,title,desc="",link=""){
  return '<div class="section-intro"><div class="text"><span class="kicker">'+kicker+'</span><h2>'+title+'</h2>'+
