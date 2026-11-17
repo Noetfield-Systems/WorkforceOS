@@ -336,6 +336,23 @@ def install(app, *, database, uid, event, authentication, write, sync_agent, lim
         sync=await sync_agent(account,agent_id)
         return {"agent_id":agent_id,"revision":next_rev,"sync_state":sync,"public":False}
 
+    @app.post("/api/agent-dna/gallery/{template_id}/clone")
+    async def clone_public(template_id:str,account=Depends(write)):
+        with database() as db:
+            published=db.execute("""SELECT agent_id AS id,revision,manifest,updated_at
+                FROM agent_dna_profiles WHERE agent_id=%s AND is_public=true""",
+                (template_id,)).fetchone()
+        if not published:
+            raise HTTPException(status_code=404,detail="PUBLIC_TEMPLATE_NOT_FOUND")
+        # A clone is a new customer-owned agent; no source workspace identifiers,
+        # private references, credentials, or tool requests are transferred.
+        copied=_public_template(published)["profile"]
+        created=await create(CreateAgent(preset_id="research_analyst"),account)
+        saved=await save(created["agent_id"],
+                         SaveProfile(expected_revision=1,profile=Profile.model_validate(copied)),account)
+        return {"agent_id":created["agent_id"],"revision":saved["revision"],
+                "sync_state":saved["sync_state"],"cloned_from":template_id}
+
     @app.post("/api/agent-dna/{agent_id}/publish")
     def publish(agent_id:str,body:PublishInput,account=Depends(write)):
         tenant=account["workspace_id"]
