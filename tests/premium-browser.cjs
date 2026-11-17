@@ -37,6 +37,17 @@ const scrub=(value)=>String(value||"").slice(0,350);
     await page.waitForTimeout(550);
     const horizontal=await page.evaluate(()=>({clientWidth:document.documentElement.clientWidth,
       scrollWidth:document.documentElement.scrollWidth}));
+    if(horizontal.scrollWidth>horizontal.clientWidth+5){
+      const offenders=await page.evaluate(()=>[...document.querySelectorAll("*")].map(el=>{
+        const rect=el.getBoundingClientRect();
+        return {element:el.tagName.toLowerCase(),className:String(el.className||"").slice(0,100),
+          width:Math.round(rect.width),left:Math.round(rect.left),right:Math.round(rect.right)};
+      }).filter(x=>x.right>document.documentElement.clientWidth+4&&x.width>1)
+        .sort((a,b)=>b.right-a.right).slice(0,12));
+      console.error("RESPONSIVE_OVERFLOW_DETAILS",viewportName,url,JSON.stringify(offenders));
+      await page.screenshot({path:path.join(output,viewportName+"-"+name+"-overflow.png"),
+                             fullPage:true,animations:"disabled"});
+    }
     assert(horizontal.scrollWidth<=horizontal.clientWidth+5,
       viewportName+" "+url+" horizontal overflow "+JSON.stringify(horizontal));
     if(name==="agent-studio"){
