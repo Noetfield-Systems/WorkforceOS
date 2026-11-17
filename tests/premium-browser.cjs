@@ -56,6 +56,8 @@ const scrub=(value)=>String(value||"").slice(0,350);
     }
     if(name==="marketplace"){
       assert((await page.locator(".agent-card").count())>=6,"official catalog missing");
+      const portrait=await page.locator(".card-art").first().evaluate(el=>getComputedStyle(el).getPropertyValue("--agent-photo"));
+      assert(portrait.includes("images.unsplash.com/photo-"),"Agent portrait background asset missing from card");
       await page.locator("#market-query").fill("this-result-does-not-exist-471");
       await page.locator(".empty-card").waitFor({state:"visible",timeout:3000});
       await page.locator("#clear-filter").click();
@@ -66,6 +68,8 @@ const scrub=(value)=>String(value||"").slice(0,350);
       assert(href.includes("template=research_analyst"),"agent detail did not link to exact template");
     }
     assert.deepEqual(errors,[],viewportName+" "+url+" frontend errors: "+errors.map(scrub).join(" | "));
+    await page.evaluate(()=>window.scrollTo(0,0));
+    await page.waitForTimeout(180);
     await page.screenshot({path:path.join(output,viewportName+"-"+name+".png"),fullPage:true,
                            animations:"disabled"});
     console.log("PASS",viewportName,name,"width",horizontal.clientWidth,"scroll",horizontal.scrollWidth);
