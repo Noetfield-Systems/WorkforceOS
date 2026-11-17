@@ -47,7 +47,7 @@ class AgentDNATests(unittest.TestCase):
         self.assertIn("Agent DNA Studio",r.text)
         catalog=self.root.get("/api/agent-dna/catalog")
         self.assertEqual(catalog.status_code,200,catalog.text)
-        self.assertEqual(len(catalog.json()["presets"]),6)
+        self.assertEqual(len(catalog.json()["presets"]),12)
         self.assertFalse(catalog.json()["capabilities"]["custom_tool_grants"])
         self.assertFalse(catalog.json()["capabilities"]["marketplace_checkout"])
         p=preset_profile("research_analyst")
