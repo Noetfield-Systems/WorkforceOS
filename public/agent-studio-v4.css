@@ -183,3 +183,7 @@ label small{color:#8a958b}
  .workbench-footer{padding:14px 18px}
  .tone-grid{grid-template-columns:repeat(3,1fr)}
 }
+
+/* Remove the final recycled marble sculpture from the Studio discovery banners. */
+.studio-editorial-panel.evaluation{--editorial-photo:url("https://images.unsplash.com/photo-1497633762265-9d179a990aa6?auto=format&fit=crop&w=1300&q=80")}
+.studio-editorial-panel.discovery{--editorial-photo:url("https://images.unsplash.com/photo-1497366216548-37526070297c?auto=format&fit=crop&w=1300&q=80")}
