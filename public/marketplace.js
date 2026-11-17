@@ -72,7 +72,7 @@ function prepare(){
 }
 
 function art(id,context="card"){
- return window.WorkforceAgentArt?.svg(id,{context})||'<div class="agent-vector-fallback" aria-hidden="true">AI</div>';
+ return window.WorkforceAgentArt?.media(id,{context,priority:context==="hero-main"||context==="product"})||'<div class="agent-vector-fallback" aria-hidden="true">AI</div>';
 }
 function button(label,href,variant="primary"){return '<a class="btn btn-'+variant+'" href="'+esc(href)+'">'+label+' <span class="arrow" aria-hidden="true">↗</span></a>';}
 function editLink(item){return item.type==="community"?"/agent-studio?community="+encodeURIComponent(item.id):

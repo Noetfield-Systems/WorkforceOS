@@ -27,12 +27,15 @@ function portraitFor(profile){
  const portrait=$("portrait-mark")?.parentElement;
  if(!portrait||!window.WorkforceAgentArt)return;
  portrait.style.backgroundImage="none";
+ if(portrait.dataset.activeAgentArt===presetId)return;
+ portrait.dataset.activeAgentArt=presetId;
+ portrait.querySelector(".agent-character-art")?.remove();
  portrait.querySelector(".agent-visual-svg")?.remove();
- portrait.insertAdjacentHTML("afterbegin",window.WorkforceAgentArt.svg(presetId,{context:"studio-preview"}));
+ portrait.insertAdjacentHTML("afterbegin",window.WorkforceAgentArt.media(presetId,{context:"studio-preview",priority:true}));
 }
 function setupStudioArt(){
  const container=$("studio-hero-art");
- if(container&&window.WorkforceAgentArt)container.innerHTML=window.WorkforceAgentArt.svg("product_engineer",{context:"studio-hero"});
+ if(container&&window.WorkforceAgentArt)container.innerHTML=window.WorkforceAgentArt.media("research_analyst",{context:"studio-hero",priority:true});
 }
 
 function flash(message){const el=$("toast");el.textContent=message;el.classList.add("visible");

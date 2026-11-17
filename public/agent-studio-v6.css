@@ -1,0 +1,35 @@
+/* Agent DNA Studio — cinematic character system v6.
+ * Keeps all editor/runtime behavior; changes only visual representation. */
+.agent-character-art{position:relative;display:block;isolation:isolate;width:100%;height:100%;overflow:hidden;
+ background:linear-gradient(140deg,#a1bbc8,#263849)}
+.agent-character-art .agent-media-fallback{position:absolute;inset:0;z-index:0}
+.agent-character-art .agent-media-fallback .agent-visual-svg{width:100%;height:100%}
+.agent-character-photo{position:absolute;inset:0;z-index:1;width:100%;height:100%;
+ display:block;object-fit:cover;filter:contrast(1.05) saturate(1.05)}
+.agent-character-photo.image-error{display:none}
+.agent-character-vignette{position:absolute;inset:0;pointer-events:none;z-index:2;
+ background:linear-gradient(180deg,transparent 36%,rgba(13,25,34,.59) 100%)}
+.agent-character-light{position:absolute;inset:0;z-index:2;pointer-events:none;
+ background:radial-gradient(circle at 22% 12%,rgba(255,255,255,.25),transparent 46%);
+ mix-blend-mode:soft-light}
+.agent-char-label,.agent-char-index{position:absolute;z-index:3;color:#eff4f5;letter-spacing:1.3px;
+ font-size:9px;font-weight:750;text-shadow:0 1px 7px #111b26b8}
+.agent-char-label{bottom:13px;left:15px}
+.agent-char-index{right:15px;top:13px}
+#studio-hero-art.dna-scene-portrait{overflow:hidden;background:#182a3a!important}
+#studio-hero-art .agent-character-art{width:100%;height:100%}
+#studio-hero-art .agent-character-photo{object-position:center 33%!important}
+#studio-hero-art .agent-char-label{left:18px;bottom:18px;font-size:10px}
+.portrait{overflow:hidden;isolation:isolate;background:#203247!important}
+.portrait>.agent-character-art{position:absolute;inset:0;z-index:1;height:100%;width:100%}
+.portrait .agent-character-photo{object-position:center 38%!important}
+.portrait .agent-char-index{top:10px;right:11px}
+.portrait .agent-char-label{bottom:37px;left:14px}
+.portrait-bottom{z-index:4;background:linear-gradient(transparent,#1021369e);bottom:0;left:0;right:0;
+ padding:16px 14px 12px;letter-spacing:1px}
+@media(max-width:730px){
+ #studio-hero-art.dna-scene-portrait{height:196px}
+ #studio-hero-art .agent-char-label{display:none}
+ .portrait{height:245px}
+}
+@media(prefers-reduced-motion:reduce){.agent-character-photo{transition:none!important}}

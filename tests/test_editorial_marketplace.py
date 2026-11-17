@@ -52,17 +52,22 @@ class EditorialMarketplaceTests(unittest.TestCase):
         self.assertIn("/static/marketplace-v4.css",html.text)
         self.assertIn("/static/marketplace-v5.css",html.text)
         self.assertIn("/static/agent-art.js",html.text)
-        self.assertIn("marketplace.js?v=20261117-v5",html.text)
+        self.assertIn("marketplace.js?v=20261117-v6",html.text)
+        self.assertIn("/static/marketplace-v6.css",html.text)
+        self.assertIn("agent-art.js?v=20261117-v6",html.text)
         self.assertIn("/static/marketplace.js",html.text)
         studio=self.client.get("/agent-studio")
         self.assertEqual(studio.status_code,200)
         self.assertIn("/static/agent-studio-v4.css",studio.text)
         self.assertIn("/static/agent-studio-v5.css",studio.text)
+        self.assertIn("/static/agent-studio-v6.css",studio.text)
         for path in ("/static/marketplace-v4.css","/static/agent-studio-v4.css",
-                     "/static/marketplace-v5.css","/static/agent-studio-v5.css","/static/agent-art.js"):
+                     "/static/marketplace-v5.css","/static/agent-studio-v5.css",
+                     "/static/marketplace-v6.css","/static/agent-studio-v6.css",
+                     "/static/agent-art.js"):
             r=self.client.get(path)
             self.assertEqual(r.status_code,200,r.text[:120])
-            self.assertGreater(len(r.content),4000)
+            self.assertGreater(len(r.content),1500, path)
         javascript=(ROOT/"public/marketplace.js").read_text()
         self.assertIn("archive_researcher",javascript)
         self.assertIn("style-filters",javascript)

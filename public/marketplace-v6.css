@@ -1,0 +1,130 @@
+/* WorkforceOS — cinematic robot characters v6
+   Replace flat illustration screens with collectible-quality, professional
+   AI agent identities: photographic 3D-style robot rendering, soft studio
+   light, individually art-directed palettes. Existing tasks/billing untouched.
+ */
+:root{--showcase-shadow:0 16px 34px rgba(14,29,43,.10)}
+.agent-character-art{
+ position:relative;display:block;width:100%;height:100%;min-height:0;overflow:hidden;
+ isolation:isolate;background:#263849;
+ --art-accent:#90b6ce;--art-shadow:rgba(13,24,37,.20);
+}
+.agent-tone-apricot{background:linear-gradient(125deg,#edaa84,#9c5844);--art-accent:#ffc2a5;--art-shadow:rgba(105,49,29,.25)}
+.agent-tone-steel{background:linear-gradient(135deg,#293e50,#071a2e);--art-accent:#b9dce6;--art-shadow:rgba(8,24,40,.32)}
+.agent-tone-silver{background:linear-gradient(140deg,#d8e2ea,#708a9c);--art-accent:#dceaf8;--art-shadow:rgba(24,40,56,.22)}
+.agent-tone-rose{background:linear-gradient(140deg,#e8b3b8,#bd7d9d);--art-accent:#ffe1e7;--art-shadow:rgba(79,38,56,.2)}
+.agent-tone-butter{background:linear-gradient(140deg,#f1d890,#d8a75a);--art-accent:#ffdfa7;--art-shadow:rgba(86,65,26,.20)}
+.agent-tone-violet{background:linear-gradient(140deg,#a9a4df,#645f9c);--art-accent:#d8d2ff;--art-shadow:rgba(37,33,88,.25)}
+.agent-tone-sepia{background:linear-gradient(140deg,#bfa78a,#4d4c4c);--art-accent:#d7c3a7;--art-shadow:rgba(39,29,20,.25)}
+.agent-tone-cobalt{background:linear-gradient(140deg,#507b97,#182e43);--art-accent:#bbd9ed;--art-shadow:rgba(12,31,52,.30)}
+.agent-tone-copper{background:linear-gradient(140deg,#d49b7d,#593e41);--art-accent:#f5c8a0;--art-shadow:rgba(80,43,34,.28)}
+.agent-tone-mint{background:linear-gradient(135deg,#e7dbcd,#6f9eaa);--art-accent:#c5ebe6;--art-shadow:rgba(17,49,62,.2)}
+.agent-tone-ink{background:linear-gradient(140deg,#677381,#14202e);--art-accent:#c7d1e8;--art-shadow:rgba(17,26,39,.33)}
+.agent-tone-sage{background:linear-gradient(140deg,#95ae9d,#405e61);--art-accent:#cde3ce;--art-shadow:rgba(23,53,43,.24)}
+.agent-character-art .agent-media-fallback{
+ position:absolute;inset:0;z-index:0;display:block;overflow:hidden;opacity:.88
+}
+.agent-character-art .agent-media-fallback svg{height:100%;width:100%;display:block}
+.agent-character-photo{
+ position:absolute;inset:0;display:block;width:100%;height:100%;object-fit:cover;
+ z-index:1;opacity:1;filter:contrast(1.055) saturate(1.07);
+ transition:transform .7s cubic-bezier(.23,.72,.22,1),filter .45s ease
+}
+.agent-character-photo.image-error{display:none}
+.agent-character-vignette{
+ position:absolute;inset:0;pointer-events:none;z-index:2;
+ background:linear-gradient(180deg,rgba(3,13,25,.04) 5%,transparent 37%,rgba(10,21,29,.53) 100%);
+}
+.agent-character-light{
+ position:absolute;inset:0;pointer-events:none;z-index:2;mix-blend-mode:soft-light;
+ background:radial-gradient(circle at 28% 18%,rgba(255,255,255,.3),transparent 42%),
+ linear-gradient(90deg,rgba(2,6,11,.08),transparent 45%,rgba(5,12,20,.13));
+}
+.agent-char-label,.agent-char-index{
+ position:absolute;z-index:3;color:#fff;letter-spacing:1.2px;
+ text-shadow:0 1px 8px rgba(6,14,25,.5);font-size:10px;font-weight:780;
+}
+.agent-char-label{left:17px;bottom:17px}
+.agent-char-index{right:17px;top:15px;font-size:9px;letter-spacing:2px}
+.agent-card{border:1px solid #d8e2e5;border-radius:13px;box-shadow:0 7px 23px rgba(12,29,42,.055);transition:box-shadow .25s,transform .25s,border-color .25s}
+.agent-card:hover{box-shadow:0 20px 42px rgba(21,40,52,.13);transform:translateY(-4px);border-color:#abbcc6}
+.agent-card .card-art{height:244px;background:#233648;overflow:hidden}
+.agent-card .card-art:hover .agent-character-photo{transform:scale(1.055);filter:contrast(1.075) saturate(1.16)}
+.agent-card .card-body{padding:20px 20px 18px}
+.agent-card .card-body h3{font-size:35px;letter-spacing:-.7px;margin:12px 0 5px}
+.agent-card .card-role{font-size:12px;color:#47657b;font-weight:730}
+.agent-card .card-category{font-size:9px;letter-spacing:1.3px}
+.agent-card .card-mission{font-size:12px;color:#667884;margin-bottom:18px}
+.agent-card .card-foot a{font-size:11px;font-weight:760;border-radius:7px;padding:10px 13px}
+.agent-grid{gap:20px}
+#market-results.agent-grid{grid-template-columns:repeat(3,minmax(0,1fr));gap:19px}
+.agent-svg-stage .agent-character-art{height:100%}
+.hero-agent-showcase{
+ border:1px solid #526c82;border-radius:17px;min-height:430px;
+ background:linear-gradient(145deg,#203549,#0f2132);
+ box-shadow:0 26px 80px rgba(4,15,27,.28);
+}
+.hero-agent-main{height:272px;border-radius:12px;overflow:hidden;border:1px solid rgba(222,235,242,.18)}
+.hero-agent-main>.agent-character-art{height:100%}
+.hero-agent-main .agent-character-photo{object-position:center 35%!important}
+.hero-agent-main .agent-char-label{display:none}
+.hero-agent-main .agent-char-index{opacity:.7}
+.hero-agent-details{z-index:5;background:linear-gradient(0deg,#101b2df5,rgba(13,24,35,.65) 55%,transparent);padding:48px 21px 19px}
+.hero-agent-details b{font-size:30px}
+.hero-agent-mini a{border-radius:10px;padding:7px;min-height:81px}
+.hero-agent-mini a>.agent-character-art{width:74px!important;height:65px!important;flex:none;border-radius:7px}
+.hero-agent-mini .agent-char-label,.hero-agent-mini .agent-char-index{display:none}
+.hero-agent-mini svg{width:100%!important;height:100%!important}
+.hero-agent-mini a b{font-size:16px}
+.hero-agent-mini a small{font-size:10px}
+.store-hero{background:linear-gradient(120deg,#101e2f,#1c2d42 65%,#23364a)}
+.store-hero::after{opacity:.1;mask-image:linear-gradient(90deg,transparent,#000)}
+.store-hero-layout{gap:63px}
+.store-hero h1{font-size:clamp(54px,5.5vw,80px)}
+.store-hero .hero-lead{font-weight:550}
+.hero-agent-showcase:before{
+ content:"";position:absolute;inset:-12%;background:radial-gradient(circle at 70% 40%,rgba(116,172,208,.15),transparent 50%);pointer-events:none
+}
+.agent-scene-art{border-radius:14px;box-shadow:var(--showcase-shadow);position:relative}
+.agent-scene-art .agent-character-art{height:100%}
+.agent-scene-art .agent-character-photo{object-position:center 32%}
+.spotlight-art-grid{height:317px;gap:16px}
+.spotlight-art-grid>.agent-character-art{height:100%;border-radius:12px;box-shadow:var(--showcase-shadow)}
+.spotlight-art-grid .agent-char-label{font-size:9px}
+.marketplace-cta-graphic>.agent-character-art{height:100%}
+.marketplace-cta-panel{border-radius:13px}
+.launch-agent-cta>.agent-character-art{height:275px}
+.product-hero .product-portrait{height:423px;border-radius:14px;box-shadow:0 16px 40px rgba(22,37,48,.16)}
+.product-hero .product-portrait .agent-character-art{height:100%}
+.product-hero .product-portrait .agent-char-label{bottom:23px;left:20px}
+.product-hero .detail-buy{border-radius:12px}
+.site-footer a{transition:color .2s}
+@media(max-width:1230px){
+ .agent-card .card-art{height:215px}
+ #market-results.agent-grid{grid-template-columns:repeat(2,minmax(0,1fr))}
+ .hero-agent-showcase{min-height:410px}
+ .hero-agent-main{height:245px}
+ .spotlight-art-grid{height:265px}
+}
+@media(max-width:1000px){
+ .store-hero-layout{gap:23px}
+ .hero-agent-mini a>.agent-character-art{width:56px!important;height:58px!important}
+ .hero-agent-mini a b{font-size:14px}
+}
+@media(max-width:700px){
+ .agent-grid,#market-results.agent-grid{grid-template-columns:1fr}
+ .agent-card .card-art{height:248px}
+ .hero-agent-showcase{min-height:0}
+ .hero-agent-main{height:252px}
+ .hero-agent-mini a>.agent-character-art{width:64px!important;height:63px!important}
+ .hero-agent-mini a{min-width:0}
+ .store-hero-layout{gap:31px}
+ .spotlight-art-grid{height:208px}
+ .launch-agent-cta>.agent-character-art{height:190px}
+ .product-hero .product-portrait{height:335px}
+ .agent-scene-art .agent-character-art{height:100%}
+ .agent-char-label{font-size:9px}
+}
+@media(prefers-reduced-motion:reduce){
+ .agent-character-photo{transition:none!important}
+}
