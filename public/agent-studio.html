@@ -3,19 +3,21 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width,initial-scale=1">
-  <meta name="theme-color" content="#f4f3ef">
+  <meta name="theme-color" content="#f4f6f5">
   <meta name="description" content="Create, customize, test and share your own specialized AI teammates with WorkforceOS Agent DNA Studio.">
   <title>Agent DNA Studio — WorkforceOS</title>
   <link rel="icon" href="/static/favicon.svg" type="image/svg+xml">
   <link rel="stylesheet" href="/static/agent-studio.css">
   <link rel="stylesheet" href="/static/agent-studio-v4.css?v=20261117-v4">
-  <script defer src="/static/agent-studio.js?v=20261117-v4"></script>
+  <link rel="stylesheet" href="/static/agent-studio-v5.css?v=20261117-v5">
+  <script defer src="/static/agent-art.js?v=20261117-v5"></script>
+  <script defer src="/static/agent-studio.js?v=20261117-v5"></script>
 </head>
 <body>
   <div class="shell">
     <header class="topbar">
       <a class="brand" href="/" aria-label="WorkforceOS home"><span class="brand-mark">w<span>.</span></span><span>workforce<span class="brand-os">OS</span></span></a>
-      <nav class="top-center studio-site-nav" aria-label="Product navigation"><a href="/marketplace">Marketplace</a><a href="/agent-studio" aria-current="page">Agent Studio</a><a href="/arena">Arena</a><a href="/creators">Creators</a><a href="/pricing">Pricing</a></nav>
+      <nav class="top-center studio-site-nav" aria-label="Product navigation"><a href="/marketplace">Marketplace</a><a href="/agent-studio" aria-current="page">Agent Studio</a><a href="/arena">Arena</a><a href="/creators">Creators</a><a href="/app">My workspace</a></nav>
       <div class="top-right"><span id="connection" class="connection">Checking workspace</span><a class="workspace-link" href="/app">My workspace ↗</a></div>
     </header>
 
@@ -23,7 +25,7 @@
       <div class="dna-scene-glass" aria-hidden="true"></div>
       <div class="dna-scene-light" aria-hidden="true"></div>
       <div class="dna-scene-orbit" aria-hidden="true"></div>
-      <div class="dna-scene-portrait" aria-hidden="true"><span>AGENT DNA</span><span>PERSONALITY / SKILLS / KNOWLEDGE</span></div>
+      <div class="dna-scene-portrait" id="studio-hero-art" aria-hidden="true"></div>
       <div class="dna-hero-content">
         <span class="dna-hero-eyebrow">WORKFORCEOS / PERSONAL INTELLIGENCE DESIGN</span>
         <h1>Agent DNA <em>Studio.</em></h1>
@@ -36,11 +38,11 @@
 
     <main class="studio">
       <aside class="rail" aria-label="Agent library">
-        <div class="rail-heading"><span class="eyebrow">YOUR CREATIONS</span><strong>AI characters<span class="sup"> / 01</span></strong><p>Give intelligence a distinct identity, purpose and working style.</p></div>
+        <div class="rail-heading"><span class="eyebrow">YOUR CREATIONS</span><strong>AI agents<span class="sup"> / 12</span></strong><p>Configure a specialized AI worker for a particular job.</p></div>
         <button id="new-agent" class="create-cta" type="button"><span class="plus">+</span><span>Build an agent</span><span>↗</span></button>
         <div class="section-label">MY AGENTS <span id="my-count">0</span></div>
         <div id="my-agents" class="agent-list"><p class="muted-note">Sign in to view your agents.</p></div>
-        <div class="section-label section-label-spaced">STARTING CHARACTERS <span>12</span></div>
+        <div class="section-label section-label-spaced">STARTER AGENTS <span>12</span></div>
         <div id="presets" class="agent-list"></div>
         <div class="rail-foot">
           <div class="small-star">✳</div>
@@ -166,8 +168,8 @@
       </section>
 
       <aside class="preview-rail" aria-label="Live identity preview">
-        <div class="preview-top"><span class="eyebrow">LIVE CHARACTER PROFILE</span><span id="preview-index">DNA / 001</span></div>
-        <div class="portrait"><div class="portrait-light"></div><div class="portrait-ring"></div><div class="portrait-mark" id="portrait-mark">N</div><div class="portrait-bottom">YOUR INTELLIGENCE <span>✳</span> YOUR RULES</div></div>
+        <div class="preview-top"><span class="eyebrow">LIVE AGENT PREVIEW</span><span id="preview-index">DNA / 001</span></div>
+        <div class="portrait"><div class="portrait-light"></div><div class="portrait-ring"></div><div class="portrait-mark" id="portrait-mark">N</div><div class="portrait-bottom">AI WORKER <span>•</span> WORKFORCEOS</div></div>
         <div class="preview-card">
           <div class="preview-intro"><span class="preview-status">● CONFIGURATION PREVIEW</span><h2 id="preview-name">Nova</h2><p id="preview-role">Specialist agent</p></div>
           <div class="preview-divider"></div>
@@ -183,12 +185,12 @@
       </aside>
     </main>
     <section class="studio-editorial-finale" aria-label="Explore more of WorkforceOS">
-      <div class="editorial-section-head"><span>THE NEXT CHAPTER OF AI WORK</span><h2>From a character to <em>a real collaborator.</em></h2></div>
+      <div class="editorial-section-head"><span>THE NEXT CHAPTER OF AI WORK</span><h2>From configuration to <em>a working AI agent.</em></h2></div>
       <div class="studio-editorial-cards">
-        <article class="studio-editorial-panel discovery"><div><span>DISCOVER & DISTRIBUTE</span><h3>Your creation belongs<br><em>in the marketplace.</em></h3><p>Share a free character template, invite others to remix, and explore what other builders publish.</p><a href="/marketplace">Explore Marketplace ↗</a></div></article>
+        <article class="studio-editorial-panel discovery"><div><span>DISCOVER & DISTRIBUTE</span><h3>Your creation belongs<br><em>in the marketplace.</em></h3><p>Share a working Agent DNA template, invite others to remix, and explore what other builders publish.</p><a href="/marketplace">Explore Marketplace ↗</a></div></article>
         <article class="studio-editorial-panel evaluation"><div><span>TEST & IMPROVE</span><h3>Better intelligence<br><em>starts with evidence.</em></h3><p>See how distinct agents perform on an identical task. Review source-backed outputs and improve your next version.</p><a href="/arena">Enter Agent Arena ↗</a></div></article>
       </div>
-      <div class="studio-next-footer"><a href="/">WorkforceOS Home ↗</a><a href="/creators">Creators</a><a href="/pricing">Pricing</a><a href="/app">Your workspace</a></div>
+      <div class="studio-next-footer"><a href="/">WorkforceOS Home ↗</a><a href="/creators">Creators</a><a href="/marketplace">Marketplace</a><a href="/app">Your workspace</a></div>
     </section>
   </div>
   <div id="toast" class="toast" role="status" aria-live="polite"></div>
