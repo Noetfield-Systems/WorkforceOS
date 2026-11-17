@@ -126,20 +126,6 @@ function motif(){
  ];
  return '<div class="motif">'+things.map(t=>'<div class="motif-item"><div class="motif-symbol">'+t[0]+'</div><strong>'+t[1]+'</strong><p>'+t[2]+'</p></div>').join("")+'</div>';
 }
-function pricingCards(preview=false){
- const plans=[
-  {name:"Explore",price:"Free",desc:"A first personal AI workforce.",features:["1 team • 3 agents","3 knowledge documents","20 tasks","Character design and studio"],tier:"START HERE"},
-  {name:"Solo",price:"$29",desc:"For independent builders with momentum.",features:["2 teams • 6 agents","10 knowledge documents","60 tasks","Agent DNA version history"],tier:"FOR BUILDERS"},
-  {name:"Builder",price:"$79",desc:"For people turning AI into useful operations.",features:["4 teams • 12 agents","20 knowledge documents","120 tasks","Publish and remix free agents"],tier:"MORE CREATIVE SPACE",highlight:true},
-  {name:"Team",price:"$199",desc:"An AI workforce for a growing organization.",features:["5 teams • 18 agents","30 knowledge documents","150 tasks","Team missions and workboard"],tier:"FOR TEAMS"}
- ];
- return '<div class="pricing-grid">'+plans.map(p=>'<article class="price-card '+(p.highlight?"highlight":"")+'">'+
-  (p.highlight?'<span class="badge">POPULAR CAPACITY</span>':'')+
-  '<span class="tag">'+p.tier+'</span><h3>'+p.name+'</h3><div class="price">'+p.price+(p.price!=="Free"?'<small> / month</small>':'')+'</div>'+
-  '<p>'+p.desc+'</p><ul>'+p.features.map(f=>'<li>'+f+'</li>').join("")+'</ul>'+
-  button(p.price==="Free"?"Start creating":"View '+p.name+' plan","/app?view=billing",p.highlight?"primary":"secondary")+'</article>').join("")+'</div>'+
- (preview?'':'<p class="trust-note">The existing workspace enforces plan capacity. Paid checkout becomes active only where Stripe billing is configured; no payment is implied by a page view.</p>');
-}
 function home(){
  document.title="WorkforceOS — AI Agent Marketplace | Discover, Configure & Run";
  const featured=["research_analyst","sales_operator","operations_director","product_engineer",
@@ -182,7 +168,7 @@ function home(){
  '<p>Role and mission. Communication style. Skills and knowledge. Tool requests. Model preference. Testing and revision. All adjustable, not just an aesthetic character.</p>'+
  button("Open the Agent Studio","/agent-studio")+'</div>'+
  '<div class="spotlight-art-grid">'+art("archive_researcher","spotlight-archive")+art("operations_director","spotlight-ops")+'</div></div>'+
- '<section class="section wrap how-agents-work">'+sectionHead("FROM DISCOVERY TO EXECUTION",
+ '<section class="section wrap how-agents-work" id="how-it-works">'+sectionHead("FROM DISCOVERY TO EXECUTION",
  'A marketplace <em>connected to actual work.</em>')+
  '<div class="workflow-steps">'+[
  ["01","Find an agent","Browse by role, expertise or job-to-be-done."],
