@@ -66,6 +66,15 @@ const scrub=(value)=>String(value||"").slice(0,350);
       assert((await page.locator("#market-results .agent-card").count())>=12,"reset did not restore the catalog");
       const neutral=await page.evaluate(()=>getComputedStyle(document.body).backgroundColor);
       assert.equal(neutral,"rgb(245, 244, 240)","site is not using restrained warm-paper v4 palette");
+      // Screenshot tools do not always scroll the page, so explicitly trigger all
+      // lazy portraits before checking visual completeness.
+      await page.locator(".agent-card-photo").evaluateAll(images=>images.forEach(i=>i.loading="eager"));
+      await page.waitForFunction(()=>[...document.querySelectorAll(".agent-card-photo")].every(i=>i.complete),{timeout:20000});
+      const imageStatuses=await page.locator(".agent-card-photo").evaluateAll(images=>images.map(img=>({
+        src:img.getAttribute("src"),naturalWidth:img.naturalWidth
+      })));
+      console.log("IMAGE_STATUS",viewportName,JSON.stringify(imageStatuses));
+      assert(imageStatuses.filter(i=>i.naturalWidth>0).length>=10,"too many editorial images unavailable");
       const portrait=await page.locator(".agent-card-photo").first().evaluate(img=>({
         src:img.getAttribute("src"),complete:img.complete,naturalWidth:img.naturalWidth
       }));
