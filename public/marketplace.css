@@ -474,3 +474,24 @@ p{margin:0}
 @media(prefers-reduced-motion:reduce){
  *,*::before,*::after{scroll-behavior:auto!important;animation:none!important;transition:none!important}
 }
+
+
+/* Mobile grid intrinsic sizing: the horizontally scrollable category strip
+   must never establish the minimum width of its parent grid track. */
+.catalog-layout,.catalog-layout>*,
+.catalog-layout>div,.filter-sidebar,.filter-choices,
+.results-toolbar,.results-toolbar>*,.agent-grid,
+.curated-row,.curated-cards{min-width:0}
+@media(max-width:700px){
+ .catalog-layout{display:grid;grid-template-columns:minmax(0,1fr);max-width:100%}
+ .catalog-layout>div{width:100%;min-width:0;max-width:100%}
+ .filter-sidebar{width:100%;max-width:100%;min-width:0;overflow:hidden}
+ .filter-choices{display:flex;min-width:0;max-width:100%;width:100%;overflow-x:auto;overflow-y:hidden;scrollbar-width:thin}
+ .filter-item{flex:0 0 auto;min-width:max-content}
+ .results-toolbar{width:100%;max-width:100%}
+ .market-search{width:100%;max-width:100%;min-width:0}
+ .market-search input{min-width:0;flex:1}
+ .curated-row{grid-template-columns:minmax(0,1fr)}
+ .curated-cards{min-width:0;max-width:100%}
+ .agent-grid{min-width:0;max-width:100%}
+}
