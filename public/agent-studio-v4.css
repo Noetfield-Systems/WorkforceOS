@@ -1,0 +1,185 @@
+/* WorkforceOS Agent DNA Studio — quiet editorial companion to Marketplace v4.
+ * Deliberately neutral; roles and images vary instead of repeated classical busts. */
+:root{color-scheme:light;--bg:#f4f3ef;--panel:#fff;--panel2:#f4f5f1;--line:#d9dfd8;
+ --soft:#718077;--white:#24302b;--mint:#2c6256;--gold:#977958;--warning:#8c7151;--radius:9px}
+body{background:var(--bg);color:var(--white);font-family:Inter,ui-sans-serif,-apple-system,BlinkMacSystemFont,"Segoe UI",Arial,sans-serif}
+.topbar{background:#fff;border-bottom:1px solid #d6dcd6;backdrop-filter:none}
+.brand{color:#253732}
+.brand-mark{background:#2d5147;color:#fff;box-shadow:none}
+.brand-mark span{color:#b0c7b7}
+.brand-os{color:#65736d}
+.studio-site-nav a{color:#74817b}
+.studio-site-nav a:hover,.studio-site-nav a[aria-current=page]{color:#2d5147}
+.studio-site-nav a[aria-current=page]{border-color:#336256}
+.connection{color:#76857b}
+.workspace-link{border-color:#c9d1c8;color:#2c4439;background:#fff}
+.workspace-link:hover{background:#f3f5f1}
+.dna-cinematic-hero{min-height:390px;background:#e7e8e2;isolation:isolate;border-bottom:1px solid #d6dcd5}
+.dna-cinematic-hero::before{content:none}
+.dna-cinematic-hero::after{content:none}
+.dna-scene-glass,.dna-scene-light,.dna-scene-orbit{display:none}
+.dna-scene-portrait{top:0;right:6%;height:100%;width:37%;transform:none;border:0;border-radius:0;
+ background-image:linear-gradient(90deg,#e7e8e2 0%,transparent 38%),linear-gradient(0deg,#1e262523,transparent 70%),
+ url("https://images.unsplash.com/photo-1531297484001-80022131f5a1?auto=format&fit=crop&w=1250&q=82");
+ background-size:cover;background-position:center;box-shadow:none}
+.dna-scene-portrait span{font-size:9px;color:#ebeee9;background:#263a3499;padding:8px;border-radius:3px}
+.dna-hero-content{max-width:1440px;width:min(calc(100% - 76px),1440px);padding:58px 0}
+.dna-hero-content>*{max-width:560px}
+.dna-hero-eyebrow{font-size:10px;color:#8e7356;letter-spacing:1.65px}
+.dna-hero-content h1{font:normal clamp(50px,5vw,78px)/1.02 "Iowan Old Style",Georgia,serif;letter-spacing:-2.5px;color:#233530}
+.dna-hero-content h1 em{color:#8d7051}
+.dna-hero-content h2{color:#53665a;font-size:18px;font-weight:450}
+.dna-hero-content p{color:#5b7064;font-size:13px;max-width:480px}
+.dna-hero-actions a,.dna-hero-actions button{background:#2d4a40;color:#fff;border:1px solid #2d4a40;border-radius:6px;box-shadow:none}
+.dna-hero-actions .dna-hero-secondary{background:#fff;color:#315447;border-color:#c5cec4}
+.dna-hero-highlights{color:#66766b;font-size:10px;gap:15px}
+.studio{border-top:0;grid-template-columns:250px minmax(0,1fr) 300px}
+.rail{background:#f9f9f6;border-right:1px solid #d9ded8}
+.rail-heading strong{color:#293931;font:normal 26px Georgia,serif}
+.rail-heading p,.muted-note{color:#748278}
+.create-cta{background:#2d5143;border:1px solid #2d5143;color:#fff;border-radius:7px}
+.create-cta:hover{background:#1d392f}
+.create-cta .plus{background:#ffffff19;color:#fff}
+.section-label{color:#738178}
+.section-label span{color:#7d8c7d}
+.agent-row{color:#405348;border-radius:7px}
+.agent-row:hover{background:#edf1ec}
+.agent-row.active{color:#2b5041;background:#e8eee7;border-color:#c3d0c1}
+.agent-avatar{background:#e6e7de;color:#3f5146;border-radius:6px}
+.agent-row small{color:#84928a}
+.agent-arrow{color:#7a8e80}
+.rail-foot{background:#f0f1eb;color:#314036;border:1px solid #d6ded3}
+.rail-foot .small-star{color:#728b72}
+.rail-foot p{color:#6f806f}
+.workbench{background:#f5f5f1}
+.workbench-head{padding-top:37px}
+.workbench-head .eyebrow-dot{background:#9b8768}
+.workbench-head h1{color:#24372b;font:normal clamp(33px,3.2vw,52px) "Iowan Old Style",Georgia,serif;letter-spacing:-1.5px}
+.workbench-head h1 em,.panel-heading h2 em{color:#8b7556}
+.workbench-head p{color:#758176}
+.eyebrow,.count-chip{color:#977959}
+.design-state{border-color:#c5cbbf}
+.design-state>span{color:#9c795a}
+.design-state strong{color:#455646}
+.design-state small{color:#778478}
+.tabs{border-bottom:1px solid #d3dcd1}
+.tab{color:#859287}
+.tab span{color:#6e8173}
+.tab.active{color:#897352;border-bottom-color:#2f6250}
+.tab.active span{color:#2c483c}
+.panels{background:#f7f8f4}
+.panel-heading h2{color:#25362b;font:normal 38px/1.15 "Iowan Old Style",Georgia,serif;letter-spacing:-1.1px}
+.panel-heading p{color:#6f7d72}
+.field-grid>label,label.field{color:#596e60}
+input:not([type=checkbox]):not([type=range]),textarea,select{background:#fff;border:1px solid #cbd6ca;color:#293c31;border-radius:7px}
+input::placeholder,textarea::placeholder{color:#a2ada3}
+input:not([type=checkbox]):not([type=range]):focus,textarea:focus,select:focus{border-color:#7b9c83}
+label small{color:#8a958b}
+.optional{color:#8e998a}
+.subheading{color:#314839}
+.subheading small{color:#829082}
+.tone-grid button,.skill,.trait-item{background:#fff;border:1px solid #d8e0d5;color:#526454;border-radius:7px}
+.tone-grid button>b{color:#2e4035}
+.tone-grid button>span{color:#8b7a5e}
+.tone-grid button small,.trait-item p,.skill small{color:#809080}
+.tone-grid button.selected,.pill.selected,.skill.selected{border-color:#4b7d5a;background:#eaf1ea}
+.tone-grid button.selected b{color:#2c553e}
+.pill{background:#fff;border:1px solid #d6e1d3;color:#556654;border-radius:6px}
+.pill.selected{color:#315440}
+.inline-note{color:#758776;border-color:#91a68a}
+.inline-note.warning{border-color:#b69e78;color:#89785b}
+.trait-header strong{color:#42584a}
+.trait-header small{color:#9a7d5e}
+.trait-item input{accent-color:#50745a}
+.workbench-footer{background:#fdfdfa;border-top:1px solid #d9ded7}
+.workbench-footer strong{color:#354a3c}
+.workbench-footer small{color:#839081}
+.save-dot{background:#678969}
+.primary-button{background:#2e5846;color:#fff;border-color:#2e5846;border-radius:7px}
+.primary-button:hover{background:#1e4535}
+.secondary-button,.small-action{background:#fff;color:#3e6249;border:1px solid #c3d1c1;border-radius:7px}
+.preview-rail{background:#edeee9;border-left:1px solid #d4ded3}
+.preview-top{color:#8e7359}
+.preview-top>span:last-child{color:#7c8c7d}
+.portrait{height:250px;border:1px solid #d3d8d0;border-radius:7px;
+ background:linear-gradient(0deg,#2b353540,transparent 60%),url("https://images.unsplash.com/photo-1560250097-0b93528c311a?auto=format&fit=crop&w=900&q=82") center 26%/cover;
+ box-shadow:none}
+.portrait-light,.portrait-ring{display:none}
+.portrait-mark{color:#f4f4e6a0;text-shadow:none;opacity:.7;top:12px;right:16px;font-size:54px}
+.portrait-bottom{color:#fff}
+.preview-card{background:#fff;border:1px solid #d1dcd0;color:#354b3b}
+.preview-status{color:#6c8d73}
+.preview-intro h2{color:#263c32}
+.preview-intro p{color:#718372}
+.preview-divider{background:#e0e8dd}
+.preview-label{color:#788b7a}
+.preview-mission{color:#475c49}
+.preview-trait span{color:#5c7160}
+.bar{background:#e5ebe4}
+.bar i{background:#6c8e6a}
+.preview-trait small{color:#987958}
+.preview-tags span{background:#f1f5f0;color:#4c6851;border:1px solid #e0e7df}
+.meta-row{color:#839384}
+.meta-row strong{color:#4d6250}
+.preview-disclaimer{color:#809083}
+.test-head,.publish-block{background:#f0f3ed;border:1px solid #d6e0d3}
+.test-head h3,.publish-block h3{color:#354936}
+.publish-block p{color:#738672}
+.check,.run-status,.arena-results{background:#fff;border:1px solid #dbe4d7;color:#3f5544}
+.check.fail span:last-child{color:#8e704d}
+.check span:last-child{color:#426e49}
+.run-status h4,.arena-side h4{color:#38513d}
+.run-status p,.run-status pre{color:#5a6e5b}
+.arena-module{border-color:#d9e2d6}
+.arena-heading h3{color:#2a3e30;font:normal 31px Georgia,serif}
+.arena-heading h3 em{color:#8f7352}
+.arena-heading p{color:#708373}
+.arena-side{background:#f6f8f3;border:1px solid #d1ded0}
+.arena-side pre{color:#465f49}
+.arena-side .arena-hash{color:#788979}
+.gallery-card,.version-row,.portable-module{background:#fff;border:1px solid #d5dfd2}
+.gallery-card h3,.portable-module h3{color:#354d39}
+.gallery-card p,.portable-module p{color:#7a887a}
+.gallery-card button{background:#ebf0e9;color:#31543a;border:1px solid #cbdac7}
+.version-row span{color:#839082}
+.version-row button{color:#3e7651}
+.import-trigger{background:#fff;color:#366043;border:1px solid #c9d9c8}
+.studio-editorial-finale{background:#e9ebe5;border-top:1px solid #d3d9d1}
+.editorial-section-head>span{color:#937c5f}
+.editorial-section-head h2{color:#304139}
+.editorial-section-head em,.studio-editorial-panel em{color:#b39a7b}
+.studio-editorial-panel{border:1px solid #d6dbd1;border-radius:8px;background:#d2d8d1;min-height:280px}
+.studio-editorial-panel::before{filter:grayscale(.4) saturate(.45) brightness(.85)}
+.studio-editorial-panel span{color:#f2e1c6}
+.studio-editorial-panel a{background:#fff;color:#274739;border-radius:6px}
+.studio-next-footer{border-color:#d1d8ce}
+.studio-next-footer a{color:#56705d}
+@media(max-width:1200px){
+ .studio{grid-template-columns:215px minmax(0,1fr) 260px}
+ .dna-hero-content{width:calc(100% - 44px)}
+}
+@media(max-width:1080px){
+ .studio{grid-template-columns:220px minmax(0,1fr)}
+ .preview-rail{grid-column:2}
+}
+@media(max-width:730px){
+ .topbar{background:#fff}
+ .studio-site-nav a{color:#637569}
+ .studio-site-nav a[aria-current=page]{color:#2b5c46}
+ .dna-cinematic-hero{min-height:520px}
+ .dna-hero-content{padding:35px 0}
+ .dna-hero-content h1{font-size:44px}
+ .dna-hero-content>*{max-width:none}
+ .dna-scene-portrait{top:auto;bottom:0;right:0;width:100%;height:185px;opacity:.8;
+   background-image:linear-gradient(0deg,#1c272526,transparent),url("https://images.unsplash.com/photo-1531297484001-80022131f5a1?auto=format&fit=crop&w=900&q=80")}
+ .dna-scene-portrait span{display:none}
+ .studio{grid-template-columns:1fr}
+ .rail{grid-column:1}
+ .preview-rail{grid-column:1}
+ .portrait{height:160px}
+ .portrait-mark{font-size:42px}
+ .panels{padding:25px 18px}
+ .workbench-head{padding:26px 18px}
+ .workbench-footer{padding:14px 18px}
+ .tone-grid{grid-template-columns:repeat(3,1fr)}
+}
