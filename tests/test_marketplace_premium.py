@@ -28,7 +28,9 @@ class PremiumMarketplaceTests(unittest.TestCase):
         cls.client.__exit__(None,None,None)
 
     def test_public_routes_have_one_complete_document_shell(self):
-        for path in ("/","/marketplace","/agents/research_analyst","/arena",
+        for path in ("/","/marketplace","/marketplace/directory/strategy","/marketplace/directory/execution",
+                     "/marketplace/directory/intelligence","/marketplace/directory/creative",
+                     "/agents/research_analyst","/agents/lyra","/arena",
                      "/creators","/pricing"):
             with self.subTest(path=path):
                 response=self.client.get(path)
@@ -76,7 +78,7 @@ class PremiumMarketplaceTests(unittest.TestCase):
     def test_public_catalog_is_real_and_payment_claims_are_disabled(self):
         catalog=self.client.get("/api/agent-dna/catalog")
         self.assertEqual(catalog.status_code,200,catalog.text)
-        self.assertEqual(len(catalog.json()["presets"]),33)
+        self.assertEqual(len(catalog.json()["presets"]),12)
         self.assertFalse(catalog.json()["capabilities"]["marketplace_checkout"])
         self.assertFalse(catalog.json()["capabilities"]["custom_tool_grants"])
         gallery=self.client.get("/api/agent-dna/gallery")

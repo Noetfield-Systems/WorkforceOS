@@ -23,7 +23,7 @@ const AGENT_ID_BY_NAME={
 };
 function portraitFor(profile){
  const first=String(profile?.name||"").trim().split(/\s+/)[0];
- const presetId=AGENT_ID_BY_NAME[first]||S.preset||"custom";
+ const presetId=S.catalog?.presets?.find(p=>p.profile.name===first)?.id||AGENT_ID_BY_NAME[first]||S.preset||"custom";
  const portrait=$("portrait-mark")?.parentElement;
  if(!portrait||!window.WorkforceAgentArt)return;
  portrait.style.backgroundImage="none";
