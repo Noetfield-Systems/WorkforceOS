@@ -1,0 +1,52 @@
+*{box-sizing:border-box}html{scroll-padding-top:85px}body{margin:0;background:#f4f6f6;color:#1c2f3d;font:14px/1.7 Inter,-apple-system,BlinkMacSystemFont,"Segoe UI",Arial,sans-serif}
+a{text-decoration:none;color:inherit}:focus-visible{outline:3px solid #82adc6;outline-offset:3px}
+.wrap{width:min(calc(100% - 70px),1480px);margin-inline:auto}.skip{position:absolute;left:10px;top:-70px;background:white;padding:9px}.skip:focus{top:10px}
+.nav{background:#101d2d;color:white}.inner{display:flex;align-items:center;min-height:72px;gap:28px;justify-content:space-between}
+.brand{font-size:20px;font-weight:800;letter-spacing:-.6px}.brand span{color:#a0d4e5;letter-spacing:-4px;margin-right:10px;font-size:23px}
+nav{display:flex;align-items:center;gap:26px}nav a{color:#bdcbd4;font-size:12px}nav a:hover{color:white}
+.nav-action{font-size:11px;border:1px solid #668194;border-radius:6px;padding:10px 16px}
+.eyebrow{font-size:10px;letter-spacing:1.6px;font-weight:790;color:#557d95}
+h1,h2,h3{font-family:Georgia,serif;line-height:1.1;font-weight:400;margin:0}
+h1 em,h2 em{font-weight:400;color:#b9d6e5}
+.hero{background:linear-gradient(105deg,#122132,#263d52);color:white}
+.hero-grid{display:grid;grid-template-columns:1.08fr .92fr;min-height:545px;padding-block:65px;gap:60px;align-items:center}
+.hero .eyebrow{color:#afcbd9}
+h1{font-size:clamp(62px,6.2vw,96px);letter-spacing:-2px;margin:18px 0 21px}
+.lead{font-size:15px;max-width:570px;color:#c1d1db;line-height:1.8}
+.hero-actions{display:flex;flex-wrap:wrap;gap:12px;margin-top:26px}
+.hero-actions a{padding:12px 17px;border-radius:6px;font-size:12px;font-weight:760}
+.primary{background:#f1f7f8;color:#1f4052}.secondary{border:1px solid #7a9aab;color:white}
+.hero-media{height:380px;background:#233c4e;border:1px solid #42677b;border-radius:13px;overflow:hidden}
+.hero-media .agent-character-art{height:100%}
+.section{padding-block:80px}.section-intro{max-width:670px;margin-bottom:33px}
+.section-intro h2{font-size:clamp(41px,4.5vw,58px);margin:12px 0 15px}
+.section-intro p{color:#70858f;font-size:13px}
+.rails{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:16px}
+.rail{background:#fff;border:1px solid #d6e2e5;border-radius:10px;padding:30px;display:flex;flex-direction:column}
+.rail-num{font-size:10px;letter-spacing:1.45px;color:#5b8699;font-weight:790}
+.rail h3{font-size:34px;margin:18px 0 15px;color:#233d4c}
+.rail p{font-size:13px;color:#607784;line-height:1.75}
+.rail-state{background:#eef3f5;color:#5d7480;border:1px solid #d3e0e5;border-radius:5px;padding:10px 12px;
+ font-size:11px;font-weight:750;margin-top:auto}
+.rail-state.active{background:#edf7f0;color:#376850;border-color:#c7ddcd}
+.rail-state.pending{background:#faf5e8;color:#876d3e;border-color:#e2d8b9}
+.rail .fine{font-size:11px;margin:13px 0;min-height:59px;color:#7d919b}
+.rail>a{font-size:12px;font-weight:760;color:#336d88;padding-top:10px;border-top:1px solid #e1eaec}
+.blueprint{background:#e5edf0;border:1px solid #d2e1e6;border-radius:13px;display:grid;grid-template-columns:1fr .85fr;
+ gap:50px;align-items:center;padding:57px;margin-bottom:68px}
+.blueprint h2{font-size:clamp(42px,5vw,65px);margin:13px 0 20px}
+.blueprint h2 em{color:#4c8099}.blueprint p{font-size:13px;line-height:1.9;color:#627d89}
+.blueprint-stages{display:grid;gap:10px}
+.blueprint-stages>div{display:flex;flex-direction:column;background:white;padding:17px 21px;border:1px solid #d8e5e9;border-radius:7px;gap:5px}
+.blueprint-stages b{color:#1f4255;font-size:15px}.blueprint-stages span{color:#8095a0;font-size:12px}
+.foot-cta{padding-bottom:75px;text-align:center}.foot-cta h2{font-size:clamp(36px,4vw,54px);margin:13px 0}
+.foot-cta p{color:#708994}
+.foot-cta a{display:inline-block;border:1px solid #b5cbd5;border-radius:6px;padding:11px 17px;margin:8px;font-size:12px;font-weight:760;color:#336a85}
+footer{background:#101d2d;color:#9aafbc;padding:24px 0}
+footer>.wrap{display:flex;align-items:center;gap:20px;justify-content:space-between;font-size:11px}
+footer a{color:white}
+@media(max-width:920px){.hero-grid{gap:20px}.hero-media{height:300px}.rails{grid-template-columns:1fr 1fr}.blueprint{padding:30px}}
+@media(max-width:680px){.wrap{width:min(calc(100% - 30px),1480px)}nav{display:none}.hero-grid{grid-template-columns:1fr;padding-block:45px}
+h1{font-size:52px}.hero-media{height:225px}.section{padding-block:53px}.rails{grid-template-columns:1fr}
+.blueprint{grid-template-columns:1fr;padding:22px;gap:20px}.blueprint h2{font-size:43px}
+footer>.wrap{display:grid;gap:9px}}
