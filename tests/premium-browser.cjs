@@ -61,6 +61,9 @@ const scrub=(value)=>String(value||"").slice(0,350);
         "premium hero must feature three real character portraits");
       assert.equal(await page.locator(".mp-feature-tile").count(),2,
         "editorial agent spotlight missing");
+      const featuredLinks=await page.locator(".mp-feature-tile").evaluateAll(els=>els.map(e=>e.getAttribute("href")));
+      assert.deepEqual(featuredLinks,["/agents/creative_partner","/agents/financial_analyst"],
+        "editorial picks must expand beyond hero's repeated identities");
       assert.equal(await page.locator(".mp-shelf").count(),6,
         "browse-by-specialization shelf is incomplete");
       assert.equal(await page.locator(".mp-team-card").count(),3,
@@ -110,6 +113,8 @@ const scrub=(value)=>String(value||"").slice(0,350);
       assert((await page.locator("#market-results").innerText()).includes("Atlas"),
         "operations filter did not show actual agent");
       await page.locator("#reset-filters").click();
+      assert.equal(await page.locator("#character-filter").evaluate(el=>el.scrollLeft),0,
+        "mobile style chip bar does not reset to the starting options");
       await page.locator("[data-compare-id='sales_operator']").click();
       await page.locator("[data-compare-id='research_analyst']").click();
       assert.equal(await page.locator("#mp-compare-tray").isVisible(),true,
@@ -142,6 +147,8 @@ const scrub=(value)=>String(value||"").slice(0,350);
       assert((await page.locator("#content .agent-character-photo").count())>0,"core marketplace page missing cinematic agent artwork");
       assert.equal(await page.locator(".price-card").count(),0,"generic subscription cards leaked into the marketplace");
     }
+    assert.equal(await page.locator("#toast.toast").isVisible(),false,
+      "empty floating toast pill is still visible");
     assert.deepEqual(errors,[],viewportName+" "+url+" frontend errors: "+errors.map(scrub).join(" | "));
     // Filters, search and reset replace card DOM nodes: load the final rendered
     // assets again before screenshot, not the stale images asserted above.
@@ -166,7 +173,10 @@ const scrub=(value)=>String(value||"").slice(0,350);
     console.log("VISIBLE_CHARACTERS",viewportName,name,JSON.stringify(mediaState));
     assert(mediaState.every(x=>x.decoded&&!x.error&&x.display!=="none"&&x.visibility!=="hidden"&&Number(x.opacity)>0&&x.rectWidth>0),
       "character images are loaded but some remain visually hidden: "+JSON.stringify(mediaState.filter(x=>x.error||x.display==="none"||x.visibility==="hidden")));
-    await page.evaluate(()=>window.scrollTo(0,0));
+    await page.evaluate(()=>{
+      document.querySelectorAll(".mp-shelf-grid,.filter-choices").forEach(el=>{el.scrollLeft=0});
+      window.scrollTo(0,0);
+    });
     await page.waitForTimeout(180);
     await page.screenshot({path:path.join(output,viewportName+"-"+name+".png"),fullPage:true,
                            animations:"disabled"});
