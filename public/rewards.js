@@ -20,7 +20,8 @@ function safe(value){return String(value||"").replace(/[&<>"']/g,s=>({"&":"&amp;
 function present(row){
  const names={daily_checkin:"Daily check-in",first_agent:"First saved agent",
    product_feedback:"Product feedback",agent_basics_quiz:"Agent fundamentals",
-   activated_referral:"New member activated",welcome_gift:"Invitation welcome gift"};
+   activated_referral:"New member activated",welcome_gift:"Invitation welcome gift",
+   genesis_join:"Genesis Season Zero membership"};
  return '<div class="reward-entry"><div><b>'+safe(names[row.kind]||row.kind)+
  '</b><br><time>'+new Date(row.created_at).toLocaleString()+'</time></div><strong>+'+
  Number(row.points)+' XP</strong></div>';
