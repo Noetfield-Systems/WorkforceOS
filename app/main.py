@@ -27,6 +27,7 @@ from .blueprints import available as available_blueprints, plan as blueprint_pla
 from . import fabric_gateway as fabric
 from . import billing
 from . import rewards
+from . import hybrid
 from .opportunity_os import router as opportunity_router, initialize_opportunities
 from .collaborate import router as collaboration_router, initialize_collaboration
 from .people_ops import router as people_router, initialize_people
@@ -85,6 +86,7 @@ app=FastAPI(title="WorkforceOS Agent Studio", version=APP_VERSION,
 app.mount("/static",StaticFiles(directory=PUBLIC),name="static")
 app.include_router(billing.router)
 app.include_router(rewards.router)
+app.include_router(hybrid.router)
 app.include_router(opportunity_router)
 app.include_router(collaboration_router)
 app.include_router(people_router)
@@ -240,6 +242,17 @@ def marketplace_pages():
 def website():
     return FileResponse(PUBLIC/"index.html",media_type="text/html",
         headers={"Cache-Control":"no-cache"})
+
+
+@app.get("/rewards")
+@app.get("/rewards/")
+def member_rewards_page():
+    return FileResponse(PUBLIC / "rewards.html")
+
+@app.get("/commerce")
+@app.get("/commerce/")
+def hybrid_commerce_page():
+    return FileResponse(PUBLIC / "commerce.html")
 
 
 @app.get("/agent-studio")
