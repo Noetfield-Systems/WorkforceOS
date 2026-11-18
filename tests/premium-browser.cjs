@@ -69,6 +69,7 @@ const scrub=(value)=>String(value||"").slice(0,350);
       await page.locator("#password").fill("Correct-Horse-123456");
       await page.locator("#auth-submit").click();
       await page.locator("#member-app").waitFor({state:"visible",timeout:15000});
+      await page.locator("#join-panel").waitFor({state:"visible",timeout:15000});
       assert.equal(await page.locator("#join-panel").isVisible(),true,"new account must opt into Genesis");
       await page.locator("#terms").check();
       await page.locator("#join-button").click();
