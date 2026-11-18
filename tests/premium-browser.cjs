@@ -17,7 +17,10 @@ const pages=[
  ["/creators","creators",".creator-journey"],
  ["/pricing","pricing",".workflow-steps"],
  ["/commerce","commerce",".rails .rail"],
- ["/rewards","rewards",".dashboard-grid"]
+ ["/rewards","rewards",".dashboard-grid"],
+ ["/genesis","genesis",".join-grid"],
+ ["/genesis/whitepaper","whitepaper",".paper-main"],
+ ["/genesis/docs","genesis-docs",".paper-main"]
 ];
 const scrub=(value)=>String(value||"").slice(0,350);
 (async()=>{
@@ -57,6 +60,16 @@ const scrub=(value)=>String(value||"").slice(0,350);
       assert.equal(await page.locator(".rails .rail").count(),3,"hybrid payment rails not rendered");
       assert((await page.locator("#crypto-status").innerText()).includes("Not active"),
         "unverified wallet checkout falsely presented as active");
+    }
+    if(name==="genesis"){
+      await page.locator("#genesis-quest-grid .quest").first().waitFor({state:"visible"});
+      assert.equal(await page.locator("#genesis-quest-grid .quest").count(),6,"Genesis quest definitions not rendered");
+      assert.equal(await page.locator("#join-button").isDisabled(),true,"anonymous user could join Genesis");
+      assert.equal(await page.locator("#create-link").isDisabled(),true,"anonymous user could create referral");
+      assert((await page.locator("#actual-members").innerText()).match(/^[\d,]+$/),"Genesis member count must be source backed");
+      assert.equal(await page.locator("#token-pools .token-row").count(),5,"tokenomics scenario incomplete");
+      const data=await page.evaluate(()=>fetch("/api/genesis/program").then(r=>r.json()));
+      assert.equal(data.scenario.units_created,0,"Genesis must not fabricate minted tokens");
     }
     if(name==="rewards"){
       await page.locator("#account-state").waitFor({state:"visible"});
