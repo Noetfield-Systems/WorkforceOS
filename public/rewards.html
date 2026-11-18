@@ -5,9 +5,9 @@
 <title>Member Rewards · WorkforceOS</title>
 <meta name="description" content="Earn internal XP for creating agents, learning the platform and sending meaningful product feedback. XP is not money or crypto.">
 <link rel="icon" href="/static/favicon.svg" type="image/svg+xml">
-<link rel="stylesheet" href="/static/rewards.css?v=20261117-r1">
+<link rel="stylesheet" href="/static/rewards.css?v=20261117-r2">
 <script src="/static/agent-art.js?v=20261117-v6" defer></script>
-<script src="/static/rewards.js?v=20261117-r1" defer></script>
+<script src="/static/rewards.js?v=20261117-r2" defer></script>
 </head>
 <body>
 <a class="skip" href="#main">Skip to main content</a>
@@ -40,6 +40,14 @@
 <option value="b">Requests are stored; the runtime still controls authorization</option>
 <option value="c">Selecting a tool guarantees task success</option></select>
 <div class="quest-action"><b>+15 XP</b><button id="quiz-submit" disabled type="button">Check answer</button></div></div>
+<div class="quest-card" id="invite-quest"><span class="quest-index">05 / GROW TOGETHER</span><h3>Invite a new builder</h3>
+<p>Share your personal invitation. An eligible new workspace must create its first real Agent DNA before the referral is recognized.</p>
+<div class="referral-counts"><span><strong id="invite-registrations">—</strong> Registrations</span><span><strong id="invite-activated">—</strong> Activated</span></div>
+<label for="invite-link">YOUR PERSONAL INVITE</label>
+<div class="invite-link-row"><input id="invite-link" readonly value="" placeholder="Sign in to create a link" aria-label="Your personal invitation link"><button id="copy-invite" disabled type="button">Copy</button></div>
+<div class="quest-action"><b>+25 XP <small>inviter</small></b><button id="invite-create" disabled type="button">Create invitation</button></div>
+<p class="invite-fine">The new builder gets a one-time +10 XP welcome gift upon activation. No value is awarded for link clicks or unactivated signups. Invites do not verify unique human identity.</p>
+</div>
 <div class="quest-card" id="feedback-quest"><span class="quest-index">04 / IMPROVE</span><h3>Share useful feedback</h3>
 <p>Tell us what would make WorkforceOS more useful for real business work. First substantial feedback each UTC week earns XP.</p>
 <label for="feedback">YOUR OBSERVATION</label><textarea id="feedback" rows="4" maxlength="2500" placeholder="What task were you trying to complete, and what should improve?"></textarea>

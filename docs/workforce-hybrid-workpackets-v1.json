@@ -141,6 +141,25 @@
         "nonfinancial XP audit",
         "retained real paid/active customer measurement"
       ]
+    },
+    {
+      "id": "WF-REF-009",
+      "title": "Source-linked verified invitation activation and nonfinancial welcome gift",
+      "priority": "P1",
+      "status": "IMPLEMENTED_AWAITING_CI",
+      "owning_role": "Growth & Product Engineering",
+      "depends_on": [
+        "WF-XP-003"
+      ],
+      "target": "/api/rewards/invite, /api/rewards/referrals, authenticated signup attribution, first Agent DNA activation",
+      "acceptance": [
+        "invitation creation requires real workspace and CSRF",
+        "new registrant pending until first real Agent DNA",
+        "inviter earns 25 XP and newcomer receives 10 XP welcome gift exactly once",
+        "no link-click payments, no crypto or airdrop claim",
+        "actual public routes verified independently"
+      ],
+      "dispatched_to_company_os": false
     }
   ]
 }

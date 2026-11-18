@@ -1,7 +1,7 @@
 /* WorkforceOS customer participation. Source-backed XP only; no mock balance. */
 "use strict";
 const $=id=>document.getElementById(id);
-let SESSION=null,STATE=null;
+let SESSION=null,STATE=null,REFERRALS=null;
 function toast(message){const x=$("toast");x.textContent=message;x.hidden=false;
  clearTimeout(toast.timer);toast.timer=setTimeout(()=>{x.hidden=true},4800)}
 async function api(path,method="GET",payload){
@@ -19,7 +19,8 @@ async function api(path,method="GET",payload){
 function safe(value){return String(value||"").replace(/[&<>"']/g,s=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[s]))}
 function present(row){
  const names={daily_checkin:"Daily check-in",first_agent:"First saved agent",
-   product_feedback:"Product feedback",agent_basics_quiz:"Agent fundamentals"};
+   product_feedback:"Product feedback",agent_basics_quiz:"Agent fundamentals",
+   activated_referral:"New member activated",welcome_gift:"Invitation welcome gift"};
  return '<div class="reward-entry"><div><b>'+safe(names[row.kind]||row.kind)+
  '</b><br><time>'+new Date(row.created_at).toLocaleString()+'</time></div><strong>+'+
  Number(row.points)+' XP</strong></div>';
@@ -41,13 +42,19 @@ function paint(){
  $("feedback-submit").disabled=!signed;
  $("feedback-submit").textContent=!signed?"Sign in to send":"Submit feedback";
  $("agent-link").textContent=STATE?.first_agent_claimed?"Agent created ✓":"Create an agent ↗";
+ $("invite-registrations").textContent=signed?String(REFERRALS?.registrations??0):"—";
+ $("invite-activated").textContent=signed?String(REFERRALS?.activated_workspaces??0):"—";
+ $("invite-link").value=signed?(REFERRALS?.invite_url||""):"";
+ $("invite-create").disabled=!signed||Boolean(REFERRALS?.invite_url);
+ $("invite-create").textContent=!signed?"Sign in to invite":REFERRALS?.invite_url?"Invitation ready ✓":"Create invitation ↗";
+ $("copy-invite").disabled=!signed||!REFERRALS?.invite_url;
  $("reward-history").innerHTML=signed?(STATE?.history?.length?STATE.history.map(present).join(""):
    '<p>No XP recorded yet. Start with a real activity.</p>'):
    '<p>Sign in to view real participation receipts.</p>';
 }
 async function refresh(){
- if(!SESSION?.authenticated){STATE=null;paint();return}
- STATE=await api("/api/rewards/me");paint();
+ if(!SESSION?.authenticated){STATE=null;REFERRALS=null;paint();return}
+ [STATE,REFERRALS]=await Promise.all([api("/api/rewards/me"),api("/api/rewards/referrals")]);paint();
 }
 async function action(btn,fn){
  btn.disabled=true;
@@ -55,6 +62,16 @@ async function action(btn,fn){
  catch(err){toast(err.message);return null}
  finally{paint()}
 }
+$("invite-create").addEventListener("click",()=>action($("invite-create"),async()=>{
+ const invite=await api("/api/rewards/invite","POST",{});
+ toast(invite.url?"Invitation created. Reward is granted only after real first-Agent activation.":"Could not create an invitation");
+}));
+$("copy-invite").addEventListener("click",async()=>{
+ const url=REFERRALS?.invite_url;
+ if(!url)return;
+ try{await navigator.clipboard.writeText(url);toast("Personal invite link copied.")}
+ catch{ $("invite-link").focus();$("invite-link").select();toast("Select and copy your referral URL."); }
+});
 $("daily-claim").addEventListener("click",()=>action($("daily-claim"),async()=>{
  const r=await api("/api/rewards/daily","POST",{});
  toast(r.awarded?"Daily activity recorded. +5 XP":"Already claimed today.");

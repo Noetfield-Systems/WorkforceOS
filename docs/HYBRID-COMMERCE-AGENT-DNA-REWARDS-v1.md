@@ -101,3 +101,13 @@ Stripe Connect https://docs.stripe.com/connect
 Stripe stablecoin eligibility https://support.stripe.com/questions/get-started-with-stablecoin-payments
 Coinbase Commerce migration https://help.coinbase.com/en/transitioning-from-coinbase-commerce-to-coinbase-business
 Circle native USDC contract https://developers.circle.com/stablecoins/usdc-contract-addresses
+
+## 9. Growth amendment — source-linked invitations and activation gifts (2026-11-17/v2)
+
+First-party referral rules extend the internal nonfinancial program without introducing token, airdrop or money promises. Authenticated members may POST /api/rewards/invite once; each tenant has one reusable opaque invitation code. The URL points to /app?ref=<code>. A new account can voluntarily register with the code; the referral is recorded transactionally under its unique workspace ID, but neither party receives XP merely for generating a URL, visiting, or registering an account.
+
+When the referred workspace creates its first real Agent DNA, the existing tenant-scoped creation transaction activates its pending registration referral exactly once; the inviting workspace earns +25 XP and the new builder earns a one-time +10 XP internal welcome gift. A repeated task, duplicate request or second agent cannot multiply the claim. No referral IDs, applicant email addresses or other tenants' data are exposed to the creator; /api/rewards/referrals returns only own invite link, attributed registration count, activation count and earned count. POST invitation requires session plus CSRF. Organic registration and nonexistent invite strings are not blocked.
+
+**Scope and evidence:** activation is a verified product-action event for a registered workspace, NOT unique-human verification, a sale, a payout, an investor airdrop or an acquisition count. Existing registration throttle, unique workspace/referral IDs and dedup apply, but further anti-sybil identity checks or reward budgets are needed before introducing anything with cash or transferable value. No token allocation, points transfer, automatic external communications or paid discounts. The frontend gives an explicit explanation and a direct copyable invite link; all numbers come from the server. Any future abuse report can suspend awarding without rewriting independent source records.
+
+**Company OS WorkPacket** WF-REF-009: introduction→new registered tenant→first Agent DNA→two internal nonfinancial XP ledger receipts; tests include unauthorized invite mutation, unknown-code signups, pending vs activated counts, replay idempotency, cross-tenant separation and independent HTTPS public route checks. Ingestion and owner assignment must occur in the existing Company OS before claiming workpacket execution.

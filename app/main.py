@@ -122,6 +122,7 @@ class Register(BaseModel):
     password:str=Field(min_length=10,max_length=128)
     workspace_name:str=Field(min_length=2,max_length=80)
     goal:str=Field(default="",max_length=1200)
+    referral_code:str|None=Field(default=None,max_length=42)
 
 class Login(BaseModel):
     email:str=Field(min_length=5,max_length=254)
@@ -345,6 +346,7 @@ def register(request:Request,body:Register):
         db.execute("INSERT INTO workspaces(id,account_id,name,mission) VALUES (%s,%s,%s,%s)",
                    (workspace,user,body.workspace_name.strip(),body.goal.strip()))
         event(db,workspace,"workspace.created",workspace)
+        rewards.record_registration_referral(db,workspace,body.referral_code)
         raw,csrf=issue_session(db,user)
     return _session_response(raw,csrf,{"email":email,"workspace_id":workspace,
                                      "workspace_name":body.workspace_name.strip()})

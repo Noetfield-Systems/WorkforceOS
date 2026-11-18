@@ -632,7 +632,9 @@ async function submitAuth(event){
  try{
   const email=$("auth-email").value.trim(),password=$("auth-password").value;
   const data=S.authMode==="register"?
-   {email,password,workspace_name:$("auth-workspace").value.trim()}:{email,password};
+   {email,password,workspace_name:$("auth-workspace").value.trim(),
+    ...(new URLSearchParams(location.search).get("ref")?.match(/^[a-zA-Z0-9_-]{8,42}$/)?
+       {referral_code:new URLSearchParams(location.search).get("ref")}:{})}:{email,password};
   const response=await api(S.authMode==="register"?"/api/register":"/api/login","POST",data);
   if(S.authMode==="register")S.pendingSignupTemplate=S.selectedTemplate;
   await afterLogin(response);
@@ -793,7 +795,10 @@ async function initialize(){
    if(VALID_VIEWS.includes(query.get("view")))setView(query.get("view"));
   }else{
    showScreen(false);
-   if(query.has("signin")||query.get("view")==="billing"){
+   if(query.get("ref")?.match(/^[a-zA-Z0-9_-]{8,42}$/)){
+     switchAuth("register");showModal("auth-modal");
+     $("auth-subtitle").textContent="You were invited to build a real AI workspace. Your inviter receives XP only after you create your first Agent DNA.";
+   }else if(query.has("signin")||query.get("view")==="billing"){
      switchAuth("login");showModal("auth-modal");
    }
   }

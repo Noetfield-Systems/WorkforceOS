@@ -1,6 +1,7 @@
 "use strict";
 const assert=require("node:assert/strict");
 const origin=(process.env.WORKFORCE_PUBLIC_ORIGIN||"https://workforce-web-production-2d15bf32.up.railway.app").replace(/\/$/,"");
+const checkingUnmergedPR=process.env.GITHUB_EVENT_NAME==="pull_request";
 const checks=[
   {path:"/health",verify:(s,t)=>{assert.equal(s,200);assert.equal(JSON.parse(t).ok,true)}},
   {path:"/api/hybrid/status",verify:(s,t)=>{
@@ -18,12 +19,17 @@ const checks=[
   {path:"/api/rewards/program",verify:(s,t)=>{
     assert.equal(s,200);const d=JSON.parse(t);
     assert.equal(d.kind,"internal_participation_xp");
-    assert.equal(d.quests.length,4);
+    if(checkingUnmergedPR)assert([4,5].includes(d.quests.length),"current live release has either v1 or v2 quests");
+    else assert.equal(d.quests.length,5);
     assert.equal(d.monetary_value,false);
     assert.equal(d.token_or_airdrop_entitlement,false);
     assert.equal(d.redeemable_for_paid_runtime,false);
   }},
   {path:"/api/rewards/me",verify:(s)=>assert.equal(s,401)},
+  {path:"/api/rewards/referrals",verify:(s)=>{
+    if(checkingUnmergedPR)assert([401,404].includes(s));
+    else assert.equal(s,401);
+  }},
   {path:"/api/agent-dna/catalog",verify:(s,t)=>{
     assert.equal(s,200);const d=JSON.parse(t);
     assert.equal(d.capabilities.ethics_instruction_sync,true);
@@ -37,7 +43,8 @@ const checks=[
   }},
   {path:"/rewards",verify:(s,t)=>{
     assert.equal(s,200);
-    for(const id of ["xp-balance","daily-claim","quiz-submit","feedback-submit"]){
+    for(const id of ["xp-balance","daily-claim","quiz-submit","feedback-submit",
+          ...(checkingUnmergedPR?[]:["invite-create","invite-link"])]){
       assert(t.includes('id="'+id+'"'));
     }
   }},
