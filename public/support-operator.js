@@ -15,7 +15,7 @@ async function load(){
    const card=mk("article","case"),top=mk("div","case-top");
    top.append(mk("small","",event.case_id+" · "+event.category+" · "+event.kind),
               mk("small","",event.priority+" PRIORITY"));
-   const title=mk("h3","",event.subject),message=mk("p","",event.message),info=mk("div","info",event.name+" · "+event.email+" · "+event.page_path);
+   const title=mk("h3","",event.subject),message=mk("p","",event.kind==="support.customer_replied"?event.event_note:event.message),info=mk("div","info",event.name+" · "+event.email+" · "+event.page_path);
    const actions=mk("div","actions"),select=mk("select");
    for(const value of ["ACKNOWLEDGED","INVESTIGATING","NEEDS_HUMAN","RESOLVED"]){
     const op=mk("option","",value.replaceAll("_"," "));op.value=value;select.append(op);
