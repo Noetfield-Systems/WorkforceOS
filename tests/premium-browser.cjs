@@ -114,8 +114,8 @@ const scrub=(value)=>String(value||"").slice(0,350);
       assert.equal(await page.locator("#market-results .agent-card").count(),33,"reset did not restore all 33 agents");
       const neutral=await page.evaluate(()=>getComputedStyle(document.body).backgroundColor);
       assert.equal(neutral,"rgb(244, 246, 245)","v5 neutral storefront palette not active");
-      const photographicPeople=await page.locator("img[src*='photo-1560250097'],img[src*='photo-1524504388940']").count();
-      assert.equal(photographicPeople,0,"human portrait imagery returned to the AI marketplace");
+      // Premium fictional human-like character artwork is the target art direction.
+      // Never prohibit human-looking AI personas solely because they are not robots.
       console.log("AGENT_VECTOR_QA",viewportName,JSON.stringify({svgCount,distinctSVG,identities:identities.slice(0,4)}));
       await page.locator("[data-density='compact']").click();
       assert.equal(await page.locator("#market-results").getAttribute("data-density"),"compact",

@@ -1,7 +1,7 @@
-/* WorkforceOS Agent Visual Language v5.
- * Original vector identities for functional AI agents. No photographs, no
- * human portraits, no game collectibles, no AI-generated image placeholders.
- * Safe static SVG shapes only, no events, external resources or script nodes.
+/* WorkforceOS character media.
+ * Cinematic fictional human-like personas are the target art direction.
+ * Existing licensed images are a legacy base; the vector fallback is not
+ * equivalent to final character artwork. External image failures remain visible.
  */
 (function(root){
  "use strict";
