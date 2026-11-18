@@ -9,8 +9,8 @@ const checks=[
   {path:"/health",verify:(s,t)=>{assert.equal(s,200);assert.equal(JSON.parse(t).ok,true)}},
   {path:"/api/hybrid/status",verify:(s,t)=>{
     assert.equal(s,200);const d=JSON.parse(t);
-    assert.equal(d.schema,"workforceos/hybrid-commerce/v1");
-    assert.equal(d.product_mode,"hybrid_ai_workforce");
+    assert.equal(d.schema,"workforceos/hybrid-commerce/v2");
+    assert.equal(d.product_mode,"web3_agent_economy");
     assert.equal(d.corporate_token_issued,false);
     assert.equal(d.crypto_checkout_active,false);
     assert.equal(d.payment_rails[0].id,"stripe");
