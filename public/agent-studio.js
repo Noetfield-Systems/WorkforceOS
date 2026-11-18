@@ -486,11 +486,11 @@ document.querySelectorAll("[data-tone]").forEach(b=>b.addEventListener("click",(
 ["name","role","mission","backstory","work_style","autonomy","model_preference","model_provider_request"].forEach(id=>{
  $(id).addEventListener("input",()=>{if(!S.profile)return;S.profile[id]=$(id).value;markChanged();});
 });
-for(const [id,sep,field] of [["expertise_domains",",","expertise_domains"],["deliverables","\\n","deliverables"]]){
+for(const [id,sep,field] of [["expertise_domains",",","expertise_domains"],["deliverables",String.fromCharCode(10),"deliverables"]]){
  const el=$(id);
  if(el)el.addEventListener("input",()=>{
   if(!S.profile)return;
-  S.profile[field]=[...new Set(el.value.split(sep==="\\n"?"\\n":",").map(s=>s.trim()).filter(Boolean))].slice(0,8);
+  S.profile[field]=[...new Set(el.value.split(sep).map(s=>s.trim()).filter(Boolean))].slice(0,8);
   markChanged();
  });
 }
