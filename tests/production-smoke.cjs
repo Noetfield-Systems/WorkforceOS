@@ -1,5 +1,8 @@
 "use strict";
 const assert=require("node:assert/strict");
+const fs=require("node:fs");
+const path=require("node:path");
+const crypto=require("node:crypto");
 const origin=(process.env.WORKFORCE_PUBLIC_ORIGIN||"https://workforce-web-production-2d15bf32.up.railway.app").replace(/\/$/,"");
 const checkingUnmergedPR=process.env.GITHUB_EVENT_NAME==="pull_request";
 const checks=[
@@ -80,12 +83,58 @@ const checks=[
   {path:"/marketplace",verify:(s,t)=>{
     assert.equal(s,200);assert(t.includes('href="/commerce"'));
     assert(t.includes('href="/rewards"'));
+    if(!checkingUnmergedPR){
+      assert(t.includes("/static/premium-reference-v9.css"),"production marketplace missing v9 editorial CSS");
+      assert(t.includes("/static/marketplace.js?v=20261118-v9"),"stale marketplace JavaScript served");
+    }
+  }},
+  {path:"/static/premium-reference-v9.css",verify:(s,t)=>{
+    assert.equal(s,200);assert(t.includes(".cinematic-character"));
+    assert(t.includes(".scene-agent-pair"));
+  }},
+  {path:"/static/agent-art.js",verify:(s,t)=>{
+    assert.equal(s,200);assert(t.includes("src=\"/static/characters/"));
   }},
   ...["/static/rewards.js","/static/rewards.css","/static/commerce.js",
       "/static/commerce.css","/static/agent-studio-v7.css"].map(path=>({
     path,verify:(s,t)=>{assert.equal(s,200);assert(t.length>100,path+" must be nonempty")}
   }))
 ];
+// The deployment receipt is content-exact. A 200 on /marketplace alone does
+// not prove the character portraits visible in a real user's browser are real.
+async function verifyPublishedCharacterAssets(){
+  if(checkingUnmergedPR)return; // PR assets can precede production deployment.
+  const catalogResponse=await fetch(origin+"/api/agent-dna/catalog",{signal:AbortSignal.timeout(14000)});
+  assert.equal(catalogResponse.status,200);
+  const catalog=await catalogResponse.json();
+  const ids=catalog.presets.map(p=>p.id);
+  assert.equal(ids.length,33);
+  assert.equal(new Set(ids).size,33);
+  const digests=new Set();
+  let byteCount=0;
+  for(let i=0;i<ids.length;i+=6){
+    await Promise.all(ids.slice(i,i+6).map(async id=>{
+      const url=origin+"/static/characters/"+encodeURIComponent(id)+".webp";
+      const response=await fetch(url,{signal:AbortSignal.timeout(16000),redirect:"follow"});
+      assert.equal(response.status,200,"portrait not live: "+id);
+      assert((response.headers.get("content-type")||"").includes("image/webp"),
+        "wrong MIME type for "+id);
+      const body=Buffer.from(await response.arrayBuffer());
+      assert(body.length>9000,"empty character portrait "+id);
+      assert.equal(body.toString("ascii",0,4),"RIFF");
+      assert.equal(body.toString("ascii",8,12),"WEBP");
+      const actual=crypto.createHash("sha256").update(body).digest("hex");
+      const local=fs.readFileSync(path.join(__dirname,"..","public","characters",id+".webp"));
+      const expected=crypto.createHash("sha256").update(local).digest("hex");
+      assert.equal(actual,expected,"Production is serving stale or incorrect portrait: "+id);
+      assert(!digests.has(actual),"Duplicate live portrait found for "+id);
+      digests.add(actual);
+      byteCount+=body.length;
+    }));
+  }
+  assert.equal(digests.size,33);
+  console.log("LIVE_CINEMATIC_ASSET_RECEIPT: 33 distinct first-party WebP portrait hashes match production, "+byteCount+" bytes.");
+}
 async function check(){
   let failures=[];
   for(const item of checks){
@@ -101,6 +150,7 @@ async function check(){
     }
   }
   if(failures.length)throw Error(failures.length+"/"+checks.length+" failures: "+JSON.stringify(failures));
+  await verifyPublishedCharacterAssets();
   console.log("SUCCESS "+checks.length+" live HTTPS checks on "+origin);
 }
 (async()=>{
