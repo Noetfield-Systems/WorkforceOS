@@ -36,6 +36,20 @@ const checks=[
     assert.equal(d.capabilities.runtime_model_choice,false);
     assert.equal(d.capabilities.custom_tool_grants,false);
     assert(d.model_provider_requests.includes("deepseek"));
+    if(!checkingUnmergedPR){
+      assert.equal(d.canonical_count,33,"production catalog must expose exactly 33 official Agent DNA products");
+      assert.equal(d.presets.length,33);
+      assert.equal(d.directories.length,4);
+      assert.equal(new Set(d.presets.map(p=>p.id)).size,33,"catalog contains duplicate IDs");
+      assert.equal(new Set(d.presets.map(p=>p.profile.name)).size,33,"catalog contains duplicate persona names");
+      assert.equal(d.presets.filter(p=>p.metadata.mode==="Customizable").length,17);
+      assert.equal(d.presets.filter(p=>p.metadata.mode==="Curated").length,16);
+      for(const preset of d.presets){
+        assert(preset.profile.mission.length>=12);
+        assert(preset.profile.skills.length>=2);
+        assert(preset.profile.visual_identity===preset.id);
+      }
+    }
   }},
   {path:"/commerce",verify:(s,t)=>{
     assert.equal(s,200);assert(t.includes('id="stripe-status"'));
@@ -55,6 +69,14 @@ const checks=[
     assert(t.includes('id="model_provider_request"'));
     assert(t.includes("/static/agent-studio-v7.css"));
   }},
+  ...["strategy","execution","intelligence","creative"].map(directory=>({
+    path:"/marketplace/directory/"+directory,
+    verify:(s,t)=>{assert.equal(s,200);assert(t.includes("/static/marketplace.js"))}
+  })),
+  ...["orion","lyra","sable","helix","pioneer"].map(id=>({
+    path:"/agents/"+id,
+    verify:(s,t)=>{assert.equal(s,200);assert(t.includes('id="content"'))}
+  })),
   {path:"/marketplace",verify:(s,t)=>{
     assert.equal(s,200);assert(t.includes('href="/commerce"'));
     assert(t.includes('href="/rewards"'));
