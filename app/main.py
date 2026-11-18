@@ -7,6 +7,7 @@ tenant-scoped by a separate secret at the Fabric source itself.
 from __future__ import annotations
 import hashlib
 import hmac
+import mimetypes
 import os
 import re
 from datetime import datetime, timezone
@@ -83,6 +84,10 @@ async def lifetime(application):
 
 app=FastAPI(title="WorkforceOS Agent Studio", version=APP_VERSION,
             docs_url=None,redoc_url=None,openapi_url=None,lifespan=lifetime)
+# Railway's minimal runtime MIME database may classify .webp as text/plain.
+# With X-Content-Type-Options: nosniff, that blocks portraits in browsers.
+# Register the correct media type *before* Starlette builds FileResponse.
+mimetypes.add_type("image/webp",".webp",strict=True)
 app.mount("/static",StaticFiles(directory=PUBLIC),name="static")
 app.include_router(billing.router)
 app.include_router(rewards.router)
