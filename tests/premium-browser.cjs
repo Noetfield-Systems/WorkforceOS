@@ -63,6 +63,33 @@ const scrub=(value)=>String(value||"").slice(0,350);
         "unverified wallet checkout falsely presented as active");
     }
     if(name==="genesis-app"){
+      // Regression: switching tabs must not resize/reposition the desktop
+      // card, portrait panel, or image crop. On mobile, the portrait remains
+      // fixed while the form may grow naturally.
+      const geometry=()=>page.evaluate(()=>{
+        const rect=selector=>{
+          const r=document.querySelector(selector).getBoundingClientRect();
+          return {x:r.left+window.scrollX,y:r.top+window.scrollY,
+                  width:r.width,height:r.height};
+        };
+        return {card:rect(".auth-box"),photo:rect(".auth-image"),
+                portrait:rect(".auth-image img")};
+      });
+      const registerGeometry=await geometry();
+      await page.locator("#mode-login").click();
+      assert.equal(await page.locator("#workspace").isHidden(),true,
+        "Login must hide workspace field");
+      const loginGeometry=await geometry();
+      for(const part of (viewportName==="desktop"?["card","photo","portrait"]:["photo","portrait"])){
+        for(const key of ["x","y","width","height"]){
+          assert(Math.abs(registerGeometry[part][key]-loginGeometry[part][key])<1,
+            viewportName+" "+part+" "+key+" shifted on login toggle: "+
+            JSON.stringify({register:registerGeometry,login:loginGeometry}));
+        }
+      }
+      await page.locator("#mode-register").click();
+      assert.equal(await page.locator("#workspace").isVisible(),true,
+        "Register must restore workspace field");
       const email="genesis-browser-"+viewportName+"-"+Date.now()+"@example.org";
       await page.locator("#workspace").fill("Browser QA "+viewportName);
       await page.locator("#email").fill(email);
