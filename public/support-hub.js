@@ -86,11 +86,41 @@ async function init(){
   try{await navigator.clipboard.writeText(value);el("copy-reference").textContent="Copied ✓";}
   catch{el("copy-reference").textContent="Select the reference above to copy";}
  });
+ function renderCase(data){
+  el("case-thread").hidden=false;const container=el("case-messages");
+  container.replaceChildren();
+  (data.messages||[]).forEach(m=>{
+   const div=document.createElement("div"),author=document.createElement("b"),content=document.createElement("span");
+   author.textContent=m.author==="support"?"Support reply":"You";
+   content.textContent=m.body;
+   div.append(author,content);container.appendChild(div);
+  });
+ }
  el("track-case").addEventListener("click",async()=>{
   const note=el("track-result");note.textContent="Checking status…";
   try{const data=await statusOf(el("track-reference").value);
    note.textContent=data.id+": "+data.status.replaceAll("_"," ")+" · Last updated "+new Date(data.updated_at).toLocaleString();
+   renderCase(data);
+  }catch(err){el("case-thread").hidden=true;note.textContent=String(err.message||err)}
+ });
+ el("case-reply-send").addEventListener("click",async()=>{
+  const note=el("track-result"),parts=trackParts(el("track-reference").value);
+  if(!parts){note.textContent="Check your full reference first.";return;}
+  const body=el("case-reply").value.trim();
+  if(body.length<8){note.textContent="Write at least 8 characters.";return;}
+  el("case-reply-send").disabled=true;
+  try{
+   const response=await fetch("/api/support/cases/"+parts[0]+"/reply",{
+    method:"POST",credentials:"same-origin",
+    headers:{"Content-Type":"application/json","X-Workforce-Request":"workspace","X-Support-Receipt":parts[1]},
+    body:JSON.stringify({message:body})
+   });
+   if(!response.ok)throw Error("Reply could not be recorded.");
+   el("case-reply").value="";
+   renderCase(await statusOf(el("track-reference").value));
+   note.textContent="Reply recorded. Support can see your follow-up.";
   }catch(err){note.textContent=String(err.message||err)}
+  finally{el("case-reply-send").disabled=false;}
  });
 }
 document.addEventListener("DOMContentLoaded",init);
