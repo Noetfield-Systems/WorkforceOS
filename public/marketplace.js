@@ -668,7 +668,14 @@ function pricing(){
  '<div class="workflow-steps"><article><span>01</span><h3>Discover</h3><p>Explore and compare functional Agent DNA templates.</p></article>'+
  '<article><span>02</span><h3>Configure</h3><p>Choose skills, behaviors and mission, then save your agent.</p></article>'+
  '<article><span>03</span><h3>Run</h3><p>Use your authenticated workforce workspace and permitted capabilities.</p></article>'+
- '<article><span>04</span><h3>Manage usage</h3><p>Open your existing billing panel for plan-specific limits.</p></article></div></section>';
+ '<article><span>04</span><h3>Manage usage</h3><p>Open your existing billing panel for plan-specific limits.</p></article></div></section>'+ 
+ '<section class="section wrap">'+sectionHead("SOFTWARE PRICING","Start free. <em>Know the limits.</em>",
+ "All plans are USD/month. Paid plans activate only with configured Stripe checkout and verified entitlements. Genesis XP, WC and demo balances are separate.")+
+ '<div class="workflow-steps"><article><span>EXPLORE / $0</span><h3>Free</h3><p>1 team · 3 agents · 3 references · 20 tickets.</p></article>'+
+ '<article><span>SOLO / $29/MO</span><h3>Solo</h3><p>2 teams · 6 agents · 10 references · 60 tickets.</p></article>'+
+ '<article><span>BUILDER / $79/MO</span><h3>Builder</h3><p>4 teams · 12 agents · 20 references · 120 tickets.</p></article>'+
+ '<article><span>TEAM / $199/MO</span><h3>Team</h3><p>5 teams · 18 agents · 30 references · 150 tickets.</p></article></div>'+
+ '<p><a href="/help#plans">Check current checkout availability ↗</a></p></section>';
 }
 
 function notFound(title,subtitle){

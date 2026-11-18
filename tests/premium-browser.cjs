@@ -21,7 +21,8 @@ const pages=[
  ["/genesis","genesis",".join-grid"],
  ["/genesis/app","genesis-app","#auth-screen .auth-box"],
  ["/genesis/whitepaper","whitepaper",".paper-main"],
- ["/genesis/docs","genesis-docs",".paper-main"]
+ ["/genesis/docs","genesis-docs",".paper-main"],
+ ["/help","help","#support-form"]
 ];
 const scrub=(value)=>String(value||"").slice(0,350);
 (async()=>{
@@ -56,6 +57,36 @@ const scrub=(value)=>String(value||"").slice(0,350);
     }
     assert(horizontal.scrollWidth<=horizontal.clientWidth+5,
       viewportName+" "+url+" horizontal overflow "+JSON.stringify(horizontal));
+    if(name!=="help"){
+      await page.locator("#wos-help-toggle").waitFor({state:"visible",timeout:5000});
+      assert.equal(await page.locator("#wos-help-panel").isHidden(),true,
+        "Help panel must not block user content by default");
+      if(name==="marketplace"){
+        await page.locator("#wos-help-toggle").click();
+        assert.equal(await page.locator("#wos-help-panel").isVisible(),true,
+          "Global Help widget must open");
+        await page.keyboard.press("Escape");
+        assert.equal(await page.locator("#wos-help-panel").isHidden(),true,
+          "Help widget must close with Escape");
+      }
+    }
+    if(name==="help"){
+      assert.equal(await page.locator(".plan").count(),4,"four published plans must be visible");
+      assert.equal(await page.locator(".path-card").count(),6,"six visitor paths missing");
+      await page.locator('[data-faq="token"]').click();
+      assert((await page.locator("#guide-answer").innerText()).includes("No WorkforceOS token sale"),
+        "Guide must not suggest a token sale");
+      await page.locator('[name="name"]').fill("Browser QA");
+      await page.locator('[name="email"]').fill("care-"+viewportName+"-"+Date.now()+"@example.org");
+      await page.locator('[name="subject"]').fill("Browser support submission");
+      await page.locator('[name="message"]').fill("Testing real support case storage and tracking in browser.");
+      await page.locator("#support-send").click();
+      await page.locator("#new-case").waitFor({state:"visible",timeout:10000});
+      assert((await page.locator("#case-reference").innerText()).startsWith("sup_"),
+        "No real support case receipt");
+      await page.locator("#track-case").click();
+      await page.waitForFunction(()=>document.querySelector("#track-result").textContent.includes("RECEIVED"));
+    }
     if(name==="commerce"){
       await page.waitForFunction(()=>!document.getElementById("stripe-status").textContent.includes("Checking live"));
       assert.equal(await page.locator(".rails .rail").count(),3,"hybrid payment rails not rendered");
@@ -240,7 +271,7 @@ const scrub=(value)=>String(value||"").slice(0,350);
     // Filters, search and reset replace card DOM nodes: load the final rendered
     // assets again before screenshot, not the stale images asserted above.
     if(name!=="whitepaper"&&name!=="genesis-docs"&&name!=="genesis-app"){
-      const mediaSelector=name==="genesis"?"main img":".agent-character-photo";
+      const mediaSelector=(name==="genesis"||name==="help")?"main img":".agent-character-photo";
     await page.locator(mediaSelector).evaluateAll(images=>images.forEach(img=>img.loading="eager"));
     await page.waitForFunction((selector)=>{
       const imgs=[...document.querySelectorAll(selector)];

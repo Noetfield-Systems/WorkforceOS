@@ -5,6 +5,8 @@ on:
       - "public/marketplace*"
       - "public/agent-studio*"
       - "public/genesis-app*"
+      - "public/support*"
+      - "app/support.py"
       - "app/main.py"
       - "tests/premium-browser.cjs"
       - ".github/workflows/premium-marketplace-browser.yml"
@@ -14,6 +16,8 @@ on:
       - "public/marketplace*"
       - "public/agent-studio*"
       - "public/genesis-app*"
+      - "public/support*"
+      - "app/support.py"
       - "app/main.py"
       - "tests/premium-browser.cjs"
 jobs:

@@ -49,6 +49,9 @@ jobs:
           node --check public/genesis.js
           node --check public/genesis-app.js
           node --check public/commerce.js
+          node --check public/support-hub.js
+          node --check public/support-widget.js
+          node --check public/support-operator.js
           node --check public/collaborate.js
           node --check public/collaborate-desk.js
           node --check public/connect-desk.js
