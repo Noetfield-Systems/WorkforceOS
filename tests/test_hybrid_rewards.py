@@ -31,11 +31,12 @@ class HybridRewardsTests(unittest.TestCase):
     def tearDownClass(cls):
         cls.root.__exit__(None,None,None)
 
-    def signup(self):
+    def signup(self,referral=None):
         c=TestClient(app)
-        r=c.post("/api/register",headers=headers(),json={
-            "email":"xp_"+uuid.uuid4().hex[:16]+"@example.org",
-            "password":"Correct-Horse-123456","workspace_name":"XP QA"})
+        payload={"email":"xp_"+uuid.uuid4().hex[:16]+"@example.org",
+                 "password":"Correct-Horse-123456","workspace_name":"XP QA"}
+        if referral is not None:payload["referral_code"]=referral
+        r=c.post("/api/register",headers=headers(),json=payload)
         self.assertEqual(r.status_code,200,r.text)
         return c,r.json()["csrf"]
 
@@ -142,6 +143,59 @@ class HybridRewardsTests(unittest.TestCase):
         other=b.post("/api/rewards/daily",json={},headers=headers(csrf_b))
         self.assertEqual(other.json()["points"],5)
         self.assertEqual(b.get("/api/rewards/me").json()["balance"],5)
+
+    def test_referral_requires_new_registration_and_first_real_agent_not_link_click(self):
+        inviter,inviter_csrf=self.signup()
+        initial=inviter.get("/api/rewards/referrals")
+        self.assertEqual(initial.status_code,200,initial.text)
+        self.assertIsNone(initial.json()["invite_url"])
+        self.assertEqual(initial.json()["registrations"],0)
+        self.assertEqual(inviter.post("/api/rewards/invite",headers=headers(),json={}).status_code,403)
+        code_response=inviter.post("/api/rewards/invite",headers=headers(inviter_csrf),json={})
+        self.assertEqual(code_response.status_code,200,code_response.text)
+        code=code_response.json()["code"]
+        self.assertTrue(code_response.json()["url"].endswith("/app?ref="+code))
+        duplicate=inviter.post("/api/rewards/invite",headers=headers(inviter_csrf),json={})
+        self.assertEqual(duplicate.json()["code"],code)
+        self.assertEqual(inviter.get("/api/rewards/me").json()["balance"],0)
+
+        newcomer,member_csrf=self.signup(referral=code)
+        tracked=inviter.get("/api/rewards/referrals").json()
+        self.assertEqual(tracked["registrations"],1)
+        self.assertEqual(tracked["activated_workspaces"],0)
+        self.assertEqual(tracked["rewarded_referrals"],0)
+        self.assertTrue(newcomer.get("/api/rewards/referrals").json()["my_pending_invite"])
+        self.assertEqual(newcomer.get("/api/rewards/me").json()["balance"],0)
+        self.assertEqual(inviter.get("/api/rewards/me").json()["balance"],0)
+
+        first=newcomer.post("/api/agent-dna",headers=headers(member_csrf),
+                            json={"preset_id":"product_engineer"})
+        self.assertEqual(first.status_code,200,first.text)
+        self.assertEqual(newcomer.get("/api/rewards/me").json()["balance"],30)
+        self.assertEqual(inviter.get("/api/rewards/me").json()["balance"],25)
+        referral=inviter.get("/api/rewards/referrals").json()
+        self.assertEqual(referral["registrations"],1)
+        self.assertEqual(referral["activated_workspaces"],1)
+        self.assertEqual(referral["rewarded_referrals"],1)
+        self.assertFalse(newcomer.get("/api/rewards/referrals").json()["my_pending_invite"])
+        self.assertEqual(newcomer.post("/api/agent-dna",
+            headers=headers(member_csrf),json={"preset_id":"research_analyst"}).status_code,200)
+        self.assertEqual(newcomer.get("/api/rewards/me").json()["balance"],30)
+        self.assertEqual(inviter.get("/api/rewards/me").json()["balance"],25)
+
+        invalid,invalid_csrf=self.signup(referral="nobody_has_this_code")
+        self.assertEqual(invalid.post("/api/agent-dna",headers=headers(invalid_csrf),
+                                     json={"preset_id":"research_analyst"}).status_code,200)
+        self.assertEqual(invalid.get("/api/rewards/me").json()["balance"],20)
+        self.assertEqual(inviter.get("/api/rewards/me").json()["balance"],25)
+        self.assertEqual(invalid.get("/api/rewards/referrals").json()["registrations"],0)
+        self.assertIsNone(invalid.get("/api/rewards/referrals").json()["invite_code"])
+
+        pending,pending_csrf=self.signup(referral=code)
+        self.assertEqual(inviter.get("/api/rewards/referrals").json()["registrations"],2)
+        self.assertEqual(inviter.get("/api/rewards/referrals").json()["activated_workspaces"],1)
+        self.assertEqual(inviter.get("/api/rewards/me").json()["balance"],25)
+        self.assertTrue(pending.get("/api/rewards/referrals").json()["my_pending_invite"])
 
     def test_feedback_reward_is_attributed_once_per_week(self):
         client,csrf=self.signup()
