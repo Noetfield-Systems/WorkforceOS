@@ -175,19 +175,21 @@ const scrub=(value)=>String(value||"").slice(0,350);
     assert.deepEqual(errors,[],viewportName+" "+url+" frontend errors: "+errors.map(scrub).join(" | "));
     // Filters, search and reset replace card DOM nodes: load the final rendered
     // assets again before screenshot, not the stale images asserted above.
-    await page.locator(".agent-character-photo").evaluateAll(images=>images.forEach(img=>img.loading="eager"));
-    await page.waitForFunction(()=>{
-      const imgs=[...document.querySelectorAll(".agent-character-photo")];
+    if(name!=="whitepaper"&&name!=="genesis-docs"){
+      const mediaSelector=name==="genesis"?"main img":".agent-character-photo";
+    await page.locator(mediaSelector).evaluateAll(images=>images.forEach(img=>img.loading="eager"));
+    await page.waitForFunction((selector)=>{
+      const imgs=[...document.querySelectorAll(mediaSelector)];
       return imgs.length>0&&imgs.every(img=>img.complete&&img.naturalWidth>0);
-    },null,{timeout:30000});
-    await page.locator(".agent-character-photo").evaluateAll(async images=>{
+    },mediaSelector,{timeout:30000});
+    await page.locator(mediaSelector).evaluateAll(async images=>{
       await Promise.all(images.map(async img=>{
         await img.decode();
         img.classList.add("image-decoded");
       }));
     });
     await page.evaluate(()=>new Promise(resolve=>requestAnimationFrame(()=>requestAnimationFrame(resolve))));
-    const mediaState=await page.locator(".agent-character-photo").evaluateAll(imgs=>imgs.map(img=>({
+    const mediaState=await page.locator(mediaSelector).evaluateAll(imgs=>imgs.map(img=>({
       agent:img.closest("[data-agent-art]")?.getAttribute("data-agent-art")||"hero",
       complete:img.complete,width:img.naturalWidth,display:getComputedStyle(img).display,
       visibility:getComputedStyle(img).visibility,opacity:getComputedStyle(img).opacity,
@@ -195,7 +197,8 @@ const scrub=(value)=>String(value||"").slice(0,350);
     })));
     console.log("VISIBLE_CHARACTERS",viewportName,name,JSON.stringify(mediaState));
     assert(mediaState.every(x=>x.decoded&&!x.error&&x.display!=="none"&&x.visibility!=="hidden"&&Number(x.opacity)>0&&x.rectWidth>0),
-      "character images are loaded but some remain visually hidden: "+JSON.stringify(mediaState.filter(x=>x.error||x.display==="none"||x.visibility==="hidden")));
+      "page images are loaded but some remain visually hidden: "+JSON.stringify(mediaState.filter(x=>x.error||x.display==="none"||x.visibility==="hidden")));
+    }
     await page.evaluate(()=>{
       document.querySelectorAll(".mp-shelf-grid,.filter-choices").forEach(el=>{el.scrollLeft=0});
       window.scrollTo(0,0);
