@@ -77,7 +77,7 @@ const scrub=(value)=>String(value||"").slice(0,350);
       assert.equal(await page.locator(".mp-feature-tile").count(),2,
         "editorial agent spotlight missing");
       const featuredLinks=await page.locator(".mp-feature-tile").evaluateAll(els=>els.map(e=>e.getAttribute("href")));
-      assert.deepEqual(featuredLinks,["/agents/lyra","/agents/financial_analyst"],
+      assert.deepEqual(featuredLinks,["/agents/lyra","/agents/archive_researcher"],
         "editorial picks must expand beyond hero's repeated identities");
       assert.equal(await page.locator(".mp-shelf").count(),6,
         "browse-by-specialization shelf is incomplete");
@@ -86,37 +86,28 @@ const scrub=(value)=>String(value||"").slice(0,350);
       assert.equal(await page.locator("#market-results").getAttribute("data-density"),"gallery",
         "premium large-art gallery must be the default");
       assert((await page.locator(".agent-card").count())===33,"exactly 33 canonical specialists expected");
-      const svgCount=await page.locator(".agent-card .agent-visual-svg").count();
-      assert(svgCount>=12,"the marketplace is not rendering twelve original AI agent vectors");
-      const identities=await page.locator(".agent-card .agent-visual-svg").evaluateAll(
-        svgs=>svgs.map(svg=>svg.querySelector("text")?.textContent||"")
-      );
-      const distinctSVG=await page.locator(".agent-card .agent-visual-svg").evaluateAll(
-        svgs=>new Set(svgs.map(svg=>svg.innerHTML)).size
-      );
-      assert(distinctSVG>=12,"AI characters are duplicated instead of having individual visual identities");
-      assert((await page.locator(".agent-card .agent-character-photo").count())>=10,
-        "cinematic robot character media missing from catalog");
-      await page.locator(".agent-card .agent-character-photo").evaluateAll(images=>images.forEach(img=>img.loading="eager"));
-      await page.waitForFunction(()=>[...document.querySelectorAll(".agent-card .agent-character-photo")].every(img=>img.complete),
-        null,{timeout:30000});
-      const photos=await page.locator(".agent-card .agent-character-photo").evaluateAll(images=>images.map(
-        img=>({url:img.src,width:img.naturalWidth,complete:img.complete})
-      ));
-      console.log("CINEMATIC_CHARACTER_LOAD",viewportName,JSON.stringify(photos));
-      assert.equal(new Set(photos.map(p=>p.url)).size,10,"all currently integrated character photos must be distinct");
-      assert.equal(photos.filter(p=>p.width>0).length,10,"the ten original character photos must load");
-      console.log("ART_ASSET_GAP",viewportName,"23 additional cinematic character portraits still require asset integration");
+      const photos=await page.locator(".agent-card .agent-character-photo").evaluateAll(images=>images.map(img=>({
+        src:new URL(img.src).pathname,alt:img.alt,loading:img.loading,
+        focus:img.getAttribute("style")||""
+      })));
+      assert.equal(photos.length,33,"catalog must show 33 unique first-party cinematic portraits");
+      assert.equal(new Set(photos.map(p=>p.src)).size,33,"character visual identities cannot repeat");
+      assert(photos.every(p=>p.src.startsWith("/static/characters/")&&p.src.endsWith(".webp")),
+        "external robot photos or missing first-party art detected");
+      assert(photos.every(p=>p.alt.includes("fictional")||p.alt.includes("Fictional")),
+        "agent images must explicitly describe fictional personas");
+      assert(photos.every(p=>p.focus.includes("object-position:")),"per-character focal metadata required");
+      console.log("REFERENCE_CHARACTER_ART",viewportName,photos.length);
       await page.locator("[data-style='Historical']").click();
       assert.equal(await page.locator("#market-results .agent-card").count(),1,"historical filter not connected");
       assert((await page.locator("#market-results").innerText()).includes("Vesper"),"Vesper is not a real listing");
       await page.locator("#reset-filters").click();
       assert.equal(await page.locator("#market-results .agent-card").count(),33,"reset did not restore all 33 agents");
       const neutral=await page.evaluate(()=>getComputedStyle(document.body).backgroundColor);
-      assert.equal(neutral,"rgb(244, 246, 245)","v5 neutral storefront palette not active");
+      assert.equal(neutral,"rgb(245, 247, 247)","v9 editorial ivory storefront palette not active");
       // Premium fictional human-like character artwork is the target art direction.
       // Never prohibit human-looking AI personas solely because they are not robots.
-      console.log("AGENT_VECTOR_QA",viewportName,JSON.stringify({svgCount,distinctSVG,identities:identities.slice(0,4)}));
+
       await page.locator("[data-density='compact']").click();
       assert.equal(await page.locator("#market-results").getAttribute("data-density"),"compact",
         "compact layout switch not wired");

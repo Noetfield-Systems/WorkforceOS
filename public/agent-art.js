@@ -173,40 +173,32 @@
   return '<svg xmlns="http://www.w3.org/2000/svg" class="agent-visual-svg" role="img" aria-label="'+(options?.ariaLabel||"Original abstract AI agent illustration")+'" viewBox="0 0 600 430" preserveAspectRatio="xMidYMid slice" style="width:'+w+';height:100%">'+
     unique+background+g(figure(key,accent,light),'stroke-linecap="round" stroke-linejoin="round"')+'</svg>';
  }
- const characters={
-   // Curated free-to-use Unsplash artwork. Editorial renderings depict a visual
-   // persona, NOT a real hardware product, provider or independent agent result.
-   sales_operator:{photo:"photo-1767716134775-6787d0def70c",tone:"apricot",focus:"center 35%",caption:"THE NEGOTIATOR"},
-   research_analyst:{photo:"photo-1771515220905-ba0784fb7522",tone:"steel",focus:"center 36%",caption:"THE OBSERVER"},
-   product_engineer:{photo:"photo-1737644467636-6b0053476bb2",tone:"silver",focus:"center 39%",caption:"THE BUILDER"},
-   creative_partner:{photo:"photo-1638957319391-9b81b996afca",tone:"rose",focus:"center 45%",caption:"THE MAKER"},
-   personal_guide:{photo:"photo-1703668929798-67cab2e41f6b",tone:"butter",focus:"center 47%",caption:"THE MENTOR"},
-   community_builder:{photo:"photo-1768400730812-039f5971185d",tone:"violet",focus:"center 42%",caption:"THE CONNECTOR"},
-   archive_researcher:{photo:"photo-1654009603731-20b6d7536002",tone:"sepia",focus:"center 50%",caption:"THE ARCHIVIST"},
-   financial_analyst:{photo:"photo-1750096319146-6310519b5af2",tone:"cobalt",focus:"center 48%",caption:"THE ANALYST"},
-   operations_director:{photo:"photo-1760931969401-9bd6ee902798",tone:"copper",focus:"center 42%",caption:"THE OPERATOR"},
-   customer_advocate:{photo:"photo-1768323286305-2fa2ad91c3cf",tone:"mint",focus:"center 42%",caption:"THE HELPER"},
-   strategy_advisor:{photo:"photo-1750192524484-36450bbb1dd6",tone:"ink",focus:"center 45%",caption:"THE COUNSEL"},
-   field_observer:{photo:"photo-1712971724897-a9ae95e0ec44",tone:"sage",focus:"center 50%",caption:"THE SCOUT"}
- };
+
+ // First-party cinematic portraits of original fictional AI personas.
+ // No external stock robot photos, image CDN dependency, or false credential claims.
+ const portraits=[{"id":"orion","name":"Orion","role":"STRATEGY","focus":"50% 33%"},{"id":"archive_researcher","name":"Vesper","role":"HISTORICAL RESEARCH","focus":"49% 34%"},{"id":"lyra","name":"Lyra","role":"CREATIVE STRATEGY","focus":"52% 36%"},{"id":"sales_operator","name":"Nova","role":"SALES & PARTNERSHIPS","focus":"51% 35%"},{"id":"research_analyst","name":"Scout","role":"RESEARCH & INTELLIGENCE","focus":"49% 37%"},{"id":"community_builder","name":"Echo","role":"COMMUNITY EXPERIENCE","focus":"51% 34%"},{"id":"ren","name":"Ren","role":"EXECUTIVE STRATEGY","focus":"50% 36%"},{"id":"kairo","name":"Kairo","role":"GROWTH","focus":"48% 35%"},{"id":"elara","name":"Elara","role":"MEMBER EXPERIENCE","focus":"52% 38%"},{"id":"sable","name":"Sable","role":"OPERATIONS","focus":"49% 33%"},{"id":"product_engineer","name":"Milo","role":"ENGINEERING","focus":"51% 34%"},{"id":"operations_director","name":"Atlas","role":"PROGRAM MANAGEMENT","focus":"50% 36%"},{"id":"mira","name":"Mira","role":"PRODUCT","focus":"49% 35%"},{"id":"forge","name":"Forge","role":"DEVOPS","focus":"52% 37%"},{"id":"quinn","name":"Quinn","role":"QA & TESTING","focus":"51% 34%"},{"id":"circuit","name":"Circuit","role":"AUTOMATION","focus":"49% 36%"},{"id":"terra","name":"Terra","role":"VENTURE OPERATIONS","focus":"51% 35%"},{"id":"financial_analyst","name":"Ledger","role":"FINANCE","focus":"50% 38%"},{"id":"strategy_advisor","name":"Vale","role":"DECISION STRATEGY","focus":"48% 33%"},{"id":"field_observer","name":"Rook","role":"FIELD INTELLIGENCE","focus":"52% 34%"},{"id":"helix","name":"Helix","role":"DATA SCIENCE","focus":"49% 36%"},{"id":"cipher","name":"Cipher","role":"SECURITY","focus":"51% 35%"},{"id":"pax","name":"Pax","role":"LEGAL RESEARCH","focus":"50% 37%"},{"id":"flint","name":"Flint","role":"REVENUE OPERATIONS","focus":"49% 34%"},{"id":"harbor","name":"Harbor","role":"CUSTOMER SUCCESS","focus":"52% 36%"},{"id":"alba","name":"Alba","role":"BRAND","focus":"51% 35%"},{"id":"nori","name":"Nori","role":"SOCIAL CAMPAIGNS","focus":"49% 38%"},{"id":"iris","name":"Iris","role":"UX RESEARCH","focus":"51% 33%"},{"id":"tessa","name":"Tessa","role":"TALENT","focus":"50% 34%"},{"id":"astra","name":"Astra","role":"LEARNING","focus":"48% 36%"},{"id":"customer_advocate","name":"Sol","role":"CUSTOMER SUPPORT","focus":"52% 35%"},{"id":"meridian","name":"Meridian","role":"PARTNERSHIPS","focus":"49% 37%"},{"id":"pioneer","name":"Pioneer","role":"PRODUCT DESIGN","focus":"51% 34%"}];
+ const characters=Object.fromEntries(portraits.map(p=>[p.id,p]));
+ const legacyMedia={creative_partner:"lyra",personal_guide:"astra"};
+ const imageIndex=Object.fromEntries(portraits.map((p,i)=>[p.id,i+1]));
+ function artEscape(value){return String(value||"").replace(/[&<>"']/g,ch=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[ch]));}
  function media(id,options={}){
-   const key=safe(id),entry=characters[key],context=safe(options.context||"card");
-   const label=entry?entry.caption:"CUSTOM AGENT";
-   const backup=svg(key,{context:"fallback-"+context,ariaLabel:"Original digital agent identity"});
-   const fallback='<span class="agent-media-fallback" aria-hidden="true">'+backup+'</span>';
-   if(!entry)return '<div class="agent-character-art agent-character-custom">'+fallback+
-     '<span class="agent-char-label">ORIGINAL / AGENT DNA</span></div>';
-   const quality=context.startsWith("hero")||context==="product"||context==="studio-hero"?1000:750;
-   const img="https://images.unsplash.com/"+entry.photo+"?auto=format&fit=crop&w="+quality+"&q=88";
-   return '<div class="agent-character-art agent-tone-'+entry.tone+' agent-id-'+key+
-     '" data-agent-art="'+key+'">'+fallback+
-     '<img class="agent-character-photo" src="'+img+'" alt="'+String(options.altText||"Fictional AI character visual identity").replace(/["<>]/g,"")+'" decoding="async" loading="'+
-     (options.priority?"eager":"lazy")+'" fetchpriority="'+(options.priority?"high":"auto")+
-     '" style="object-position:'+entry.focus+'">'+
+   const requested=safe(id),key=legacyMedia[requested]||requested;
+   const entry=characters[key];
+   const accessibleName=artEscape(options.altText||((entry?.name||"Original")+" — fictional AI agent portrait"));
+   const label=artEscape(entry?.role||"CUSTOM AGENT DNA");
+   const name=artEscape(entry?.name||String(requested).replaceAll("_"," ").toUpperCase());
+   const fallback='<span class="cinematic-portrait-placeholder" aria-hidden="true"><span>'+name+'</span></span>';
+   if(!entry)return '<div class="agent-character-art cinematic-character agent-character-custom" data-agent-art="'+requested+'">'+fallback+
+      '<span class="agent-char-label">CUSTOM AGENT DNA</span></div>';
+   const priority=Boolean(options.priority);
+   return '<div class="agent-character-art cinematic-character agent-id-'+requested+'" data-agent-art="'+requested+'">'+fallback+
+     '<img class="agent-character-photo" src="/static/characters/'+key+'.webp" alt="'+accessibleName+'" width="640" height="800"'+
+     ' loading="'+(priority?"eager":"lazy")+'" fetchpriority="'+(priority?"high":"auto")+'" decoding="async"'+
+     ' style="object-position:'+entry.focus+'">'+
      '<span class="agent-character-vignette" aria-hidden="true"></span>'+
      '<span class="agent-character-light" aria-hidden="true"></span>'+
      '<span class="agent-char-label">'+label+'</span>'+
-     '<span class="agent-char-index">W / '+String(Object.keys(characters).indexOf(key)+1).padStart(2,"0")+'</span></div>';
+     '<span class="agent-char-index">W / '+String(imageIndex[key]).padStart(2,"0")+'</span></div>';
  }
  document.addEventListener("error",event=>{
    if(event.target?.classList?.contains("agent-character-photo")&&event.target.naturalWidth===0)
@@ -220,6 +212,6 @@
      img.decode().then(()=>img.classList.add("image-decoded")).catch(()=>{});
    }else img.classList.add("image-decoded");
  },true);
- root.WorkforceAgentArt={svg,media,has:id=>Object.prototype.hasOwnProperty.call(colors,id),ids:Object.keys(colors)};
+ root.WorkforceAgentArt={svg,media,has:id=>Object.prototype.hasOwnProperty.call(characters,legacyMedia[id]||id),ids:Object.keys(characters)};
 
 })(window);

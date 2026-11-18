@@ -35,7 +35,7 @@ function portraitFor(profile){
 }
 function setupStudioArt(){
  const container=$("studio-hero-art");
- if(container&&window.WorkforceAgentArt)container.innerHTML=window.WorkforceAgentArt.media("research_analyst",{context:"studio-hero",priority:true});
+ if(container&&window.WorkforceAgentArt)container.innerHTML=window.WorkforceAgentArt.media("lyra",{context:"studio-hero",priority:true});
 }
 
 function flash(message){const el=$("toast");el.textContent=message;el.classList.add("visible");
