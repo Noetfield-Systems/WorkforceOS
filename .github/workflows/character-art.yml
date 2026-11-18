@@ -1,0 +1,56 @@
+name: Build original fictional character portraits
+on:
+  push:
+    branches: [fix/reference-visual-characters-v9]
+    paths:
+      - scripts/generate_character_art.py
+      - .github/workflows/character-art.yml
+  workflow_dispatch:
+permissions:
+  contents: write
+jobs:
+  create-33-characters:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: true
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - run: pip install 'Pillow>=10.0'
+      - name: Generate and verify 33 original cinematic AI personas
+        run: python scripts/generate_character_art.py
+      - name: Build production artwork contact-sheet for manual crop QA
+        run: |
+          python - <<'PY'
+          from PIL import Image,ImageDraw
+          from pathlib import Path
+          files=sorted(Path("public/characters").glob("*.webp"))
+          assert len(files)==33
+          w,h=192,242
+          out=Image.new("RGB",(6*w,6*h),(12,24,37))
+          draw=ImageDraw.Draw(out)
+          for n,p in enumerate(files):
+              im=Image.open(p).convert("RGB")
+              im.thumbnail((w-12,h-34))
+              x,y=(n%6)*w,(n//6)*h
+              out.paste(im,(x+6+(w-12-im.width)//2,y+4))
+              draw.text((x+7,y+h-24),p.stem,fill=(230,242,246))
+          Path("artifacts").mkdir(exist_ok=True)
+          out.save("artifacts/character-contact-sheet.jpg",quality=84)
+          PY
+      - uses: actions/upload-artifact@v4
+        with:
+          name: workforceos-33-character-contact-sheet
+          path: artifacts/character-contact-sheet.jpg
+      - name: Commit the 33 actual production WebP images to this branch
+        run: |
+          git config user.name 'WorkforceOS Art Build'
+          git config user.email 'actions@users.noreply.github.com'
+          git add public/characters
+          git commit -m 'art: integrate 33 distinct cinematic character portraits [skip ci]'
+          git fetch origin fix/reference-visual-characters-v9
+          git rebase origin/fix/reference-visual-characters-v9
+          git push origin HEAD:fix/reference-visual-characters-v9
