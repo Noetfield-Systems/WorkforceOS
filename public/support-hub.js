@@ -13,7 +13,7 @@ function showAnswer(key){
  document.querySelectorAll("[data-faq]").forEach(b=>b.classList.toggle("active",b.dataset.faq===key));
  document.querySelector(".bubble.user").textContent=entry[0];
  const box=el("guide-answer");box.replaceChildren(document.createTextNode(entry[1]+" "));
- const a=document.createElement("a");a.href=entry[2];a.textContent=entry[3]+" ↗";a.style.textDecoration="underline";box.appendChild(a);
+ const a=document.createElement("a");a.href=entry[2];a.textContent=entry[3]+" ↗";a.className="inline-answer";box.appendChild(a);
 }
 function trackParts(raw){
  const parts=String(raw||"").trim().split(":");
