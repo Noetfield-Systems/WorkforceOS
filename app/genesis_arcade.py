@@ -155,6 +155,8 @@ def get_streak(db,workspace):
 
 def streak_award(db,tenant):
     streak=get_streak(db,tenant)
+    if not _joined(db,tenant):
+        return streak,0
     # Milestone bonuses only (never APY or compounding financial yield).
     bonus=10 if streak>=7 and streak%7==0 else 4 if streak>=3 and streak%7==3 else 0
     if bonus:
@@ -233,10 +235,13 @@ def sandbox_operate(body:SandboxOperation,request:Request):
             (tenant,)).fetchone()
         if not wallet:
             raise HTTPException(status_code=409,detail="START_SANDBOX_FIRST")
-        previous=db.execute("""SELECT 1 FROM genesis_sandbox_operations
+        previous=db.execute("""SELECT action,amount,category FROM genesis_sandbox_operations
              WHERE workspace_id=%s AND request_id=%s""",
              (tenant,body.request_id)).fetchone()
-        if previous:return {"replayed":True,**_public_wallet(db,tenant)}
+        if previous:
+            if previous["action"]!=body.action or previous["amount"]!=body.amount or (body.action=="invest" and previous["category"]!=body.category):
+                raise HTTPException(409,"REQUEST_ID_REUSED_WITH_DIFFERENT_ACTION")
+            return {"replayed":True,**_public_wallet(db,tenant)}
         credits=wallet["credits"]
         units=wallet["units"]
         staked=wallet["staked_units"]

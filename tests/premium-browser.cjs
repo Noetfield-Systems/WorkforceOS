@@ -76,7 +76,7 @@ const scrub=(value)=>String(value||"").slice(0,350);
       assert.equal((await page.locator("#xp-total").innerText()).trim(),"10","join must award 10 real XP");
       await page.locator('[data-view="daily"]').click();
       await page.locator("#claim").click();
-      await page.waitForFunction(()=>document.getElementById("claim").disabled);
+      await page.waitForFunction(()=>document.getElementById("streak-count").textContent.trim()==="1" && document.getElementById("claim").textContent.includes("Already claimed"));
       assert.equal((await page.locator("#streak-count").innerText()).trim(),"1");
       assert.equal((await page.locator("#xp-total").innerText()).trim(),"15","claim must award 5 real XP");
       await page.locator('[data-view="trade"]').click();
