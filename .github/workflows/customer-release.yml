@@ -47,6 +47,7 @@ jobs:
           node --check public/agent-art.js
           node --check public/rewards.js
           node --check public/genesis.js
+          node --check public/genesis-app.js
           node --check public/commerce.js
           node --check public/collaborate.js
           node --check public/collaborate-desk.js

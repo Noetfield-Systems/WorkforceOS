@@ -58,6 +58,17 @@ const checks=[
     assert(d.leaders.every(x=>x.member.startsWith("Member ")));
   }},
   {path:"/api/genesis/me",verify:(s)=>assert.equal(s,401)},
+  {path:"/api/genesis/play/today",verify:(s)=>assert.equal(s,401)},
+  {path:"/api/genesis/daily-state",verify:(s)=>assert.equal(s,401)},
+  {path:"/api/genesis/sandbox",verify:(s)=>assert.equal(s,401)},
+  {path:"/genesis/app",verify:(s,t)=>{
+    assert.equal(s,200);
+    for(const id of ["auth-form","mode-register","mode-login","member-app","claim",
+                     "answer","start-demo","buy","sell","stake","invest"]){
+      assert(t.includes('id="'+id+'"'),"member app missing "+id);
+    }
+    assert(t.includes("/static/genesis-app.js"));
+  }},
   ...["/genesis","/genesis/whitepaper","/genesis/docs"].map(path=>({
     path,verify:(s,t)=>{assert.equal(s,200);assert(t.includes("WorkforceOS"))}
   }))
@@ -129,7 +140,7 @@ const checks=[
     assert.equal(s,200);assert(t.includes("src=\"/static/characters/"));
   }},
   ...["/static/rewards.js","/static/rewards.css",
-      ...(!checkingUnmergedPR?["/static/genesis.js","/static/genesis.css"]:[]),
+      ...(!checkingUnmergedPR?["/static/genesis.js","/static/genesis.css","/static/genesis-app.js","/static/genesis-app.css"]:[]),
       "/static/commerce.js",
       "/static/commerce.css","/static/agent-studio-v7.css"].map(path=>({
     path,verify:(s,t)=>{assert.equal(s,200);assert(t.length>100,path+" must be nonempty")}
