@@ -57,6 +57,19 @@ const scrub=(value)=>String(value||"").slice(0,350);
         "Studio did not load the template from the marketplace deep link");
     }
     if(name==="marketplace"){
+      assert.equal(await page.locator(".mp-hero-gallery .agent-character-photo").count(),3,
+        "premium hero must feature three real character portraits");
+      assert.equal(await page.locator(".mp-feature-tile").count(),2,
+        "editorial agent spotlight missing");
+      const featuredLinks=await page.locator(".mp-feature-tile").evaluateAll(els=>els.map(e=>e.getAttribute("href")));
+      assert.deepEqual(featuredLinks,["/agents/creative_partner","/agents/financial_analyst"],
+        "editorial picks must expand beyond hero's repeated identities");
+      assert.equal(await page.locator(".mp-shelf").count(),6,
+        "browse-by-specialization shelf is incomplete");
+      assert.equal(await page.locator(".mp-team-card").count(),3,
+        "functional team pairings are not visible");
+      assert.equal(await page.locator("#market-results").getAttribute("data-density"),"gallery",
+        "premium large-art gallery must be the default");
       assert((await page.locator(".agent-card").count())>=12,"specialist catalog missing");
       const svgCount=await page.locator(".agent-card .agent-visual-svg").count();
       assert(svgCount>=12,"the marketplace is not rendering twelve original AI agent vectors");
@@ -88,6 +101,38 @@ const scrub=(value)=>String(value||"").slice(0,350);
       const photographicPeople=await page.locator("img[src*='photo-1560250097'],img[src*='photo-1524504388940']").count();
       assert.equal(photographicPeople,0,"human portrait imagery returned to the AI marketplace");
       console.log("AGENT_VECTOR_QA",viewportName,JSON.stringify({svgCount,distinctSVG,identities:identities.slice(0,4)}));
+      await page.locator("[data-density='compact']").click();
+      assert.equal(await page.locator("#market-results").getAttribute("data-density"),"compact",
+        "compact layout switch not wired");
+      await page.locator("[data-density='gallery']").click();
+      assert.equal(await page.locator("#market-results").getAttribute("data-density"),"gallery",
+        "gallery layout switch not wired");
+      await page.locator("[data-shelf-category='Operations']").click();
+      assert.equal(await page.locator("#market-results .agent-card").count(),1,
+        "browse-by-specialization shelf not wired to catalog filter");
+      assert((await page.locator("#market-results").innerText()).includes("Atlas"),
+        "operations filter did not show actual agent");
+      await page.locator("#reset-filters").click();
+      assert.equal(await page.locator("#character-filter").evaluate(el=>el.scrollLeft),0,
+        "mobile style chip bar does not reset to the starting options");
+      await page.locator("[data-compare-id='sales_operator']").click();
+      await page.locator("[data-compare-id='research_analyst']").click();
+      assert.equal(await page.locator("#mp-compare-tray").isVisible(),true,
+        "DNA comparison tray not displayed");
+      await page.locator("[data-open-compare]").click();
+      assert.equal(await page.getByRole("dialog").isVisible(),true,
+        "real Agent DNA comparison dialog not opened");
+      const comparisonText=await page.getByRole("dialog").innerText();
+      assert(comparisonText.includes("Scout")&&comparisonText.includes("Nova"),
+        "comparison dialog does not display the selected agents");
+      assert(comparisonText.includes("Primary mission")&&comparisonText.includes("Core skills"),
+        "real Agent DNA data fields are absent");
+      await page.keyboard.press("Escape");
+      assert.equal(await page.locator("#mp-compare-modal").isVisible(),false,
+        "Escape did not close the comparison dialog");
+      await page.locator("[data-clear-compare]").click();
+      assert.equal(await page.locator("#mp-compare-tray").isVisible(),false,
+        "comparison selection was not cleared");
       await page.locator("#market-query").fill("this-result-does-not-exist-471");
       await page.locator(".empty-card").waitFor({state:"visible",timeout:3000});
       await page.locator("#clear-filter").click();
@@ -102,6 +147,9 @@ const scrub=(value)=>String(value||"").slice(0,350);
       assert((await page.locator("#content .agent-character-photo").count())>0,"core marketplace page missing cinematic agent artwork");
       assert.equal(await page.locator(".price-card").count(),0,"generic subscription cards leaked into the marketplace");
     }
+    const emptyToast=await page.locator("#toast.toast").evaluate(el=>el.textContent.trim().length===0);
+    if(emptyToast)assert.equal(await page.locator("#toast.toast").isVisible(),false,
+      "empty floating toast pill is still visible");
     assert.deepEqual(errors,[],viewportName+" "+url+" frontend errors: "+errors.map(scrub).join(" | "));
     // Filters, search and reset replace card DOM nodes: load the final rendered
     // assets again before screenshot, not the stale images asserted above.
@@ -126,7 +174,10 @@ const scrub=(value)=>String(value||"").slice(0,350);
     console.log("VISIBLE_CHARACTERS",viewportName,name,JSON.stringify(mediaState));
     assert(mediaState.every(x=>x.decoded&&!x.error&&x.display!=="none"&&x.visibility!=="hidden"&&Number(x.opacity)>0&&x.rectWidth>0),
       "character images are loaded but some remain visually hidden: "+JSON.stringify(mediaState.filter(x=>x.error||x.display==="none"||x.visibility==="hidden")));
-    await page.evaluate(()=>window.scrollTo(0,0));
+    await page.evaluate(()=>{
+      document.querySelectorAll(".mp-shelf-grid,.filter-choices").forEach(el=>{el.scrollLeft=0});
+      window.scrollTo(0,0);
+    });
     await page.waitForTimeout(180);
     await page.screenshot({path:path.join(output,viewportName+"-"+name+".png"),fullPage:true,
                            animations:"disabled"});

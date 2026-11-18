@@ -52,7 +52,8 @@ class EditorialMarketplaceTests(unittest.TestCase):
         self.assertIn("/static/marketplace-v4.css",html.text)
         self.assertIn("/static/marketplace-v5.css",html.text)
         self.assertIn("/static/agent-art.js",html.text)
-        self.assertIn("marketplace.js?v=20261117-v6",html.text)
+        self.assertIn("marketplace.js?v=20261117-v7",html.text)
+        self.assertIn("/static/marketplace-v7.css",html.text)
         self.assertIn("/static/marketplace-v6.css",html.text)
         self.assertIn("agent-art.js?v=20261117-v6",html.text)
         self.assertIn("/static/marketplace.js",html.text)
@@ -64,6 +65,7 @@ class EditorialMarketplaceTests(unittest.TestCase):
         for path in ("/static/marketplace-v4.css","/static/agent-studio-v4.css",
                      "/static/marketplace-v5.css","/static/agent-studio-v5.css",
                      "/static/marketplace-v6.css","/static/agent-studio-v6.css",
+                     "/static/marketplace-v7.css",
                      "/static/agent-art.js"):
             r=self.client.get(path)
             self.assertEqual(r.status_code,200,r.text[:120])
