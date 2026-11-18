@@ -258,7 +258,7 @@ const scrub=(value)=>String(value||"").slice(0,350);
     // Filters, search and reset replace card DOM nodes: load the final rendered
     // assets again before screenshot, not the stale images asserted above.
     if(name!=="whitepaper"&&name!=="genesis-docs"&&name!=="genesis-app"){
-      const mediaSelector=name==="genesis"?"main img":".agent-character-photo";
+      const mediaSelector=(name==="genesis"||name==="help")?"main img":".agent-character-photo";
     await page.locator(mediaSelector).evaluateAll(images=>images.forEach(img=>img.loading="eager"));
     await page.waitForFunction((selector)=>{
       const imgs=[...document.querySelectorAll(selector)];
