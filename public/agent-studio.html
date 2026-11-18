@@ -11,8 +11,9 @@
   <link rel="stylesheet" href="/static/agent-studio-v4.css?v=20261117-v4">
   <link rel="stylesheet" href="/static/agent-studio-v5.css?v=20261117-v5">
   <link rel="stylesheet" href="/static/agent-studio-v6.css?v=20261117-v6">
+  <link rel="stylesheet" href="/static/agent-studio-v7.css?v=20261117-v7">
   <script defer src="/static/agent-art.js?v=20261117-v6"></script>
-  <script defer src="/static/agent-studio.js?v=20261117-v6"></script>
+  <script defer src="/static/agent-studio.js?v=20261117-v7"></script>
 </head>
 <body>
   <div class="shell">
@@ -62,8 +63,9 @@
           <button type="button" class="tab active" data-tab="identity">01 <span>Identity</span></button>
           <button type="button" class="tab" data-tab="character">02 <span>Character</span></button>
           <button type="button" class="tab" data-tab="capabilities">03 <span>Capabilities</span></button>
-          <button type="button" class="tab" data-tab="laboratory">04 <span>Test lab</span></button>
-          <button type="button" class="tab" data-tab="marketplace">05 <span>Library</span></button>
+          <button type="button" class="tab" data-tab="advanced">04 <span>Ethics & Runtime</span></button>
+          <button type="button" class="tab" data-tab="laboratory">05 <span>Test lab</span></button>
+          <button type="button" class="tab" data-tab="marketplace">06 <span>Library</span></button>
         </div>
 
         <div class="panels">
@@ -116,8 +118,76 @@
             <p class="inline-note warning">Tool requests are profile metadata only. They do not grant API credentials, browser actions or access to your other accounts.</p>
           </section>
 
+          <section class="panel" id="tab-advanced" hidden>
+            <div class="panel-heading"><span class="count-chip">04 / TECHNICAL OPERATING CONTRACT</span>
+              <h2>Build with <em>principles.</em></h2>
+              <p>Configure the behavioral contract actually sent to the existing Agent Fabric, and inspect what still requires deeper runtime integration.</p>
+            </div>
+            <div class="advanced-status-row"><span class="advanced-state-active">Instruction policy · Live on Save</span>
+              <span class="advanced-state-request">Provider selection · Requested only</span></div>
+            <div class="subheading"><span>ETHICS & ACCOUNTABILITY</span><small>Included in compiled instructions</small></div>
+            <div class="field-grid two advanced-fields">
+              <label>EVIDENCE STANDARD <select id="ethics-evidence">
+                <option value="source_first">Source-first — cite evidence and flag missing proof</option>
+                <option value="balanced">Balanced — distinguish facts and interpretation</option>
+                <option value="explicit_uncertainty">Explicit uncertainty — label confidence limits</option>
+              </select></label>
+              <label>PRIVACY STANDARD <select id="ethics-privacy">
+                <option value="minimal_data">Minimal data — least necessary information</option>
+                <option value="workspace_context">Workspace — authorized tenant context</option>
+                <option value="approved_sources">Approved sources — selected references only</option>
+              </select></label>
+              <label>HUMAN ESCALATION <select id="ethics-escalation">
+                <option value="ask_on_external_effects">External effects — require permission</option>
+                <option value="ask_on_uncertainty">On uncertainty — clarify material unknowns</option>
+                <option value="human_review">Human review — consequential decisions</option>
+              </select></label>
+              <label>SENSITIVE ACTIONS <select id="ethics-sensitive_actions">
+                <option value="propose_only">Propose only — separately authorized execution</option>
+                <option value="never">Never attempt sensitive external actions</option>
+              </select></label>
+            </div>
+            <p class="inline-note">These are customer instructions. Access to tools, data and external actions still requires real authorization in the execution runtime.</p>
+            <div class="subheading"><span>OUTPUT ENGINEERING</span><small>Instruction-level execution contract</small></div>
+            <div class="field-grid two advanced-fields">
+              <label>DELIVERABLE FORMAT <select id="output-format">
+                <option value="structured_markdown">Structured report / Markdown</option>
+                <option value="plain_text">Plain text</option>
+                <option value="json_outline">JSON-style outline (not enforced JSON mode)</option>
+              </select></label>
+              <label>LEVEL OF DETAIL <select id="output-detail">
+                <option value="concise">Concise</option><option value="standard">Standard</option><option value="comprehensive">Comprehensive</option>
+              </select></label>
+              <label>REVIEW EXPECTATION <select id="output-review">
+                <option value="self_check">Self-check for inconsistencies</option>
+                <option value="independent_review_requested">Request separate external review</option>
+              </select></label>
+              <label>SOURCE REFERENCE MODE <select id="output-citation_mode">
+                <option value="source_links_when_available">Source links when available</option>
+                <option value="strict_source_ids">Source identifiers when supplied</option>
+              </select></label>
+            </div>
+            <div class="subheading"><span>MODEL & PROVIDER REQUEST</span><small>Not yet applied to HDIR routing</small></div>
+            <label class="field">PREFERRED MODEL PROVIDER
+              <select id="model_provider_request">
+                <option value="auto">Auto · Existing runtime decides</option>
+                <option value="cloudflare_ai">Cloudflare Workers AI</option>
+                <option value="deepseek">DeepSeek</option>
+                <option value="hugging_face">Hugging Face</option>
+                <option value="openai">OpenAI</option>
+                <option value="other">Other / custom endpoint</option>
+              </select>
+              <small>Stored in your versioned manifest. It does not change the actual provider, sampling parameters, pricing or runtime routing until an authenticated HDIR adapter is connected.</small>
+            </label>
+            <div class="advanced-runtime-status">
+              <span class="eyebrow">EXECUTION BOUNDARY</span>
+              <strong>Existing Agent Fabric → task execution → independent review</strong>
+              <p>Saving applies identity, behavior, ethics and output instructions. Permission grants, raw model controls, provider routing, budgets and direct tool execution remain governed by the connected runtime.</p>
+            </div>
+          </section>
+
           <section class="panel" id="tab-laboratory" hidden>
-            <div class="panel-heading"><span class="count-chip">04 / TEST LAB</span><h2>Test the <em>real agent.</em></h2><p>Submit actual work to the existing Fabric runtime and inspect the recorded status.</p></div>
+            <div class="panel-heading"><span class="count-chip">05 / TEST LAB</span><h2>Test the <em>real agent.</em></h2><p>Submit actual work to the existing Fabric runtime and inspect the recorded status.</p></div>
             <div class="test-head">
               <div><span class="eyebrow">CONFIGURATION READINESS</span><h3>Checks before you run</h3></div>
               <button type="button" class="small-action" id="check-readiness">Check configuration ↗</button>
@@ -146,7 +216,7 @@
           </section>
 
           <section class="panel" id="tab-marketplace" hidden>
-            <div class="panel-heading"><span class="count-chip">05 / CREATOR LIBRARY</span><h2>Share what <em>you build.</em></h2><p>Discover starter identities and opt-in community templates. Payments and paid listings are not yet enabled.</p></div>
+            <div class="panel-heading"><span class="count-chip">06 / CREATOR LIBRARY</span><h2>Share what <em>you build.</em></h2><p>Discover starter identities and opt-in community templates. Payments and paid listings are not yet enabled.</p></div>
             <div class="publish-block">
               <div><span class="eyebrow">PUBLIC TEMPLATE</span><h3 id="publish-title">Publish an agent DNA</h3><p>A public template reveals its character settings, mission, backstory and skills. Private knowledge references and requested tools are excluded.</p></div>
               <button id="publish-button" class="small-action" type="button">Publish free template ↗</button>
