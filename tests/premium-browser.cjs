@@ -104,7 +104,7 @@ const scrub=(value)=>String(value||"").slice(0,350);
       await page.locator("#reset-filters").click();
       assert.equal(await page.locator("#market-results .agent-card").count(),33,"reset did not restore all 33 agents");
       const neutral=await page.evaluate(()=>getComputedStyle(document.body).backgroundColor);
-      assert.equal(neutral,"rgb(244, 246, 245)","v5 neutral storefront palette not active");
+      assert.equal(neutral,"rgb(245, 247, 247)","v9 editorial ivory storefront palette not active");
       // Premium fictional human-like character artwork is the target art direction.
       // Never prohibit human-looking AI personas solely because they are not robots.
 
