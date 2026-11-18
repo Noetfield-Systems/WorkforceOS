@@ -29,6 +29,39 @@ const checks=[
     assert.equal(d.redeemable_for_paid_runtime,false);
   }},
   {path:"/api/rewards/me",verify:(s)=>assert.equal(s,401)},
+  ...(!checkingUnmergedPR?[
+  {path:"/api/genesis/program",verify:(s,t)=>{
+    assert.equal(s,200);
+    const d=JSON.parse(t);
+    assert.equal(d.id,"season-zero");
+    assert.equal(d.phase,"OPEN_OFFCHAIN");
+    assert.equal(d.quests.length,6);
+    assert.equal(d.join_bonus_xp,10);
+    assert.equal(d.scenario.scenario_total_units,100000000);
+    assert.equal(d.scenario.units_created,0);
+    assert.equal(d.scenario.claim_active,false);
+    assert.equal(d.scenario.sale_active,false);
+    assert.equal(d.airdrop_right,false);
+    assert.equal(d.wallet_required,false);
+  }},
+  {path:"/api/genesis/overview",verify:(s,t)=>{
+    assert.equal(s,200);const d=JSON.parse(t);
+    assert(Number.isInteger(d.joined_workspaces));
+    assert(Number.isInteger(d.recorded_genesis_xp));
+    assert(Number.isInteger(d.agent_builders));
+    assert(Number.isInteger(d.activated_referrals));
+    assert.equal(d.no_issued_tokens,true);
+  }},
+  {path:"/api/genesis/leaderboard",verify:(s,t)=>{
+    assert.equal(s,200);const d=JSON.parse(t);
+    assert(Array.isArray(d.leaders));
+    assert(d.leaders.every(x=>x.member.startsWith("Member ")));
+  }},
+  {path:"/api/genesis/me",verify:(s)=>assert.equal(s,401)},
+  ...["/genesis","/genesis/whitepaper","/genesis/docs"].map(path=>({
+    path,verify:(s,t)=>{assert.equal(s,200);assert(t.includes("WorkforceOS"))}
+  }))
+  ]:[]),
   {path:"/api/rewards/referrals",verify:(s)=>{
     if(checkingUnmergedPR)assert([401,404].includes(s));
     else assert.equal(s,401);
@@ -95,7 +128,9 @@ const checks=[
   {path:"/static/agent-art.js",verify:(s,t)=>{
     assert.equal(s,200);assert(t.includes("src=\"/static/characters/"));
   }},
-  ...["/static/rewards.js","/static/rewards.css","/static/commerce.js",
+  ...["/static/rewards.js","/static/rewards.css",
+      ...(!checkingUnmergedPR?["/static/genesis.js","/static/genesis.css"]:[]),
+      "/static/commerce.js",
       "/static/commerce.css","/static/agent-studio-v7.css"].map(path=>({
     path,verify:(s,t)=>{assert.equal(s,200);assert(t.length>100,path+" must be nonempty")}
   }))

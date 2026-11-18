@@ -17,7 +17,10 @@ const pages=[
  ["/creators","creators",".creator-journey"],
  ["/pricing","pricing",".workflow-steps"],
  ["/commerce","commerce",".rails .rail"],
- ["/rewards","rewards",".dashboard-grid"]
+ ["/rewards","rewards",".dashboard-grid"],
+ ["/genesis","genesis",".join-grid"],
+ ["/genesis/whitepaper","whitepaper",".paper-main"],
+ ["/genesis/docs","genesis-docs",".paper-main"]
 ];
 const scrub=(value)=>String(value||"").slice(0,350);
 (async()=>{
@@ -57,6 +60,16 @@ const scrub=(value)=>String(value||"").slice(0,350);
       assert.equal(await page.locator(".rails .rail").count(),3,"hybrid payment rails not rendered");
       assert((await page.locator("#crypto-status").innerText()).includes("Not active"),
         "unverified wallet checkout falsely presented as active");
+    }
+    if(name==="genesis"){
+      await page.locator("#genesis-quest-grid .quest").first().waitFor({state:"visible"});
+      assert.equal(await page.locator("#genesis-quest-grid .quest").count(),6,"Genesis quest definitions not rendered");
+      assert.equal(await page.locator("#join-button").isDisabled(),true,"anonymous user could join Genesis");
+      assert.equal(await page.locator("#create-link").isDisabled(),true,"anonymous user could create referral");
+      assert((await page.locator("#actual-members").innerText()).match(/^[\d,]+$/),"Genesis member count must be source backed");
+      assert.equal(await page.locator("#token-pools .token-row").count(),5,"tokenomics scenario incomplete");
+      const data=await page.evaluate(()=>fetch("/api/genesis/program").then(r=>r.json()));
+      assert.equal(data.scenario.units_created,0,"Genesis must not fabricate minted tokens");
     }
     if(name==="rewards"){
       await page.locator("#account-state").waitFor({state:"visible"});
@@ -162,19 +175,21 @@ const scrub=(value)=>String(value||"").slice(0,350);
     assert.deepEqual(errors,[],viewportName+" "+url+" frontend errors: "+errors.map(scrub).join(" | "));
     // Filters, search and reset replace card DOM nodes: load the final rendered
     // assets again before screenshot, not the stale images asserted above.
-    await page.locator(".agent-character-photo").evaluateAll(images=>images.forEach(img=>img.loading="eager"));
-    await page.waitForFunction(()=>{
-      const imgs=[...document.querySelectorAll(".agent-character-photo")];
+    if(name!=="whitepaper"&&name!=="genesis-docs"){
+      const mediaSelector=name==="genesis"?"main img":".agent-character-photo";
+    await page.locator(mediaSelector).evaluateAll(images=>images.forEach(img=>img.loading="eager"));
+    await page.waitForFunction((selector)=>{
+      const imgs=[...document.querySelectorAll(selector)];
       return imgs.length>0&&imgs.every(img=>img.complete&&img.naturalWidth>0);
-    },null,{timeout:30000});
-    await page.locator(".agent-character-photo").evaluateAll(async images=>{
+    },mediaSelector,{timeout:30000});
+    await page.locator(mediaSelector).evaluateAll(async images=>{
       await Promise.all(images.map(async img=>{
         await img.decode();
         img.classList.add("image-decoded");
       }));
     });
     await page.evaluate(()=>new Promise(resolve=>requestAnimationFrame(()=>requestAnimationFrame(resolve))));
-    const mediaState=await page.locator(".agent-character-photo").evaluateAll(imgs=>imgs.map(img=>({
+    const mediaState=await page.locator(mediaSelector).evaluateAll(imgs=>imgs.map(img=>({
       agent:img.closest("[data-agent-art]")?.getAttribute("data-agent-art")||"hero",
       complete:img.complete,width:img.naturalWidth,display:getComputedStyle(img).display,
       visibility:getComputedStyle(img).visibility,opacity:getComputedStyle(img).opacity,
@@ -182,7 +197,8 @@ const scrub=(value)=>String(value||"").slice(0,350);
     })));
     console.log("VISIBLE_CHARACTERS",viewportName,name,JSON.stringify(mediaState));
     assert(mediaState.every(x=>x.decoded&&!x.error&&x.display!=="none"&&x.visibility!=="hidden"&&Number(x.opacity)>0&&x.rectWidth>0),
-      "character images are loaded but some remain visually hidden: "+JSON.stringify(mediaState.filter(x=>x.error||x.display==="none"||x.visibility==="hidden")));
+      "page images are loaded but some remain visually hidden: "+JSON.stringify(mediaState.filter(x=>x.error||x.display==="none"||x.visibility==="hidden")));
+    }
     await page.evaluate(()=>{
       document.querySelectorAll(".mp-shelf-grid,.filter-choices").forEach(el=>{el.scrollLeft=0});
       window.scrollTo(0,0);
