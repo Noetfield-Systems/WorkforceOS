@@ -100,6 +100,20 @@ class Traits(BaseModel):
     directness:int=Field(default=75,ge=0,le=100)
     initiative:int=Field(default=60,ge=0,le=100)
 
+class EthicsPolicy(BaseModel):
+    """User-owned behavioral requirements; runtime authorization always wins."""
+    evidence:Literal["source_first","balanced","explicit_uncertainty"]="source_first"
+    privacy:Literal["minimal_data","workspace_context","approved_sources"]="minimal_data"
+    escalation:Literal["ask_on_uncertainty","ask_on_external_effects","human_review"]="ask_on_external_effects"
+    sensitive_actions:Literal["never","propose_only"]="propose_only"
+
+class OutputContract(BaseModel):
+    """Actual instruction-level behavior, not unimplemented model API knobs."""
+    format:Literal["structured_markdown","plain_text","json_outline"]="structured_markdown"
+    detail:Literal["concise","standard","comprehensive"]="standard"
+    review:Literal["self_check","independent_review_requested"]="self_check"
+    citation_mode:Literal["source_links_when_available","strict_source_ids"]="source_links_when_available"
+
 class Profile(BaseModel):
     name:str=Field(min_length=2,max_length=90)
     role:str=Field(min_length=3,max_length=90)
@@ -111,6 +125,9 @@ class Profile(BaseModel):
     skills:list[Literal["research","critical_review","sales","writing","engineering","product","finance","operations","education","creative","community","support"]]=Field(default_factory=lambda:["research"])
     autonomy:Literal["advice","draft","approved","bounded"]="draft"
     model_preference:Literal["economy","balanced","quality"]="balanced"
+    model_provider_request:Literal["auto","cloudflare_ai","deepseek","hugging_face","openai","other"]="auto"
+    ethics:EthicsPolicy=Field(default_factory=EthicsPolicy)
+    output:OutputContract=Field(default_factory=OutputContract)
     knowledge_ids:list[str]=Field(default_factory=list,max_length=4)
     requested_tools:list[Literal["web","crm","github","calendar","email"]]=Field(default_factory=list,max_length=5)
 
@@ -179,6 +196,35 @@ def compile_instructions(profile):
         "VALUES: "+", ".join(p.values or ["honesty","accuracy"])+".",
         "SKILLS AND DELIVERABLE STANDARDS:",
         *["- "+SKILLS[x] for x in p.skills],
+        "ETHICS / EVIDENCE CONTRACT: "+{
+            "source_first":"Prioritize source-backed evidence; label unsupported claims and missing sources.",
+            "balanced":"Separate observed facts, informed interpretations and untested assumptions.",
+            "explicit_uncertainty":"State confidence limits and what would resolve uncertainty."
+        }[p.ethics.evidence],
+        "DATA HANDLING: "+{
+            "minimal_data":"Use only necessary task information; avoid exposing personal details.",
+            "workspace_context":"Use only authorized workspace context for the assigned task.",
+            "approved_sources":"Use only sources expressly selected or approved for this task."
+        }[p.ethics.privacy],
+        "ESCALATION: "+{
+            "ask_on_uncertainty":"Request clarification when uncertainty materially changes the result.",
+            "ask_on_external_effects":"Seek required authorization for any outbound or external state change.",
+            "human_review":"Flag consequential decisions for human review before action."
+        }[p.ethics.escalation],
+        "SENSITIVE ACTIONS: "+{
+            "never":"Do not attempt sensitive external actions.",
+            "propose_only":"Propose sensitive external actions; do not perform them without separately scoped runtime authorization."
+        }[p.ethics.sensitive_actions],
+        "OUTPUT CONTRACT: "+{
+            "structured_markdown":"Use structured Markdown with clear headings and actionable next steps.",
+            "plain_text":"Use readable plain text without unnecessary formatting.",
+            "json_outline":"Provide a JSON-style structured outline when feasible; do not claim schema enforcement."
+        }[p.output.format]+" Detail: "+p.output.detail+
+           ". Citation practice: "+p.output.citation_mode.replace("_"," ")+".",
+        "REVIEW METHOD: "+{
+            "self_check":"Before responding, check for unsupported assumptions, missing evidence and internal contradictions.",
+            "independent_review_requested":"Label this output for separate external review; do not claim independent verification yourself."
+        }[p.output.review],
         "AUTONOMY CONTRACT: "+{
             "advice":"Provide advice and reasoning. Do not claim to have acted.",
             "draft":"Produce drafts and proposals. Do not claim to have sent or published them.",
@@ -192,7 +238,7 @@ def compile_instructions(profile):
     # Model preference and requested tools are metadata, NOT currently passed to Fabric:
     # the bridge does not support per-customer tool grants or model selection.
     output="\n".join(pieces)
-    if len(output)>3500:
+    if len(output)>6500:
         raise HTTPException(status_code=422,detail="AGENT_PROFILE_TOO_LONG")
     return output
 
@@ -277,9 +323,16 @@ def install(app, *, database, uid, event, authentication, write, sync_agent, lim
     def catalog():
         return {"schema_version":"agent-dna/v2","skills":[{"id":k,"description":v,"type":"instruction"} for k,v in SKILLS.items()],
                 "tones":list(TONE),"values":sorted(VALUES),
+                "ethics_fields":{ "evidence":list(EthicsPolicy.model_fields["evidence"].annotation.__args__),
+                                  "privacy":list(EthicsPolicy.model_fields["privacy"].annotation.__args__),
+                                  "escalation":list(EthicsPolicy.model_fields["escalation"].annotation.__args__),
+                                  "sensitive_actions":list(EthicsPolicy.model_fields["sensitive_actions"].annotation.__args__) },
+                "model_provider_requests":["auto","cloudflare_ai","deepseek","hugging_face","openai","other"],
                 "presets":[{"id":x["id"],"profile":preset_profile(x["id"])} for x in PRESETS],
                 "capabilities":{"behavioral_profile":True,"version_history":True,
                                 "fabric_instruction_sync":True,"runtime_model_choice":False,
+                                "runtime_provider_request_only":True,"ethics_instruction_sync":True,
+                                "output_contract_instruction_sync":True,
                                 "custom_tool_grants":False,"marketplace_checkout":False}}
 
     @app.get("/api/agent-dna")
