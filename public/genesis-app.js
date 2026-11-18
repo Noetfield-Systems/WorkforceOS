@@ -233,6 +233,7 @@ document.addEventListener("click",event=>{const b=event.target.closest("[data-go
 $("terms").addEventListener("change",render);
 $("join-button").addEventListener("click",()=>run($("join-button"),async()=>{
  const r=await api("/api/genesis/join","POST",{acknowledge:$("terms").checked});
+ if(r.new_member) await api("/api/genesis/growth/visit","POST",{});
  toast(r.new_member?"Welcome! +10 internal XP recorded.":"Already joined.");
  return r;
 }));
