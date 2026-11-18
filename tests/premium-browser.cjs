@@ -57,6 +57,16 @@ const scrub=(value)=>String(value||"").slice(0,350);
         "Studio did not load the template from the marketplace deep link");
     }
     if(name==="marketplace"){
+      assert.equal(await page.locator(".mp-hero-gallery .agent-character-photo").count(),3,
+        "premium hero must feature three real character portraits");
+      assert.equal(await page.locator(".mp-feature-tile").count(),2,
+        "editorial agent spotlight missing");
+      assert.equal(await page.locator(".mp-shelf").count(),6,
+        "browse-by-specialization shelf is incomplete");
+      assert.equal(await page.locator(".mp-team-card").count(),3,
+        "functional team pairings are not visible");
+      assert.equal(await page.locator("#market-results").getAttribute("data-density"),"gallery",
+        "premium large-art gallery must be the default");
       assert((await page.locator(".agent-card").count())>=12,"specialist catalog missing");
       const svgCount=await page.locator(".agent-card .agent-visual-svg").count();
       assert(svgCount>=12,"the marketplace is not rendering twelve original AI agent vectors");
@@ -88,6 +98,36 @@ const scrub=(value)=>String(value||"").slice(0,350);
       const photographicPeople=await page.locator("img[src*='photo-1560250097'],img[src*='photo-1524504388940']").count();
       assert.equal(photographicPeople,0,"human portrait imagery returned to the AI marketplace");
       console.log("AGENT_VECTOR_QA",viewportName,JSON.stringify({svgCount,distinctSVG,identities:identities.slice(0,4)}));
+      await page.locator("[data-density='compact']").click();
+      assert.equal(await page.locator("#market-results").getAttribute("data-density"),"compact",
+        "compact layout switch not wired");
+      await page.locator("[data-density='gallery']").click();
+      assert.equal(await page.locator("#market-results").getAttribute("data-density"),"gallery",
+        "gallery layout switch not wired");
+      await page.locator("[data-shelf-category='Operations']").click();
+      assert.equal(await page.locator("#market-results .agent-card").count(),1,
+        "browse-by-specialization shelf not wired to catalog filter");
+      assert((await page.locator("#market-results").innerText()).includes("Atlas"),
+        "operations filter did not show actual agent");
+      await page.locator("#reset-filters").click();
+      await page.locator("[data-compare-id='sales_operator']").click();
+      await page.locator("[data-compare-id='research_analyst']").click();
+      assert.equal(await page.locator("#mp-compare-tray").isVisible(),true,
+        "DNA comparison tray not displayed");
+      await page.locator("[data-open-compare]").click();
+      assert.equal(await page.getByRole("dialog").isVisible(),true,
+        "real Agent DNA comparison dialog not opened");
+      const comparisonText=await page.getByRole("dialog").innerText();
+      assert(comparisonText.includes("Scout")&&comparisonText.includes("Nova"),
+        "comparison dialog does not display the selected agents");
+      assert(comparisonText.includes("Primary mission")&&comparisonText.includes("Core skills"),
+        "real Agent DNA data fields are absent");
+      await page.keyboard.press("Escape");
+      assert.equal(await page.locator("#mp-compare-modal").isVisible(),false,
+        "Escape did not close the comparison dialog");
+      await page.locator("[data-clear-compare]").click();
+      assert.equal(await page.locator("#mp-compare-tray").isVisible(),false,
+        "comparison selection was not cleared");
       await page.locator("#market-query").fill("this-result-does-not-exist-471");
       await page.locator(".empty-card").waitFor({state:"visible",timeout:3000});
       await page.locator("#clear-filter").click();
