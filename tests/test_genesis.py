@@ -95,6 +95,7 @@ class GenesisTests(unittest.TestCase):
         self.assertFalse(duplicate.json()["new_member"])
         self.assertEqual(duplicate.json()["xp_awarded"],0)
         self.assertEqual(self.root.get("/api/genesis/overview").json()["joined_workspaces"],baseline+1)
+        self.assertGreaterEqual(self.root.get("/api/genesis/overview").json()["recorded_genesis_xp"],10)
         mine=member.get("/api/genesis/me").json()
         self.assertTrue(mine["joined"])
         self.assertEqual(mine["genesis_xp"],10)

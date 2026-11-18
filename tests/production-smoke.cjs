@@ -48,6 +48,8 @@ const checks=[
     assert.equal(s,200);const d=JSON.parse(t);
     assert(Number.isInteger(d.joined_workspaces));
     assert(Number.isInteger(d.recorded_genesis_xp));
+    assert(Number.isInteger(d.agent_builders));
+    assert(Number.isInteger(d.activated_referrals));
     assert.equal(d.no_issued_tokens,true);
   }},
   {path:"/api/genesis/leaderboard",verify:(s,t)=>{

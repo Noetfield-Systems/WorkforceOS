@@ -74,6 +74,8 @@ async function refreshAll(){
  const [overview,board]=await Promise.all([api("/api/genesis/overview"),api("/api/genesis/leaderboard")]);
  $("actual-members").textContent=fmt(overview.joined_workspaces);
  $("actual-xp").textContent=fmt(overview.recorded_genesis_xp);
+ $("actual-builders").textContent=fmt(overview.agent_builders);
+ $("actual-referrals").textContent=fmt(overview.activated_referrals);
  renderLeaderboard(board.leaders||[]);
  if(session?.authenticated){
   [me,referrals]=await Promise.all([api("/api/genesis/me"),api("/api/rewards/referrals")]);

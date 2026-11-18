@@ -97,8 +97,19 @@ def _summary(db):
                        JOIN participation_points p ON p.workspace_id=m.workspace_id
                        WHERE m.season_id=%s AND p.created_at >= %s""",
                     (SEASON_ID,SEASON_START)).fetchone()
+    engagement=db.execute("""SELECT
+        count(DISTINCT p.workspace_id) FILTER
+           (WHERE p.kind='first_agent')::integer AS agent_builders,
+        count(DISTINCT p.source_id) FILTER
+           (WHERE p.kind='activated_referral')::integer AS activated_referrals
+        FROM genesis_memberships m
+        JOIN participation_points p ON p.workspace_id=m.workspace_id
+        WHERE m.season_id=%s AND p.created_at >= %s""",
+        (SEASON_ID,SEASON_START)).fetchone()
     return {"joined_workspaces":int(r["members"]),
-            "recorded_genesis_xp":int(xp["earned"])}
+            "recorded_genesis_xp":int(xp["earned"]),
+            "agent_builders":int(engagement["agent_builders"]),
+            "activated_referrals":int(engagement["activated_referrals"])}
 
 @router.get("/program")
 def program():
