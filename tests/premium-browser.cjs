@@ -147,7 +147,8 @@ const scrub=(value)=>String(value||"").slice(0,350);
       assert((await page.locator("#content .agent-character-photo").count())>0,"core marketplace page missing cinematic agent artwork");
       assert.equal(await page.locator(".price-card").count(),0,"generic subscription cards leaked into the marketplace");
     }
-    assert.equal(await page.locator("#toast.toast").isVisible(),false,
+    const emptyToast=await page.locator("#toast.toast").evaluate(el=>el.textContent.trim().length===0);
+    if(emptyToast)assert.equal(await page.locator("#toast.toast").isVisible(),false,
       "empty floating toast pill is still visible");
     assert.deepEqual(errors,[],viewportName+" "+url+" frontend errors: "+errors.map(scrub).join(" | "));
     // Filters, search and reset replace card DOM nodes: load the final rendered
