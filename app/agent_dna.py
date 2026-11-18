@@ -12,6 +12,7 @@ from typing import Literal
 from fastapi import Depends, HTTPException
 from pydantic import BaseModel, Field, field_validator
 from .rewards import award as award_participation, activate_referral
+from .workforce_roster import ROSTER, DIRECTORIES, CANONICAL_IDS, BY_ID
 
 SKILLS={
     "research":"Investigate evidence, cite sources supplied in the task, and separate findings from hypotheses.",
@@ -94,6 +95,18 @@ PRESETS=[
      "tone":"friendly","skills":["community","writing","support","operations"],
      "traits":{"creativity":75,"critical_thinking":75,"empathy":90,"directness":65,"initiative":85}},
 ]
+# Add the canonical editorial characters while preserving historical preset IDs.
+# Older owned configurations are never re-keyed or migrated destructively.
+_original_presets={item["id"]:item for item in PRESETS}
+for _spec in ROSTER:
+    _config={key:_spec[key] for key in ("id","name","role","mission","backstory","tone","skills","traits")}
+    if _spec["id"] in _original_presets:
+        _original_presets[_spec["id"]].update(_config)
+    else:
+        PRESETS.append(_config)
+assert len(CANONICAL_IDS)==33
+assert len([x for x in ROSTER if x["mode"]=="Customizable"])==17
+
 class Traits(BaseModel):
     creativity:int=Field(default=50,ge=0,le=100)
     critical_thinking:int=Field(default=70,ge=0,le=100)
@@ -329,7 +342,12 @@ def install(app, *, database, uid, event, authentication, write, sync_agent, lim
                                   "escalation":list(EthicsPolicy.model_fields["escalation"].annotation.__args__),
                                   "sensitive_actions":list(EthicsPolicy.model_fields["sensitive_actions"].annotation.__args__) },
                 "model_provider_requests":["auto","cloudflare_ai","deepseek","hugging_face","openai","other"],
-                "presets":[{"id":x["id"],"profile":preset_profile(x["id"])} for x in PRESETS],
+                "presets":[{"id":x["id"],"profile":preset_profile(x["id"]),
+                             "metadata":{k:v for k,v in x.items() if k not in ("traits", "tone", "skills", "mission", "backstory", "role", "name", "id")}}
+                            for x in ROSTER],
+                 "directories":DIRECTORIES,
+                 "canonical_count":len(ROSTER),
+                 "legacy_presets_supported":["creative_partner","personal_guide"],
                 "capabilities":{"behavioral_profile":True,"version_history":True,
                                 "fabric_instruction_sync":True,"runtime_model_choice":False,
                                 "runtime_provider_request_only":True,"ethics_instruction_sync":True,
