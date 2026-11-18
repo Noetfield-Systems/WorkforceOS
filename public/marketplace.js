@@ -146,28 +146,28 @@ function motif(){
  return '<div class="motif">'+things.map(t=>'<div class="motif-item"><div class="motif-symbol">'+t[0]+'</div><strong>'+t[1]+'</strong><p>'+t[2]+'</p></div>').join("")+'</div>';
 }
 function home(){
- document.title="WorkforceOS — AI Agent Marketplace | Discover, Configure & Run";
+ document.title="WorkforceOS — Genesis Agent Economy | Build, Claim, Create";
  const featured=["orion","lyra","archive_researcher","sable",
                  "community_builder","sales_operator","product_engineer","elara"]
    .map(id=>S.items.find(x=>x.id===id)).filter(Boolean);
  const count=(S.catalog?.presets||[]).length;
  $("content").innerHTML=
  '<section class="store-hero scene-home"><div class="wrap store-hero-layout"><div class="store-hero-copy">'+
- '<div class="hero-overline"><span class="signal-dot"></span> WORKFORCEOS / AGENT MARKETPLACE</div>'+
- '<h1>Meet your<br><em>AI workforce.</em></h1>'+
- '<p class="hero-lead">Distinct personalities. Serious skills. Work that matters.</p>'+
- '<p class="hero-description">Discover character-led AI specialists built for strategy, research, creation, growth and execution. Choose the right expertise and the right working style.</p>'+
- '<div class="hero-actions">'+button("Explore AI agents","/marketplace")+button("Build your own","/agent-studio","secondary")+'</div>'+
+ '<div class="hero-overline"><span class="signal-dot"></span> WORKFORCEOS / GENESIS AGENT ECONOMY</div>'+
+ '<h1>Meet the agents.<br><em>Build the economy.</em></h1>'+
+ '<p class="hero-lead">33 agent identities. One emerging crypto-native society.</p>'+
+ '<p class="hero-description">Create agents, earn offchain Genesis XP, explore proposed tokenomics and help grow an agent economy. The community comes first; real token trading has not launched.</p>'+
+ '<div class="hero-actions">'+button("Join Genesis","/genesis/app")+button("Explore tokenomics","/tokenomics","secondary")+'</div>'+
  '<div class="store-hero-meta"><span><strong>'+count+'</strong> official agent configurations</span>'+
  '<span><strong>'+Number(S.catalog?.canonical_count||S.items.length)+'</strong> distinct AI identities</span><span><strong>1</strong> connected execution workspace</span></div></div>'+
  '<div class="hero-agent-showcase"><div class="hero-ui-heading"><span class="signal-dot"></span> AGENTS / EXPLORE</div>'+
  '<div class="hero-agent-main">'+art("community_builder","hero-main")+'<div class="hero-agent-details"><span>COMMUNITY / MEMBER EXPERIENCE</span><b>Echo</b><small>A proactive community specialist with both capability and personality.</small></div></div>'+
  '<div class="hero-agent-mini">'+["orion","lyra"].map(id=>{const a=S.items.find(x=>x.id===id);return '<a href="/agents/'+id+'">'+art(id,"hero-"+id)+'<div><b>'+esc(a?.display||"AI Agent")+'</b><small>'+esc(a?.category||"Specialist")+'</small></div><span>↗</span></a>'}).join("")+'</div>'+
  '</div></div></section>'+
- '<div class="wrap store-quickline"><span>Choose a role</span><i></i><span>Customize Agent DNA</span><i></i><span>Run a real task</span><i></i><span>Review its output</span></div>'+
- '<section class="section wrap" id="featured">'+sectionHead("DISCOVER / CURATED AGENTS",
+ '<div class="wrap store-quickline"><span>Join Genesis</span><i></i><span>Claim daily XP</span><i></i><span>Build an agent</span><i></i><span>Invite the next wave</span></div>'+
+ '<section class="section wrap" id="featured">'+sectionHead("THE AGENT ECONOMY / SPECIALISTS",
  'Find a specialist <em>for your job.</em>',
- 'Not a chatbot gallery. Each product is a real Agent DNA configuration with explicit mission, skills and runtime workflow.',
+ 'Meet the specialist personalities behind the next agent economy. Customize an Agent DNA, ship a useful result and contribute to Genesis.',
  '<a class="inline-link" href="/marketplace">Browse all agents <span class="arrow">↗</span></a>')+
  '<div class="agent-grid featured-agent-grid">'+cards(featured)+'</div></section>'+
  '<section class="section wrap use-case-section">'+sectionHead("AGENTS BY USE CASE",
@@ -656,26 +656,22 @@ function creators(){
  button("See existing plans","/pricing","secondary")+'</div></section>';
 }
 function pricing(){
- document.title="Agent Marketplace Access — WorkforceOS";
+ document.title="Genesis Tokenomics & Economy — WorkforceOS";
  $("content").innerHTML=
- scene({kind:"pricing",kicker:"WORKFORCEOS / AGENT ACCESS",
-  title:"Agents are products.<br><em>Workspaces run them.</em>",
-  subtitle:"Discover and configure specialist Agent DNA templates.",
-  description:"The marketplace is for finding the right AI worker. Runtime capacity and existing account billing are managed separately within your Workspace.",
-  buttons:button("Browse agents","/marketplace")+button("Manage account billing","/app?view=billing","secondary")})+
- '<section class="section wrap">'+sectionHead("HOW ACCESS WORKS","Choose the agent.<br><em>Run it in your workspace.</em>",
- "Current official starter profiles are free to customize. Paid marketplace listings, creator payout claims and agent-specific prices are not presented until real checkout and entitlements are available.")+
- '<div class="workflow-steps"><article><span>01</span><h3>Discover</h3><p>Explore and compare functional Agent DNA templates.</p></article>'+
- '<article><span>02</span><h3>Configure</h3><p>Choose skills, behaviors and mission, then save your agent.</p></article>'+
- '<article><span>03</span><h3>Run</h3><p>Use your authenticated workforce workspace and permitted capabilities.</p></article>'+
- '<article><span>04</span><h3>Manage usage</h3><p>Open your existing billing panel for plan-specific limits.</p></article></div></section>'+ 
- '<section class="section wrap">'+sectionHead("SOFTWARE PRICING","Start free. <em>Know the limits.</em>",
- "All plans are USD/month. Paid plans activate only with configured Stripe checkout and verified entitlements. Genesis XP, WC and demo balances are separate.")+
- '<div class="workflow-steps"><article><span>EXPLORE / $0</span><h3>Free</h3><p>1 team · 3 agents · 3 references · 20 tickets.</p></article>'+
- '<article><span>SOLO / $29/MO</span><h3>Solo</h3><p>2 teams · 6 agents · 10 references · 60 tickets.</p></article>'+
- '<article><span>BUILDER / $79/MO</span><h3>Builder</h3><p>4 teams · 12 agents · 20 references · 120 tickets.</p></article>'+
- '<article><span>TEAM / $199/MO</span><h3>Team</h3><p>5 teams · 18 agents · 30 references · 150 tickets.</p></article></div>'+
- '<p><a href="/help#plans">Check current checkout availability ↗</a></p></section>';
+ scene({kind:"pricing",kicker:"WORKFORCEOS / GENESIS ECONOMY",
+  title:"The token economy.<br><em>Built by participation.</em>",
+  subtitle:"Community, creators, agents and the economy they can build together.",
+  description:"Genesis XP and referrals are live. The 100M-unit allocation model, token price scenarios and future market mechanics are research, not an issued token or a current offer.",
+  buttons:button("Tokenomics & price scenarios","/tokenomics")+
+          button("Enter Genesis App","/genesis/app","secondary")})+
+ '<section class="section wrap">'+sectionHead("GENESIS / PRICE MODEL",
+  "Understand the token.<br><em>Before it exists onchain.</em>",
+  "100,000,000 hypothetical units. Proposed allocation: community 30%, ecosystem 25%, builders 20%, treasury 15%, liquidity 10%. A $0.005 modelling assumption implies $500,000 illustrative FDV; neither figure is a market quote.")+
+ '<div class="workflow-steps"><article><span>01 / COMMUNITY · 30%</span><h3>Participation</h3><p>Genesis activity, contribution and qualified referrals.</p></article>'+
+ '<article><span>02 / ECOSYSTEM · 25%</span><h3>Adoption</h3><p>Agent commerce experiments and integrations.</p></article>'+
+ '<article><span>03 / BUILDERS · 20%</span><h3>Creators</h3><p>Agent DNA, tool contributions and real outcomes.</p></article>'+
+ '<article><span>04 / LONG TERM · 25%</span><h3>Treasury & liquidity</h3><p>15% proposed treasury and 10% potential liquidity.</p></article></div>'+
+ '<p><a class="inline-link" href="/tokenomics">Open the full interactive token model ↗</a></p></section>';
 }
 
 function notFound(title,subtitle){

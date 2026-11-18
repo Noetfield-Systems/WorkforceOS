@@ -32,6 +32,7 @@ from . import genesis
 from . import genesis_arcade
 from . import genesis_credits
 from . import hybrid
+from . import token_economy
 from . import support
 from .opportunity_os import router as opportunity_router, initialize_opportunities
 from .collaborate import router as collaboration_router, initialize_collaboration
@@ -103,6 +104,7 @@ app.include_router(genesis.router)
 app.include_router(genesis_arcade.router)
 app.include_router(genesis_credits.router)
 app.include_router(hybrid.router)
+app.include_router(token_economy.router)
 app.include_router(support.router)
 app.include_router(opportunity_router)
 app.include_router(collaboration_router)
@@ -301,6 +303,13 @@ def support_operator_console():
 @app.get("/help/")
 def customer_help_center():
     return FileResponse(PUBLIC/"support.html",media_type="text/html",
+                        headers={"Cache-Control":"no-cache"})
+
+@app.get("/tokenomics")
+@app.get("/tokenomics/")
+@app.get("/economy")
+def tokenomics_page():
+    return FileResponse(PUBLIC/"tokenomics.html",media_type="text/html",
                         headers={"Cache-Control":"no-cache"})
 
 @app.get("/commerce")

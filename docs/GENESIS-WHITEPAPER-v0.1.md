@@ -1,5 +1,5 @@
-# WorkforceOS Genesis — Season Zero Whitepaper
-Version **0.1 / illustrative research edition** | 17 November 2026
+# WorkforceOS Genesis — Web3 Agent Economy Whitepaper
+Version **0.2 / token-first research edition** | 18 November 2026
 Project owner: WorkforceOS (an independent software venture)
 
 > This document describes a real internal points-based community season and
@@ -18,9 +18,7 @@ DNA, save a workspace-owned specialist, run authorized work through the
 existing runtime, inspect results and improve. The community helps the
 ecosystem grow by contributing verified product activity.
 
-**Product utility comes first.** An optional token experiment may one day
-complement user governance, creator coordination or ecosystem services.
-No token is required for access to the software, and none exists today.
+**The agent token economy is the core venture direction.** The existing marketplace, Agent DNA, execution runtime and community are the useful work and participation layers underneath it. Genesis is the live offchain entry; public tokenomics, prospective distribution and onchain agent commerce form the roadmap. No token is issued today and the free member journey remains wallet-optional.
 
 ## 2. What exists now (verifiable in the repository)
 
@@ -100,6 +98,18 @@ rights, mint authority, audits, distribution eligibility, jurisdictions,
 liquidity and governance are **undecided**. Nothing on this page should
 be mistaken for a fixed exchange ratio between XP and tokens, a price
 prediction, guaranteed grant or a request for investment.
+
+### Token price scenarios — not a live quote
+
+The public [Genesis Economy desk](/tokenomics) now models three illustrative unit prices against the existing 100,000,000-unit supply hypothesis. They are **modelling inputs**, not fixed offering terms:
+
+| Assumed hypothetical unit price | Resulting illustrative fully diluted value |
+|---:|---:|
+| $0.0025 USD | $250,000 USD |
+| $0.005 USD | $500,000 USD |
+| $0.01 USD | $1,000,000 USD |
+
+These scenarios do not identify a real token ticker, a circulating supply, liquidity, a market quote, a valid sale price, or a purchase right. No current token has been minted, allocated, sold or offered. A price becomes real only through a verified issuance and transaction mechanism.
 
 ## 5. A future design hypothesis (not the current product)
 

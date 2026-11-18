@@ -45,7 +45,7 @@ class HybridRewardsTests(unittest.TestCase):
         self.assertEqual(info.status_code,200,info.text)
         data=info.json()
         self.assertEqual(data["venture"],"WorkforceOS")
-        self.assertEqual(data["product_mode"],"hybrid_ai_workforce")
+        self.assertEqual(data["product_mode"],"web3_agent_economy")
         self.assertFalse(data["corporate_token_issued"])
         self.assertFalse(data["token_sale_active"])
         self.assertFalse(data["crypto_checkout_active"])

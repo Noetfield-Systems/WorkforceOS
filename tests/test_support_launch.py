@@ -28,7 +28,7 @@ class SupportLaunchTests(unittest.TestCase):
         self.assertIn("noindex",ops.text)
         page=self.client.get("/help")
         self.assertEqual(page.status_code,200,page.text)
-        for item in ("Join", "Report an issue", "Track", "$29", "$79", "$199"):
+        for item in ("Join", "Report an issue", "Track", "100M", "30%", "$0.005"):
             self.assertIn(item.lower(),page.text.lower())
         config=self.client.get("/api/support/config")
         self.assertEqual(config.status_code,200)
