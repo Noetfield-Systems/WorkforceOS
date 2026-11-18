@@ -79,3 +79,13 @@ footer a{color:#f0f7fa;font-size:12px}footer p{font-size:11px;margin:0}
  .quests-area{grid-template-columns:1fr}.history{grid-template-columns:1fr}
  .footer-inner{display:block}.footer-inner>*{display:block;margin-bottom:9px}
 }
+
+/* v2: activation-based referral membership, not a speculative token campaign */
+.referral-counts{display:flex;gap:22px;border-top:1px solid #e2e9ed;border-bottom:1px solid #e2e9ed;padding:15px 0;margin:8px 0 17px;color:#718795;font-size:11px}
+.referral-counts span{display:grid;gap:1px}.referral-counts strong{font:normal 25px Georgia,serif;color:#1f526b}
+.invite-link-row{display:flex;gap:8px;margin-top:8px;margin-bottom:13px}
+.invite-link-row input{min-width:0;flex:1;padding:10px 11px;background:#f8fbfc;border:1px solid #d5e3e9;border-radius:6px;color:#48687a;font-size:11px}
+.invite-link-row button{border:1px solid #acc7d3;padding:9px 15px;border-radius:6px;background:#e4f1f5;color:#245b74;font-weight:760}
+.quest-action small{font-weight:500;color:#778d99;font-size:10px}
+.quest-card .invite-fine{font-size:10px;color:#7c929d;line-height:1.65;margin:13px 0 0}
+@media(max-width:410px){.invite-link-row{flex-wrap:wrap}.invite-link-row button{flex-basis:100%}}
