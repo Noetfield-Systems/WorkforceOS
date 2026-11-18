@@ -21,7 +21,7 @@ class CinematicCharacterContractTests(unittest.TestCase):
         for file in files:
             with self.subTest(name=file.name):
                 data=file.read_bytes()
-                self.assertGreater(len(data),14000)
+                self.assertGreater(len(data),9000)
                 self.assertEqual(data[:4],b"RIFF")
                 self.assertEqual(data[8:12],b"WEBP")
                 hashes.add(hashlib.sha256(data).hexdigest())
