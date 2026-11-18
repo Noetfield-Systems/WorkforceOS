@@ -1,0 +1,146 @@
+{
+  "schema": "workforceos.company-os.workpackets.v1",
+  "venture": "WorkforceOS",
+  "business_mode": "hybrid_software_first",
+  "parent_corporation_token_issuer": false,
+  "canonical_owner": "Workforce Company OS",
+  "founder_os": "Sina Founder OS",
+  "execution_runtime": "existing AgentOS/HDIR/Fabric/Runway",
+  "verifier": "independent verifier",
+  "generated": "2026-11-17",
+  "source": "docs/HYBRID-COMMERCE-AGENT-DNA-REWARDS-v1.md",
+  "dispatched_to_company_os": false,
+  "external_effects_verified": 0,
+  "money_collected_verified": false,
+  "workpacks": [
+    {
+      "id": "WF-HYB-001",
+      "title": "Hybrid product/readiness contract",
+      "priority": "P0",
+      "status": "IMPLEMENTED_AWAITING_CI",
+      "owning_role": "Product Engineering",
+      "target": "/api/hybrid/status + /commerce",
+      "acceptance": [
+        "public source-backed status",
+        "no crypto or token claims",
+        "browser checks"
+      ]
+    },
+    {
+      "id": "WF-DNA-002",
+      "title": "Advanced ethics and output Agent DNA",
+      "priority": "P0",
+      "status": "IMPLEMENTED_AWAITING_CI",
+      "owning_role": "Agent Studio Engineering",
+      "target": "/agent-studio?tab=advanced",
+      "acceptance": [
+        "tenant versioned profile",
+        "compiled actual instruction contract",
+        "provider selection marked request-only",
+        "negative tests"
+      ]
+    },
+    {
+      "id": "WF-XP-003",
+      "title": "Nonfinancial internal XP program",
+      "priority": "P0",
+      "status": "IMPLEMENTED_AWAITING_CI",
+      "owning_role": "Growth and Platform Engineering",
+      "target": "/api/rewards + /rewards",
+      "acceptance": [
+        "real persisted activity",
+        "UTC daily idempotency",
+        "tenant isolation",
+        "no cash/token/airdrop value"
+      ]
+    },
+    {
+      "id": "WF-REV-004",
+      "title": "Activate legitimate Stripe merchant and signed checkout",
+      "priority": "P0",
+      "status": "READY_EXTERNAL_CONFIGURATION",
+      "owning_role": "Revenue/Finance and Product Engineering",
+      "depends_on": [
+        "WF-HYB-001"
+      ],
+      "target": "Existing /api/billing/checkout, webhook and portal",
+      "acceptance": [
+        "authorized legal seller mapping",
+        "production provider keys and webhook",
+        "real paid external order",
+        "correct entitlement",
+        "refund state verified"
+      ]
+    },
+    {
+      "id": "WF-CRYPTO-005",
+      "title": "Verified optional stablecoin checkout",
+      "priority": "P1",
+      "status": "READY_DEPENDENCIES",
+      "owning_role": "Payments Engineering and Finance",
+      "depends_on": [
+        "WF-HYB-001"
+      ],
+      "target": "One-time verified quote->payment->receipt->entitlement",
+      "acceptance": [
+        "merchant-controlled recipient",
+        "chain/token allowlist",
+        "payer-invoice binding",
+        "confirmations and idempotent source receipts",
+        "no fraudulent entitlement"
+      ]
+    },
+    {
+      "id": "WF-HDIR-006",
+      "title": "Real provider routing and runtime knobs",
+      "priority": "P0",
+      "status": "READY_DEPENDENCIES",
+      "owning_role": "Agent Runtime Engineering",
+      "depends_on": [
+        "WF-DNA-002"
+      ],
+      "target": "Existing HDIR/Fabric authorized operation API",
+      "acceptance": [
+        "real selected provider invocation",
+        "bounded spend",
+        "fallback receipts",
+        "no tool permission elevation"
+      ]
+    },
+    {
+      "id": "WF-CREATOR-007",
+      "title": "Paid creator products and payout receipts",
+      "priority": "P1",
+      "status": "READY_DEPENDENCIES",
+      "owning_role": "Creator/Revenue Engineering",
+      "depends_on": [
+        "WF-REV-004"
+      ],
+      "target": "Existing Marketplace and authorized payment provider Connect",
+      "acceptance": [
+        "creator rights",
+        "source charge/refund",
+        "entitlement",
+        "agreed commission",
+        "provider payout and reversal"
+      ]
+    },
+    {
+      "id": "WF-GROWTH-008",
+      "title": "Real acquisition and referral loop",
+      "priority": "P1",
+      "status": "READY_DEPENDENCIES",
+      "owning_role": "Company OS Growth",
+      "depends_on": [
+        "WF-XP-003"
+      ],
+      "target": "Real invites, meaningful quests, feedback and repeat work",
+      "acceptance": [
+        "verified genuine user/referral",
+        "anti-self-referral protections",
+        "nonfinancial XP audit",
+        "retained real paid/active customer measurement"
+      ]
+    }
+  ]
+}

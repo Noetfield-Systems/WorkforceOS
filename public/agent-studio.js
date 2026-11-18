@@ -61,7 +61,12 @@ function markChanged(){const dirty=JSON.stringify(S.profile)!==JSON.stringify(S.
  updatePreview();
 }
 function setProfile(p,id,revision,published,sync){
- S.profile=profileCopy(p);S.original=profileCopy(p);S.id=id||null;S.revision=revision||0;
+ const base=S.catalog?.presets?.[0]?.profile||{};
+ S.profile={...profileCopy(base),...profileCopy(p),
+   traits:{...(base.traits||{}),...(p.traits||{})},
+   ethics:{...(base.ethics||{}),...(p.ethics||{})},
+   output:{...(base.output||{}),...(p.output||{})}};
+ S.original=profileCopy(S.profile);S.id=id||null;S.revision=revision||0;
  S.published=Boolean(published);S.sync=sync||"NOT_CONNECTED";
  populate();drawPresets();drawMyAgents();markChanged();
  $("publish-button").textContent=S.published?"Unpublish template ↗":"Publish free template ↗";
@@ -74,7 +79,15 @@ function setProfile(p,id,revision,published,sync){
 }
 function populate(){
  const p=S.profile;if(!p)return;
- ["name","role","mission","backstory","autonomy","model_preference"].forEach(k=>{$(k).value=p[k]||"";});
+ ["name","role","mission","backstory","autonomy","model_preference","model_provider_request"].forEach(k=>{
+   if($(k))$(k).value=p[k]||"auto";
+ });
+ for(const [key,value] of Object.entries(p.ethics||{})){
+   const input=$("ethics-"+key);if(input)input.value=value;
+ }
+ for(const [key,value] of Object.entries(p.output||{})){
+   const input=$("output-"+key);if(input)input.value=value;
+ }
  document.querySelectorAll("[data-tone]").forEach(b=>{const yes=b.dataset.tone===p.tone;
   b.classList.toggle("selected",yes);b.setAttribute("aria-pressed",String(yes));});
  drawTraits();drawValues();drawSkills();drawKnowledge();drawTools();
@@ -459,7 +472,7 @@ async function init(){
   }else if(qs.has("agent")&&userSignedIn()){
     if(S.agents.some(a=>a.id===qs.get("agent")))await openAgent(qs.get("agent"));
   }
-  if(["identity","character","capabilities","laboratory","marketplace"].includes(qs.get("tab"))){
+  if(["identity","character","capabilities","advanced","laboratory","marketplace"].includes(qs.get("tab"))){
     activateTab(qs.get("tab"));
   }
  }catch(e){flash("Studio initialization: "+detailText(e));$("connection").textContent="Connection unavailable";}
@@ -468,9 +481,15 @@ document.querySelectorAll("[data-tab]").forEach(b=>b.addEventListener("click",()
 document.querySelectorAll("[data-tone]").forEach(b=>b.addEventListener("click",()=>{
  if(!S.profile)return;S.profile.tone=b.dataset.tone;populate();markChanged();
 }));
-["name","role","mission","backstory","autonomy","model_preference"].forEach(id=>{
+["name","role","mission","backstory","autonomy","model_preference","model_provider_request"].forEach(id=>{
  $(id).addEventListener("input",()=>{if(!S.profile)return;S.profile[id]=$(id).value;markChanged();});
 });
+document.querySelectorAll("[id^='ethics-'],[id^='output-']").forEach(input=>input.addEventListener("change",()=>{
+ if(!S.profile)return;
+ const prefix=input.id.startsWith("ethics-")?"ethics":"output";
+ const key=input.id.slice(prefix.length+1);
+ S.profile[prefix]??={};S.profile[prefix][key]=input.value;markChanged();
+}));
 $("new-agent").addEventListener("click",()=>{if(S.catalog)choosePreset(S.catalog.presets[0].id)});
 $("save-button").addEventListener("click",saveAgent);
 $("reset-button").addEventListener("click",resetProfile);

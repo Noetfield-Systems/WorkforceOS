@@ -1,0 +1,25 @@
+/* Agent Studio v7 — real commercial-grade configuration controls */
+#tab-advanced .panel-heading p{max-width:650px}
+.advanced-status-row{display:flex;gap:9px;flex-wrap:wrap;padding:3px 0 21px;
+ border-bottom:1px solid #d7e3e9;margin-bottom:20px}
+.advanced-status-row>span{padding:8px 10px;border:1px solid #cddde4;background:#f4f8fa;color:#456779;
+ border-radius:6px;font-size:10px;font-weight:760;letter-spacing:.25px}
+.advanced-status-row .advanced-state-active{border-color:#b0d2bd;background:#ebf6ee;color:#316d4e}
+.advanced-status-row .advanced-state-request{border-color:#dbcba7;background:#faf6e9;color:#806b48}
+.advanced-fields{margin:18px 0 20px}
+.advanced-fields label{font-size:10px;color:#516b7c;font-weight:730;letter-spacing:.6px;
+ display:grid;gap:9px;align-content:start}
+.advanced-fields select,#model_provider_request{min-width:0;width:100%;height:auto;min-height:44px;padding:10px 12px;
+ font-size:12px;line-height:1.4;background:#fff;border:1px solid #c8dce4;border-radius:7px;color:#2d4759}
+.advanced-runtime-status{background:linear-gradient(120deg,#203448,#2d4d60);color:#eef4f6;
+ padding:22px 24px;border-radius:10px;margin:23px 0 4px;border:1px solid #54778b}
+.advanced-runtime-status .eyebrow{display:block;color:#b6d4e1;margin-bottom:11px}
+.advanced-runtime-status strong{font:normal 21px/1.35 Georgia,serif;color:#f5f8f9;display:block}
+.advanced-runtime-status p{font-size:12px;line-height:1.8;color:#b5ccd6;max-width:640px;margin-top:9px}
+#tab-advanced .inline-note{color:#567183;border-color:#9db9c8}
+@media(max-width:730px){
+ .advanced-status-row{display:grid;grid-template-columns:1fr}
+ .advanced-fields{grid-template-columns:1fr}
+ .advanced-runtime-status{padding:18px}
+ .advanced-runtime-status strong{font-size:18px}
+}

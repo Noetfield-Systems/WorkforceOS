@@ -9,7 +9,7 @@ import hashlib
 import hmac
 import os
 import re
-from datetime import datetime
+from datetime import datetime, timezone
 from pathlib import Path
 from urllib.parse import urlparse
 
@@ -26,6 +26,8 @@ from .storage import (database, initialize, uid, hashed_password, password_match
 from .blueprints import available as available_blueprints, plan as blueprint_plan
 from . import fabric_gateway as fabric
 from . import billing
+from . import rewards
+from . import hybrid
 from .opportunity_os import router as opportunity_router, initialize_opportunities
 from .collaborate import router as collaboration_router, initialize_collaboration
 from .people_ops import router as people_router, initialize_people
@@ -64,6 +66,7 @@ async def lifetime(application):
     initialize_collaboration()
     initialize_people()
     initialize_dna(database)
+    rewards.initialize_rewards()
     if fabric.connected():
         # A read-only authenticated source probe uses an empty namespace;
         # it does NOT register a fictitious customer or create test work.
@@ -82,6 +85,8 @@ app=FastAPI(title="WorkforceOS Agent Studio", version=APP_VERSION,
             docs_url=None,redoc_url=None,openapi_url=None,lifespan=lifetime)
 app.mount("/static",StaticFiles(directory=PUBLIC),name="static")
 app.include_router(billing.router)
+app.include_router(rewards.router)
+app.include_router(hybrid.router)
 app.include_router(opportunity_router)
 app.include_router(collaboration_router)
 app.include_router(people_router)
@@ -237,6 +242,17 @@ def marketplace_pages():
 def website():
     return FileResponse(PUBLIC/"index.html",media_type="text/html",
         headers={"Cache-Control":"no-cache"})
+
+
+@app.get("/rewards")
+@app.get("/rewards/")
+def member_rewards_page():
+    return FileResponse(PUBLIC / "rewards.html")
+
+@app.get("/commerce")
+@app.get("/commerce/")
+def hybrid_commerce_page():
+    return FileResponse(PUBLIC / "commerce.html")
 
 
 @app.get("/agent-studio")
@@ -790,6 +806,11 @@ def product_feedback(body:ProductFeedback,account=Depends(_write)):
         db.execute("INSERT INTO product_feedback(id,workspace_id,body) VALUES (%s,%s,%s)",
                    (fid,tenant,body.feedback.strip()))
         event(db,tenant,"product.feedback",fid)
+        if len(body.feedback.strip())>=30:
+            now=datetime.now(timezone.utc)
+            week=now.strftime("%G-W%V")
+            rewards.award(db,tenant,kind="product_feedback",
+                          claim_key="feedback:"+week,points=10,source_id=fid)
     return {"id":fid,"saved":True}
 
 

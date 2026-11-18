@@ -15,7 +15,9 @@ const pages=[
  ["/agent-studio?template=sales_operator","agent-studio",".dna-cinematic-hero"],
  ["/arena","arena",".arena-surface"],
  ["/creators","creators",".creator-journey"],
- ["/pricing","pricing",".workflow-steps"]
+ ["/pricing","pricing",".workflow-steps"],
+ ["/commerce","commerce",".rails .rail"],
+ ["/rewards","rewards",".dashboard-grid"]
 ];
 const scrub=(value)=>String(value||"").slice(0,350);
 (async()=>{
@@ -50,6 +52,18 @@ const scrub=(value)=>String(value||"").slice(0,350);
     }
     assert(horizontal.scrollWidth<=horizontal.clientWidth+5,
       viewportName+" "+url+" horizontal overflow "+JSON.stringify(horizontal));
+    if(name==="commerce"){
+      await page.waitForFunction(()=>!document.getElementById("stripe-status").textContent.includes("Checking live"));
+      assert.equal(await page.locator(".rails .rail").count(),3,"hybrid payment rails not rendered");
+      assert((await page.locator("#crypto-status").innerText()).includes("Not active"),
+        "unverified wallet checkout falsely presented as active");
+    }
+    if(name==="rewards"){
+      await page.locator("#account-state").waitFor({state:"visible"});
+      assert.equal(await page.locator(".quest-card").count(),4,"XP quests incomplete");
+      assert.equal(await page.locator("#daily-claim").isDisabled(),true,"anonymous visitor can mint XP");
+      assert.equal(await page.locator("#quiz-submit").isDisabled(),true,"anonymous visitor can claim quiz XP");
+    }
     if(name==="agent-studio"){
       assert((await page.locator(".portrait .agent-character-photo").count())===1,"Studio agent preview did not receive photographic character media");
       assert((await page.locator("#studio-hero-art .agent-character-photo").count())===1,"Studio hero did not receive matching cinematic character media");
@@ -147,9 +161,11 @@ const scrub=(value)=>String(value||"").slice(0,350);
       assert((await page.locator("#content .agent-character-photo").count())>0,"core marketplace page missing cinematic agent artwork");
       assert.equal(await page.locator(".price-card").count(),0,"generic subscription cards leaked into the marketplace");
     }
-    const emptyToast=await page.locator("#toast.toast").evaluate(el=>el.textContent.trim().length===0);
-    if(emptyToast)assert.equal(await page.locator("#toast.toast").isVisible(),false,
-      "empty floating toast pill is still visible");
+    if(await page.locator("#toast.toast").count()){
+      const emptyToast=await page.locator("#toast.toast").evaluate(el=>el.textContent.trim().length===0);
+      if(emptyToast)assert.equal(await page.locator("#toast.toast").isVisible(),false,
+        "empty floating toast pill is still visible");
+    }
     assert.deepEqual(errors,[],viewportName+" "+url+" frontend errors: "+errors.map(scrub).join(" | "));
     // Filters, search and reset replace card DOM nodes: load the final rendered
     // assets again before screenshot, not the stale images asserted above.

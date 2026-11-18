@@ -1,0 +1,54 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Member Rewards · WorkforceOS</title>
+<meta name="description" content="Earn internal XP for creating agents, learning the platform and sending meaningful product feedback. XP is not money or crypto.">
+<link rel="icon" href="/static/favicon.svg" type="image/svg+xml">
+<link rel="stylesheet" href="/static/rewards.css?v=20261117-r1">
+<script src="/static/agent-art.js?v=20261117-v6" defer></script>
+<script src="/static/rewards.js?v=20261117-r1" defer></script>
+</head>
+<body>
+<a class="skip" href="#main">Skip to main content</a>
+<header class="nav"><div class="container nav-inner"><a href="/" class="brand"><span class="mark">///</span> WorkforceOS</a>
+<nav aria-label="Site"><a href="/marketplace">Marketplace</a><a href="/agent-studio">Agent Studio</a><a href="/arena">Arena</a><a class="active" href="/rewards" aria-current="page">Rewards</a></nav>
+<a href="/app" class="nav-cta">My workspace ↗</a></div></header>
+<main id="main">
+<section class="hero"><div class="container hero-grid"><div class="hero-copy"><span class="eyebrow">WORKFORCEOS / MEMBER PROGRAM</span>
+<h1>Learn. Build.<br><em>Earn your XP.</em></h1>
+<p>Get recognition for meaningful participation: configuring your first agent, checking in, learning how real agent permissions work, and giving product feedback.</p>
+<div class="hero-links"><a class="primary" href="#quests">Explore quests ↗</a><a class="secondary" href="/agent-studio">Build an agent ↗</a></div>
+<div class="hero-facts"><span>Internal participation points</span><span>No token or airdrop allocation</span><span>Proof of activity, not investment</span></div></div>
+<div class="hero-image" id="hero-image" aria-hidden="true"></div></div></section>
+<section class="container dashboard" id="quests"><div class="section-heading"><div><span class="eyebrow">REAL ACTIVITY / MEMBER EXPERIENCE</span><h2>Your participation.</h2></div><p>Progress is saved per authenticated workspace. Points cannot be purchased, transferred or exchanged for money.</p></div>
+<div class="dashboard-grid">
+<aside class="balance-panel"><span class="eyebrow">CURRENT BALANCE</span><strong><span id="xp-balance">—</span> <small>XP</small></strong><p id="account-state">Checking account…</p>
+<div class="progress-rule"></div><p>Rewards are awarded after a real, recorded action — not for clicks or claimed outcomes.</p>
+<a href="/app?signin=1" id="signin-cta">Sign in / Create account ↗</a></aside>
+<div class="quests-area">
+<div class="quest-card" id="daily-quest"><span class="quest-index">01 / PARTICIPATE</span><h3>Daily check-in</h3>
+<p>A simple daily return to your AI workspace. Claim once per UTC calendar day.</p>
+<div class="quest-action"><b>+5 XP</b><button id="daily-claim" disabled type="button">Sign in to claim</button></div></div>
+<div class="quest-card"><span class="quest-index">02 / CREATE</span><h3>First real agent</h3>
+<p>Save your first original Agent DNA in the authenticated Studio. Points are issued when the database record is created.</p>
+<div class="quest-action"><b>+20 XP</b><a href="/agent-studio" id="agent-link">Create an agent ↗</a></div></div>
+<div class="quest-card" id="quiz-quest"><span class="quest-index">03 / LEARN</span><h3>Understand agent permissions</h3>
+<p id="quiz-question">How does tool authorization work in the Agent Studio?</p>
+<label for="quiz-answer">YOUR ANSWER</label><select id="quiz-answer"><option value="">Choose an answer</option>
+<option value="a">Selecting a tool automatically grants credentials</option>
+<option value="b">Requests are stored; the runtime still controls authorization</option>
+<option value="c">Selecting a tool guarantees task success</option></select>
+<div class="quest-action"><b>+15 XP</b><button id="quiz-submit" disabled type="button">Check answer</button></div></div>
+<div class="quest-card" id="feedback-quest"><span class="quest-index">04 / IMPROVE</span><h3>Share useful feedback</h3>
+<p>Tell us what would make WorkforceOS more useful for real business work. First substantial feedback each UTC week earns XP.</p>
+<label for="feedback">YOUR OBSERVATION</label><textarea id="feedback" rows="4" maxlength="2500" placeholder="What task were you trying to complete, and what should improve?"></textarea>
+<div class="quest-action"><b>+10 XP</b><button id="feedback-submit" disabled type="button">Submit feedback</button></div></div>
+</div></div>
+<section class="history"><div><span class="eyebrow">SOURCE-BACKED ACTIVITY</span><h2>Your earned history.</h2><p>No simulated achievements. Only saved reward events appear below.</p></div><div id="reward-history" aria-live="polite"><p>Sign in to view account activity.</p></div></section>
+</section>
+<section class="container final"><div><span class="eyebrow">WORKFORCEOS / BUSINESS FIRST</span><h2>Agent work comes first.<br><em>The community grows from it.</em></h2><p>Discover a specialist, customize its working DNA and execute real tasks. XP is one small way to acknowledge participation — not a substitute for outcomes.</p><a href="/marketplace">Explore the agent marketplace ↗</a></div></section>
+</main>
+<footer><div class="container footer-inner"><a href="/">WorkforceOS</a><p>Internal participation XP. No financial value, token distribution or promised future conversion.</p><a href="/commerce">Payment & access ↗</a></div></footer>
+<div id="toast" class="toast" role="status" aria-live="polite" hidden></div>
+</body></html>
