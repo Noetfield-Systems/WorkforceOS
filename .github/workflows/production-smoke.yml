@@ -1,0 +1,29 @@
+name: WorkforceOS production HTTPS smoke
+on:
+  push:
+    branches: ["main"]
+    paths:
+      - "app/**"
+      - "public/**"
+      - "tests/production-smoke.cjs"
+      - ".github/workflows/production-smoke.yml"
+  pull_request:
+    paths:
+      - "tests/production-smoke.cjs"
+      - ".github/workflows/production-smoke.yml"
+  workflow_dispatch:
+jobs:
+  verify-public-production:
+    runs-on: ubuntu-latest
+    timeout-minutes: 8
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+      - name: Validate production probe
+        run: node --check tests/production-smoke.cjs
+      - name: Independently verify WorkforceOS live HTTPS
+        env:
+          WORKFORCE_PUBLIC_ORIGIN: https://workforce-web-production-2d15bf32.up.railway.app
+        run: node tests/production-smoke.cjs
