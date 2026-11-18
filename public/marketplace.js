@@ -101,11 +101,22 @@ function cards(items,limit=items.length){return items.slice(0,limit).map((item,i
 
 function scene({kind,title,subtitle,description,kicker,buttons,footnotes="",breadcrumbs=""}){
  const key=kind==="arena"?"archive_researcher":kind==="creators"?"orion":kind==="pricing"?"financial_analyst":"lyra";
- const showcase=kind==="arena"?
- '<div class="scene-agent-pair"><a href="/agents/archive_researcher">'+art("archive_researcher","arena-vesper")+
- '<span class="arena-photo-label"><strong>Vesper</strong><small>Research & analysis</small></span></a>'+
- '<a href="/agents/sable">'+art("sable","arena-sable")+
- '<span class="arena-photo-label"><strong>Sable</strong><small>Operations & execution</small></span></a></div>':art(key,"scene");
+ const arenaCards=["archive_researcher","sable"].map(id=>{
+  const item=S.items.find(x=>x.id===id);
+  const profile=item?.profile||{};
+  const skills=(profile.skills||[]).slice(0,3).map(words);
+  return '<article class="arena-specialist"><a class="arena-specialist-photo" href="/agents/'+id+'">'+art(id,"arena-"+id)+
+   '<span class="arena-photo-label"><strong>'+esc(item?.display||id)+'</strong><small>'+esc(item?.subtitle||"AI specialist")+'</small></span></a>'+
+   '<div class="arena-specialist-meta"><p>'+esc(profile.mission||"Specialized instruction-based AI agent.")+'</p>'+
+   '<div class="arena-specialist-row"><b>Skills</b><span>'+esc(skills.join(" · "))+'</span></div>'+
+   '<div class="arena-specialist-row"><b>Working style</b><span>'+esc(words(profile.tone||"professional"))+'</span></div>'+
+   '<a class="arena-config-link" href="'+esc(editLink(item||{id,type:"preset"}))+'">Inspect Agent DNA ↗</a></div></article>';
+ }).join("");
+ const showcase=kind==="arena"?'<div class="scene-agent-pair">'+arenaCards+'</div>':
+ kind==="creators"?'<div class="creator-scene-photo">'+art("orion","creator-hero")+
+ '<div class="creator-hero-feature"><span>FEATURED SPECIALIST</span><h3>Orion</h3>'+
+ '<b>STRATEGY / EXECUTIVE COPILOT</b><p>From strategic choices to structured execution.</p>'+
+ '<a href="/agents/orion">Meet Orion ↗</a></div></div>':art(key,"scene");
  return '<section class="agent-scene scene-'+esc(kind)+'"><div class="wrap scene-stage">'+
  '<div class="scene-copy">'+(breadcrumbs||"")+'<span class="kicker">'+esc(kicker||"WORKFORCEOS / AGENT NETWORK")+'</span>'+
  '<h1>'+title+'</h1>'+(subtitle?'<p class="masthead-subtitle">'+subtitle+'</p>':"")+
@@ -605,10 +616,15 @@ function creators(){
  const published=owned.filter(x=>publicIds.has(x.id));
  const drafted=owned.filter(x=>!publicIds.has(x.id));
  $("content").innerHTML=
- scene({kind:"creators",kicker:"WORKFORCEOS / THE CREATOR ECONOMY",title:"Make agents.<br><em>Make impact.</em>",
- subtitle:"Build expertise into something others can use.",
- description:"Craft a distinctive agent, test real work and publish an opt-in free template to the public library. Your private knowledge stays in your workspace.",
- buttons:button("Start creating","/agent-studio")+button("Discover public templates","/marketplace","secondary")})+
+ scene({kind:"creators",kicker:"CREATORS / THE WORKFORCE ECOSYSTEM",title:"Creators shape the next<br><em>AI workforce.</em>",
+ subtitle:"Meet the builders and personalities behind the agent economy.",
+ description:"Discover original specialist identities, shape your own Agent DNA and publish a free template others can customize. Your private workspace remains yours.",
+ buttons:button("Explore agent catalog","/marketplace")+button("Become a creator","/agent-studio","secondary")})+
+ '<section class="wrap creator-cinematic-collection">'+sectionHead("MEET THE AGENTS",
+ "Distinct personalities. <em>Real capabilities.</em>",
+ "Explore these original agent profiles and the expertise behind their instruction contracts.",
+ '<a href="/marketplace" class="inline-link">Browse all 33 specialists ↗</a>')+
+ '<div class="agent-grid creator-character-grid">'+cards(["lyra","archive_researcher","sable","community_builder"].map(id=>S.items.find(i=>i.id===id)).filter(Boolean))+'</div></section>'+
  '<section class="section wrap">'+sectionHead("01 / CREATOR WORKFLOW","Your ideas. <em>Your craft.</em>",
  "One connected path from a character concept to a publicly remixable profile.")+
  '<div class="creator-journey">'+[

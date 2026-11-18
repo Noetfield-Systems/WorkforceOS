@@ -323,3 +323,53 @@ body:has(.dna-cinematic-hero){background:#f6f8f8}
  .dna-hero-agent-badge h3{font-size:26px}
  .dna-hero-agent-badge small{font-size:9px}
 }
+
+/* Arena — photographic specialists with honest instruction-level comparison. */
+.scene-arena .scene-stage{grid-template-columns:minmax(0,.6fr) minmax(0,1.4fr);min-height:660px;align-items:center;gap:28px}
+.scene-arena .agent-scene-art{height:586px;min-height:586px}
+.scene-arena .masthead-subtitle,.scene-arena .kicker,.scene-creators .masthead-subtitle,.scene-creators .kicker{color:#bfdae7!important}
+.scene-agent-pair{display:grid;grid-template-columns:1fr 1fr;gap:13px;height:100%}
+.scene-agent-pair .arena-specialist{border:1px solid rgba(189,217,231,.45);border-radius:12px;
+  display:flex;flex-direction:column;min-width:0;overflow:hidden;background:linear-gradient(180deg,#142e43,#102638)}
+.scene-agent-pair .arena-specialist-photo{position:relative;display:block;height:292px;flex:none;overflow:hidden;border-radius:0}
+.scene-agent-pair .arena-specialist-photo .agent-character-art{height:100%}
+.scene-agent-pair .agent-char-label{display:none!important}
+.scene-agent-pair .arena-photo-label{padding:60px 19px 18px}
+.scene-agent-pair .arena-photo-label strong{font-size:43px}
+.scene-agent-pair .arena-photo-label small{color:#b9dfe9;font-size:10px}
+.arena-specialist-meta{display:flex;flex-direction:column;gap:12px;padding:19px 19px 18px;min-height:0;color:#e2eef3}
+.arena-specialist-meta>p{font-size:12px;color:#d1e2e9;line-height:1.6;margin:0;display:-webkit-box;
+  -webkit-box-orient:vertical;-webkit-line-clamp:3;overflow:hidden}
+.arena-specialist-row{display:grid;grid-template-columns:90px 1fr;gap:8px;border-top:1px solid rgba(200,226,238,.19);
+  font-size:11px;padding-top:9px}
+.arena-specialist-row b{font-weight:660;color:#f5fafb}
+.arena-specialist-row span{color:#c3dfe9}
+.arena-config-link{font-size:11px;color:#dcf2fb;font-weight:700;margin-top:auto}
+/* Creator hero with actual specialist information; no fictional subscriber counts. */
+.creator-scene-photo{position:relative;height:100%;width:100%;overflow:hidden}
+.creator-scene-photo .agent-character-art{height:100%;width:100%}
+.creator-scene-photo .agent-char-label{display:none}
+.creator-scene-photo .agent-character-vignette{background:linear-gradient(90deg,rgba(6,19,32,.13),transparent 56%),
+ linear-gradient(0deg,rgba(6,19,32,.86),transparent 50%)}
+.creator-hero-feature{position:absolute;left:25px;bottom:21px;z-index:5;max-width:360px;color:#fff}
+.creator-hero-feature span{font-size:9px;letter-spacing:.24em;color:#cde5ee}
+.creator-hero-feature h3{font:normal 59px/1 var(--serif,Georgia,serif);margin:9px 0 6px}
+.creator-hero-feature b{font-size:10px;letter-spacing:.16em;color:#cee8f2}
+.creator-hero-feature p{font-size:12px;line-height:1.5;color:#e5eff4;margin:8px 0}
+.creator-hero-feature a{font-size:12px;color:#fff}
+.creator-cinematic-collection{padding-block:68px 76px}
+.creator-character-grid{margin-top:31px}
+@media(max-width:1100px){
+ .scene-arena .scene-stage{grid-template-columns:1fr;min-height:0}
+ .scene-arena .agent-scene-art{height:570px;min-height:570px}
+}
+@media(max-width:650px){
+ .scene-arena .scene-stage{gap:20px}
+ .scene-arena .agent-scene-art{height:auto;min-height:0}
+ .scene-agent-pair{grid-template-columns:1fr;gap:12px}
+ .scene-agent-pair .arena-specialist-photo{height:270px}
+ .arena-specialist-meta{padding:14px}
+ .creator-hero-feature{left:17px;bottom:18px}
+ .creator-hero-feature h3{font-size:43px}
+ .creator-cinematic-collection{padding-block:36px}
+}
