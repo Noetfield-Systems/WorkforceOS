@@ -3,8 +3,8 @@ const el=id=>document.getElementById(id);
 const answers={
  signup:["How do I join?","Sign up for a free account in Genesis or start in Agent Studio. Your existing WorkforceOS workspace is reused—no second wallet or account is necessary.","/genesis/app","Open Genesis App"],
  daily:["How do daily rewards work?","Visit Genesis each UTC day. Claim 5 XP, play Specialist Match for 8 XP when eligible, build streaks and earn qualifying referral XP. The internal WC store is for cosmetics—not money.","/genesis/app","Claim and play"],
- billing:["Can I pay for a plan?","Published software plans: Explore $0, Solo $29, Builder $79 and Team $199 USD/month. Open billing to see actual Checkout availability. A plan is active only after confirmed payment entitlement.","/app?view=billing","View billing"],
- token:["Can I buy a token or invest?","Not today. No WorkforceOS token sale, token price, crypto checkout, investment subscription or real staking is open. Genesis demo units are fictional and XP is not redeemable for cash.","/genesis/whitepaper","Read the whitepaper"],
+ billing:["How does token pricing work?","The Genesis design models 100M hypothetical units. For example, a $0.005 assumed unit price implies $500,000 fully diluted valuation. No real token or live trading price exists.","/tokenomics","Explore scenarios"],
+ token:["Can I buy a token or invest?","There is no issued WorkforceOS token or live purchase today. Join Genesis for real offchain activities and review proposed supply, pricing scenarios and future distribution. Register launch interest without sending funds.","/tokenomics","See the token model"],
  agent:["How do I work with an agent?","Browse specialist profiles, open Agent Studio, customize an Agent DNA, save it in your workspace and create a task. Read the returned task state: queued does not mean completed.","/agent-studio","Go to Agent Studio"],
  problem:["What if something is broken?","Select ‘Bug or broken feature’ below. Include the page, expected result, actual result and steps to reproduce. You'll receive a private reference to track progress. Never send credentials.","#contact","Report an issue"]
 };
@@ -39,15 +39,13 @@ async function init(){
  }));
  document.querySelectorAll("[data-faq]").forEach(node=>node.addEventListener("click",()=>showAnswer(node.dataset.faq)));
  try{
-  const r=await fetch("/api/support/config",{cache:"no-store"});
-  if(!r.ok)throw Error("configuration unavailable");
+  const r=await fetch("/api/token-economy/status",{cache:"no-store"});
+  if(!r.ok)throw Error("economy status unavailable");
   const data=await r.json();
-  el("billing-status").textContent=data.stripe_checkout_ready?
-   "Card subscription checkout is configured. Select a paid plan to continue in authenticated workspace billing.":
-   "Paid subscription checkout is not configured on this service. The free workspace and Genesis participation remain available; no money is collected here.";
-  document.querySelectorAll("[data-paid-plan]").forEach(a=>a.textContent=data.stripe_checkout_ready?
-     "Open checkout in workspace ↗":"View plan / checkout unavailable ↗");
- }catch{el("billing-status").textContent="Checkout status unavailable. Verify inside workspace billing before paying."}
+  el("token-status").textContent=data.token_issued?
+    "Token status available through the official network record. Verify the contract and issuer before trading.":
+    "Genesis participation is live. Token launch, token price and crypto checkout are not live; the figures above are modelling scenarios only.";
+ }catch{el("token-status").textContent="Official token status currently unavailable. Do not treat any scenario price as a live quote."}
  try{
   const response=await fetch("/api/session",{credentials:"same-origin",cache:"no-store"});
   const session=await response.json();
