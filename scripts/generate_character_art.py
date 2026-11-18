@@ -64,10 +64,11 @@ ROOT.mkdir(parents=True, exist_ok=True)
 
 def request_horde_image(scene,seed):
     base="https://stablehorde.net/api/v2"
-    prompt=scene+" ### cut off head, chopped forehead, words, writing, watermark, robot, metal face, blurry, plastic face, low quality, extra arms, cropped eyes"
+    prompt=scene+" ### cropped head, cut forehead, white blank studio backdrop, gray stock photo background, closeup, low neckline, exposed chest, cleavage, revealing top, bikini, bare skin, lingerie, glamor, model posing, no shirt, words, watermark, robot, metal face, face fragment, blurry, distorted face, extra fingers"
     payload={"prompt":prompt,
-             "params":{"width":512,"height":640,"steps":24,"n":1,"seed":str(seed),
-                       "cfg_scale":7.1,"sampler_name":"k_euler_a"},
+             "models":["ICBINP - I Can't Believe It's Not Photography"],
+             "params":{"width":512,"height":640,"steps":29,"n":1,"seed":str(seed),
+                       "cfg_scale":7.5,"sampler_name":"k_euler_a"},
              "nsfw":False,"censor_nsfw":True}
     headers={"Content-Type":"application/json","apikey":"0000000000",
              "Client-Agent":"WorkforceOS:1.0:NoetfieldSystems"}
@@ -102,13 +103,20 @@ def build(item):
     ident=item["id"]
     spec=CHARACTERS[ident]
     backdrop=BACKDROPS[item["directory"]]
-    scene=(f"Original fictional AI agent identity, premium cinematic photographic character portrait, {spec}. "
-      f"Environment: {backdrop}. Sympathetic confident thoughtful expression, natural skin texture, professional "
-      "luxury fashion editorial photography, cinematic tungsten practical lights and cool navy shadows, "
-      "sophisticated tasteful dramatic composition, 85mm lens, shallow depth of field, tasteful desaturated colors. "
-      "VERTICAL MID-CHEST PORTRAIT, camera slightly below eye level, head fully visible with generous headroom, "
-      "both shoulders visible, centered subject, clear eyes and unobstructed mouth, intentional unique identity, "
-      "highly detailed realistic style. No text, logos, watermarks, labels, diagrams, borders, robots, armor or mechanical faces.")
+    scene=(
+      f"Wide vertical cinematic movie still inside {backdrop}, "
+      f"a fictional professional specialist: {spec}, "
+      "wearing formal fully covering sophisticated business clothing: high neckline opaque "
+      "shirt or turtleneck fully covering chest and shoulders underneath tailored blazer. "
+      "Environment dramatically visible behind subject: architectural office or research room, "
+      "bookshelves, warm lamps, navy-tinted windows, soft people in distance, subtle atmospheric "
+      "haze and cinematic amber practical lighting. Medium shot from waist to head, "
+      "subject centered with ample headroom, fully visible scalp, full face and both shoulders, "
+      "some upper body in frame, not too close. Photography for prestige television drama, "
+      "muted dark navy teal and warm amber palette, beautiful realistic skin texture, "
+      "careful expression, natural cinematic lighting, high production value, original fictional identity. "
+      "Vertical magazine cover still without writing or logos."
+    )
     seed=17001+ROSTER.index(item)*467
     path=ROOT/(ident+".webp")
     for attempt in range(3):
