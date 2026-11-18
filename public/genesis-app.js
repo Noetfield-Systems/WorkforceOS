@@ -3,7 +3,7 @@ const $=id=>document.getElementById(id);
 const list=q=>Array.from(document.querySelectorAll(q));
 const safe=v=>String(v??"").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
 const fmt=n=>Number(n||0).toLocaleString("en-US");
-let session=null,member=null,xp=null,referral=null,daily=null,puzzle=null,sandbox=null,program=null,credits=null;
+let session=null,member=null,xp=null,referral=null,daily=null,puzzle=null,sandbox=null,program=null,credits=null,growth=null;
 let authMode="register",screen="home";
 const ref=(new URLSearchParams(location.search).get("ref")||"").slice(0,42);
 function toast(message){const el=$("toast");el.textContent=message;el.hidden=false;clearTimeout(toast.t);toast.t=setTimeout(()=>el.hidden=true,5100)}
@@ -47,7 +47,7 @@ function go(name){
  screen=name;
  list("[data-page]").forEach(x=>x.hidden=x.dataset.page!==name);
  list("[data-view]").forEach(x=>x.classList.toggle("current",x.dataset.view===name));
- const headers={home:"Your Genesis dashboard.",daily:"Daily claim & play.",quests:"Quests & XP.",referral:"Invite & referrals.",leaders:"Season Zero leaderboard.",store:"Work Credits / earned utility.",trade:"Buy & sell sandbox.",stake:"Staking sandbox.",invest:"Investing sandbox."};
+ const headers={home:"Your Genesis dashboard.",daily:"Daily claim & play.",quests:"Quests & XP.",referral:"Invite & referrals.",leaders:"Season Zero leaderboard.",growth:"My Genesis progress.",store:"Work Credits / earned utility.",trade:"Buy & sell sandbox.",stake:"Staking sandbox.",invest:"Investing sandbox."};
  $("page-title").textContent=headers[name]||"Your Genesis dashboard.";
  $("sandbox-start").hidden=!member?.joined||Boolean(sandbox?.started)||!["trade","stake","invest"].includes(name);
  window.scrollTo({top:0,behavior:"instant"});
@@ -134,6 +134,15 @@ function renderCredits(){
  document.body.classList.toggle("wc-profile-frame",owned.has("pioneer_frame"));
  $("member-id").textContent=(member?.member||"Founding member")+(owned.has("builder_badge")?" · ✦ Builder":"");
 }
+function renderGrowth(){
+ if(!growth)return;
+ const o=growth.observed_30d||{};
+ for(const [id,n] of Object.entries({"growth-index":growth.engagement_index?.total,"growth-claims":o.daily_claims,"growth-games":o.correct_daily_games,"growth-agent":o.first_agent_awards,"growth-invites":o.activated_invited_workspaces,"growth-visits":o.recorded_app_visit_days,"growth-xp":growth.xp_total})){
+   $(id).textContent=fmt(n);
+ }
+ $("growth-in-app").checked=Boolean(growth.preferences?.in_app_updates);
+ $("growth-email").checked=Boolean(growth.preferences?.email_updates);
+}
 function render(){
  $("member-id").textContent=member?.member||"Founding member";
  $("workspace-label").textContent=session?.account?.workspace_name||"Workspace";
@@ -162,15 +171,15 @@ function render(){
  $("invite-create").textContent=url?"Invitation ready ✓":"Create invitation ↗";
  $("invite-copy").disabled=!url;$("invite-message").disabled=!url;
  $("telegram").href=url?"https://t.me/share/url?url="+encodeURIComponent(url)+"&text="+encodeURIComponent("Join me in WorkforceOS Genesis Season Zero. Build a specialist AI agent and earn internal nonfinancial XP. No token or airdrop is guaranteed."):"#";
- showQuests();showPuzzle();showSandbox();renderCredits();
+ showQuests();showPuzzle();showSandbox();renderCredits();renderGrowth();
 }
 async function refresh(){
  const results=await Promise.all([
   api("/api/genesis/me"),api("/api/rewards/me"),api("/api/rewards/referrals"),
   api("/api/genesis/daily-state"),api("/api/genesis/play/today"),
-  api("/api/genesis/credits/me")
+  api("/api/genesis/credits/me"),api("/api/genesis/growth/me")
  ]);
- [member,xp,referral,daily,puzzle,credits]=results;
+ [member,xp,referral,daily,puzzle,credits,growth]=results;
  sandbox=member.joined?await api("/api/genesis/sandbox"):null;
  render();
 }
@@ -179,6 +188,8 @@ async function loadMember(){
  try{
   program=await api("/api/genesis/program");
   await refresh();
+  if(member?.joined){try{await api("/api/genesis/growth/visit","POST",{});growth=await api("/api/genesis/growth/me");renderGrowth()}catch(e){console.warn("Growth visit unavailable:",explain(e))}}
+  try{const p=await api("/api/genesis/growth/program");$("growth-status").textContent=p.status==="RESEARCH_PROPOSAL_NOT_TOKEN_OFFER"?"Candidate 90-day program only. No token rights or confirmed distribution.":"Campaign status: "+p.status;}catch{$("growth-status").textContent="Campaign status temporarily unavailable."}
   const data=await api("/api/genesis/leaderboard");
   $("board").innerHTML=(data.leaders||[]).length?data.leaders.map(row=>
    '<div class="board-row"><b>#'+row.rank+'</b><span>'+safe(row.member)+'</span><strong>'+fmt(row.genesis_xp)+' XP</strong></div>').join(""):
@@ -206,6 +217,14 @@ function demo(button,kind,input,category){
   return v;
  });
 }
+$("growth-save").addEventListener("click",async()=>{
+ const button=$("growth-save");button.disabled=true;
+ try{const r=await api("/api/genesis/growth/preferences","POST",{
+  in_app_updates:$("growth-in-app").checked,email_updates:$("growth-email").checked});
+  $("growth-pref-status").textContent=r.saved?"Preferences saved. External email delivery is not connected yet.":"Preferences not saved.";
+  growth=await api("/api/genesis/growth/me");renderGrowth();
+ }catch(e){$("growth-pref-status").textContent="Could not save: "+explain(e)}finally{button.disabled=false}
+});
 $("mode-register").addEventListener("click",()=>changeAuth("register"));
 $("mode-login").addEventListener("click",()=>changeAuth("login"));
 $("auth-form").addEventListener("submit",onAuth);
@@ -214,6 +233,7 @@ document.addEventListener("click",event=>{const b=event.target.closest("[data-go
 $("terms").addEventListener("change",render);
 $("join-button").addEventListener("click",()=>run($("join-button"),async()=>{
  const r=await api("/api/genesis/join","POST",{acknowledge:$("terms").checked});
+ if(r.new_member) await api("/api/genesis/growth/visit","POST",{});
  toast(r.new_member?"Welcome! +10 internal XP recorded.":"Already joined.");
  return r;
 }));
@@ -268,7 +288,7 @@ document.addEventListener("click",event=>{
 });
 $("signout").addEventListener("click",async()=>{
  try{await api("/api/logout","POST",{});}catch{}
- session=null;member=null;xp=null;referral=null;daily=null;puzzle=null;sandbox=null;credits=null;
+ session=null;member=null;xp=null;referral=null;daily=null;puzzle=null;sandbox=null;credits=null;growth=null;
  $("member-app").hidden=true;$("signout").hidden=true;$("auth-screen").hidden=false;changeAuth("login");
 });
 (async()=>{
