@@ -27,6 +27,10 @@ class CinematicCharacterContractTests(unittest.TestCase):
                 hashes.add(hashlib.sha256(data).hexdigest())
         self.assertEqual(len(hashes),33,"Character portraits cannot be duplicated")
 
+    def test_image_mime_registration_is_explicit(self):
+        import mimetypes
+        self.assertEqual(mimetypes.guess_type("agent.webp")[0],"image/webp")
+
     def test_photo_media_and_reference_css_are_integrated(self):
         art=(ROOT/"public"/"agent-art.js").read_text()
         self.assertIn('src="/static/characters/',art)
