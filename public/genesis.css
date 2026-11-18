@@ -73,3 +73,9 @@ footer{background:#0c1d2b;color:#a9c6d4;padding:26px 0}.footer-inner{display:fle
 .statistics{grid-template-columns:repeat(4,minmax(0,1fr))}
 @media(max-width:780px){.statistics{grid-template-columns:repeat(2,minmax(0,1fr))}.statistics>div:nth-child(2){border-right:0}}
 @media(max-width:520px){.statistics{grid-template-columns:repeat(2,minmax(0,1fr));gap:6px}.statistics>div{min-width:0;padding:12px 7px;border-bottom:1px solid #dce6e9}.statistics strong{font-size:29px}.statistics small{font-size:9px}}
+
+/* A shareable invite needs a real attributed link, not a fabricated reward. */
+.share-kit{display:flex;flex-wrap:wrap;gap:10px;margin-top:13px;align-items:center}
+.share-kit button,.share-kit a{display:inline-flex;align-items:center;justify-content:center;padding:9px 13px;border-radius:6px;font-size:11px;font-weight:740;color:#31576d;background:#edf5f8;border:1px solid #c6dce5}
+.share-kit a[aria-disabled="true"]{opacity:.5;cursor:not-allowed}
+@media(max-width:520px){.share-kit>*{flex:1}}

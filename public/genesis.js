@@ -62,6 +62,11 @@ function paint(){
  $("create-link").disabled=!authenticated||Boolean(referrals?.invite_url);
  $("create-link").textContent=!authenticated?"Sign in to invite":referrals?.invite_url?"Your link is ready":"Create my invitation ↗";
  $("copy-link").disabled=!authenticated||!referrals?.invite_url;
+ $("copy-message").disabled=!authenticated||!referrals?.invite_url;
+ const url=referrals?.invite_url||"";
+ const message="I'm exploring WorkforceOS Genesis Season Zero: build an AI specialist, earn nonfinancial internal XP and help shape a real agent community. No token is issued and future airdrops aren't guaranteed.";
+ $("telegram-share").href=url?"https://t.me/share/url?url="+encodeURIComponent(url)+"&text="+encodeURIComponent(message):"#";
+ $("telegram-share").setAttribute("aria-disabled",String(!url));
  $("join-signin").hidden=authenticated;
  $("join-ack").disabled=!authenticated||joined;
  $("join-button").disabled=!authenticated||joined||!$("join-ack").checked;
@@ -99,6 +104,15 @@ $("create-link").addEventListener("click",async()=>{
   await api("/api/rewards/invite","POST",{});
   await refreshAll();notify("Invitation link ready. XP is granted only after first-Agent activation.");
  }catch(err){notify(err.message)}finally{paint()}
+});
+$("copy-message").addEventListener("click",async()=>{
+ const url=referrals?.invite_url;if(!url)return;
+ const text="I'm exploring WorkforceOS Genesis Season Zero: build an AI specialist, earn nonfinancial internal XP and help shape a real agent community. No token is issued and future airdrops aren't guaranteed. Join me: "+url;
+ try{await navigator.clipboard.writeText(text);notify("Invitation message copied.")}
+ catch{notify("Browser clipboard is unavailable; copy your personal invitation URL instead.")}
+});
+$("telegram-share").addEventListener("click",event=>{
+ if(!referrals?.invite_url){event.preventDefault();notify("Create a personal invitation first.");}
 });
 $("copy-link").addEventListener("click",async()=>{
  const url=referrals?.invite_url;if(!url)return;
