@@ -13,6 +13,7 @@ os.environ.pop("WORKFORCE_FABRIC_GATEWAY_KEY",None)
 
 from app.main import app
 from app.agent_dna import compile_instructions, preset_profile, Profile
+from app.workforce_roster import ROSTER, BY_ID
 
 
 def headers(csrf=None):
@@ -47,16 +48,54 @@ class AgentDNATests(unittest.TestCase):
         self.assertIn("Agent DNA Studio",r.text)
         catalog=self.root.get("/api/agent-dna/catalog")
         self.assertEqual(catalog.status_code,200,catalog.text)
-        self.assertEqual(len(catalog.json()["presets"]),12)
+        self.assertEqual(len(catalog.json()["presets"]),33)
         self.assertFalse(catalog.json()["capabilities"]["custom_tool_grants"])
         self.assertFalse(catalog.json()["capabilities"]["marketplace_checkout"])
         p=preset_profile("research_analyst")
+        self.assertEqual(p["visual_identity"],"research_analyst")
+        self.assertTrue(p["expertise_domains"])
+        self.assertTrue(p["related_template_ids"])
+        self.assertIn("EXPECTED OUTPUT TYPES",compile_instructions(p))
         self.assertIn("Mission".upper(),compile_instructions(p))
         self.assertIn("SKILLS AND DELIVERABLE STANDARDS",compile_instructions(p))
         p["requested_tools"]=["github","email"]
         self.assertNotIn("github",compile_instructions(p).lower())
         with self.assertRaises(Exception):
             Profile.model_validate({**p,"skills":["unknown"]})
+
+    def test_all_33_catalog_profiles_are_real_validated_instruction_contracts(self):
+        catalog=self.root.get("/api/agent-dna/catalog").json()
+        profiles=catalog["presets"]
+        self.assertEqual(len(profiles),33)
+        self.assertEqual(len({entry["id"] for entry in profiles}),33)
+        self.assertEqual(len({entry["profile"]["name"] for entry in profiles}),33)
+        self.assertEqual(len({entry["profile"]["role"] for entry in profiles}),33)
+        self.assertEqual(sum(x["metadata"]["mode"]=="Customizable" for x in profiles),17)
+        self.assertEqual(sum(x["metadata"]["mode"]=="Curated" for x in profiles),16)
+        self.assertEqual(len({x["metadata"]["directory"] for x in profiles}),4)
+        for entry in profiles:
+            with self.subTest(agent=entry["id"]):
+                profile=Profile.model_validate(entry["profile"])
+                self.assertGreaterEqual(len(profile.skills),2)
+                self.assertTrue(profile.work_style)
+                self.assertTrue(profile.expertise_domains)
+                self.assertTrue(profile.deliverables)
+                self.assertEqual(profile.visual_identity,entry["id"])
+                self.assertIn(profile.mission,compile_instructions(profile.model_dump()))
+        for legacy in ("creative_partner","personal_guide"):
+            self.assertNotIn(legacy,{entry["id"] for entry in profiles})
+            self.assertTrue(Profile.model_validate(preset_profile(legacy)))
+
+    def test_new_specialists_can_be_created_as_tenant_owned_profiles(self):
+        for preset in ("lyra","sable","helix","pioneer"):
+            with self.subTest(preset=preset):
+                c,csrf=self.signup()
+                response=c.post("/api/agent-dna",json={"preset_id":preset},
+                                headers=headers(csrf))
+                self.assertEqual(response.status_code,200,response.text)
+                detail=c.get("/api/agent-dna/"+response.json()["agent_id"]).json()
+                self.assertEqual(detail["profile"]["visual_identity"],preset)
+                self.assertEqual(detail["revision"],1)
 
     def test_real_create_versioned_save_and_run(self):
         client,csrf=self.signup()

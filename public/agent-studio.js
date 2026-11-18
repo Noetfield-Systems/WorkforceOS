@@ -23,7 +23,7 @@ const AGENT_ID_BY_NAME={
 };
 function portraitFor(profile){
  const first=String(profile?.name||"").trim().split(/\s+/)[0];
- const presetId=AGENT_ID_BY_NAME[first]||S.preset||"custom";
+ const presetId=S.catalog?.presets?.find(p=>p.profile.name===first)?.id||AGENT_ID_BY_NAME[first]||S.preset||"custom";
  const portrait=$("portrait-mark")?.parentElement;
  if(!portrait||!window.WorkforceAgentArt)return;
  portrait.style.backgroundImage="none";
@@ -79,9 +79,11 @@ function setProfile(p,id,revision,published,sync){
 }
 function populate(){
  const p=S.profile;if(!p)return;
- ["name","role","mission","backstory","autonomy","model_preference","model_provider_request"].forEach(k=>{
+ ["name","role","mission","backstory","work_style","autonomy","model_preference","model_provider_request"].forEach(k=>{
    if($(k))$(k).value=p[k]||"auto";
  });
+ if($("expertise_domains"))$("expertise_domains").value=(p.expertise_domains||[]).join(", ");
+ if($("deliverables"))$("deliverables").value=(p.deliverables||[]).join("\n");
  for(const [key,value] of Object.entries(p.ethics||{})){
    const input=$("ethics-"+key);if(input)input.value=value;
  }
@@ -481,9 +483,17 @@ document.querySelectorAll("[data-tab]").forEach(b=>b.addEventListener("click",()
 document.querySelectorAll("[data-tone]").forEach(b=>b.addEventListener("click",()=>{
  if(!S.profile)return;S.profile.tone=b.dataset.tone;populate();markChanged();
 }));
-["name","role","mission","backstory","autonomy","model_preference","model_provider_request"].forEach(id=>{
+["name","role","mission","backstory","work_style","autonomy","model_preference","model_provider_request"].forEach(id=>{
  $(id).addEventListener("input",()=>{if(!S.profile)return;S.profile[id]=$(id).value;markChanged();});
 });
+for(const [id,sep,field] of [["expertise_domains",",","expertise_domains"],["deliverables",String.fromCharCode(10),"deliverables"]]){
+ const el=$(id);
+ if(el)el.addEventListener("input",()=>{
+  if(!S.profile)return;
+  S.profile[field]=[...new Set(el.value.split(sep).map(s=>s.trim()).filter(Boolean))].slice(0,8);
+  markChanged();
+ });
+}
 document.querySelectorAll("[id^='ethics-'],[id^='output-']").forEach(input=>input.addEventListener("change",()=>{
  if(!S.profile)return;
  const prefix=input.id.startsWith("ethics-")?"ethics":"output";

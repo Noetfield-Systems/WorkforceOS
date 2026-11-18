@@ -370,3 +370,29 @@ body{background:#f4f6f5;color:var(--mp-ink)}
 /* Keep the live status toast available, but never paint its empty fixed shell. */
 #toast.toast:empty{display:none!important}
 #toast.toast:not(.show){pointer-events:none}
+
+/* Real four-directory navigation and specialist profile expansion */
+.wos-directory-hub{padding-block:67px 56px}
+.wos-directory-grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:14px;margin-top:30px}
+.wos-directory-tile{display:flex;flex-direction:column;gap:11px;padding:26px;min-height:264px;background:#f7f9f9;border:1px solid #d7e1e5;border-radius:10px;color:#192b3a;text-decoration:none;transition:transform .2s,border-color .2s,background .2s}
+.wos-directory-tile:hover,.wos-directory-tile:focus-visible{transform:translateY(-3px);border-color:#6b99b0;background:#eef6f8}
+.wos-directory-tile>span{font-size:10px;letter-spacing:2px;color:#4b7187;font-weight:700}
+.wos-directory-tile h3{font:normal clamp(23px,1.8vw,33px)/1.08 var(--serif);margin:10px 0 0}
+.wos-directory-tile p{font-size:13px;line-height:1.7;color:#587080}
+.wos-directory-tile b{font-size:12px;margin-top:auto;color:#22506c}
+.wos-directory-hero{background:linear-gradient(120deg,#0a1927,#18364b);color:#f2f7f9;overflow:hidden}
+.wos-directory-hero-grid{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,.8fr);gap:40px;min-height:480px;align-items:center;padding-block:54px}
+.wos-directory-hero h1{font:normal clamp(47px,5vw,85px)/1.03 var(--serif);max-width:860px;letter-spacing:-2.5px;margin:27px 0}
+.wos-directory-hero h1 em{color:#afd9ea;font-weight:normal}
+.wos-directory-hero p{color:#c0d4dc;max-width:530px;font-size:16px;line-height:1.7;margin-bottom:30px}
+.wos-back{display:block;width:max-content;color:#cae1ea;font-size:12px;margin-bottom:38px}
+.wos-directory-cta{display:inline-flex;padding:15px 23px;border-radius:6px;font-size:12px;font-weight:700}
+.wos-directory-art{height:380px;overflow:hidden;border:1px solid #6b8797;border-radius:10px}
+.wos-directory-art .agent-character-art{height:100%}
+.wos-agent-professional{display:grid;grid-template-columns:1fr 1fr;gap:18px;margin-block:35px 55px}
+.wos-agent-professional article{border:1px solid #d6e1e4;border-radius:10px;padding:30px;background:#f9fbfa}
+.wos-agent-professional h3{font:normal 28px/1.15 var(--serif);color:#152a3b;margin:12px 0 20px}
+.wos-agent-professional ul{padding-left:20px;line-height:2;color:#365169;font-size:13px}
+#market-type{max-width:195px}
+@media(max-width:1050px){.wos-directory-grid{grid-template-columns:repeat(2,minmax(0,1fr))}.wos-directory-hero-grid{grid-template-columns:1fr 1fr}}
+@media(max-width:700px){.wos-directory-grid,.wos-agent-professional,.wos-directory-hero-grid{grid-template-columns:1fr}.wos-directory-tile{min-height:190px;padding:20px}.wos-directory-hero-grid{padding-block:35px}.wos-directory-hero h1{letter-spacing:-1px}.wos-directory-art{height:280px}#market-type{max-width:none}.wos-directory-hub{padding-block:30px}}

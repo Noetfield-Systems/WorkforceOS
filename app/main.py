@@ -226,6 +226,7 @@ def marketplace_home():
 
 @app.get("/marketplace")
 @app.get("/marketplace/")
+@app.get("/marketplace/directory/{directory}")
 @app.get("/arena")
 @app.get("/arena/")
 @app.get("/creators")
