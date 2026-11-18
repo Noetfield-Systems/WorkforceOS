@@ -21,7 +21,8 @@ const pages=[
  ["/genesis","genesis",".join-grid"],
  ["/genesis/app","genesis-app","#auth-screen .auth-box"],
  ["/genesis/whitepaper","whitepaper",".paper-main"],
- ["/genesis/docs","genesis-docs",".paper-main"]
+ ["/genesis/docs","genesis-docs",".paper-main"],
+ ["/help","help","#support-form"]
 ];
 const scrub=(value)=>String(value||"").slice(0,350);
 (async()=>{
@@ -56,6 +57,23 @@ const scrub=(value)=>String(value||"").slice(0,350);
     }
     assert(horizontal.scrollWidth<=horizontal.clientWidth+5,
       viewportName+" "+url+" horizontal overflow "+JSON.stringify(horizontal));
+    if(name==="help"){
+      assert.equal(await page.locator(".plan").count(),4,"four published plans must be visible");
+      assert.equal(await page.locator(".path-card").count(),6,"six visitor paths missing");
+      await page.locator('[data-faq="token"]').click();
+      assert((await page.locator("#guide-answer").innerText()).includes("No WorkforceOS token sale"),
+        "Guide must not suggest a token sale");
+      await page.locator('[name="name"]').fill("Browser QA");
+      await page.locator('[name="email"]').fill("care-"+viewportName+"-"+Date.now()+"@example.org");
+      await page.locator('[name="subject"]').fill("Browser support submission");
+      await page.locator('[name="message"]').fill("Testing real support case storage and tracking in browser.");
+      await page.locator("#support-send").click();
+      await page.locator("#new-case").waitFor({state:"visible",timeout:10000});
+      assert((await page.locator("#case-reference").innerText()).startsWith("sup_"),
+        "No real support case receipt");
+      await page.locator("#track-case").click();
+      await page.waitForFunction(()=>document.querySelector("#track-result").textContent.includes("RECEIVED"));
+    }
     if(name==="commerce"){
       await page.waitForFunction(()=>!document.getElementById("stripe-status").textContent.includes("Checking live"));
       assert.equal(await page.locator(".rails .rail").count(),3,"hybrid payment rails not rendered");
