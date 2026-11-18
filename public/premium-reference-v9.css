@@ -373,3 +373,11 @@ body:has(.dna-cinematic-hero){background:#f6f8f8}
  .creator-hero-feature h3{font-size:43px}
  .creator-cinematic-collection{padding-block:36px}
 }
+
+/* Portrait framing acceptance: protect foreheads in wide scene crops. */
+.scene-creators .creator-scene-photo .agent-character-photo{object-position:50% 8%!important}
+.scene-arena .arena-specialist-photo .agent-character-photo{object-position:50% 13%!important}
+.dna-cinematic-hero .dna-scene-portrait .agent-character-photo{object-position:50% 14%!important}
+.product-hero .product-portrait .agent-character-photo{object-position:50% 23%!important}
+.mp-hero-gallery .mp-hero-center .agent-character-photo{object-position:50% 22%!important}
+.mp-hero-gallery .mp-hero-side .agent-character-photo{object-position:50% 15%!important}
