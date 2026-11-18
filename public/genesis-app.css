@@ -33,3 +33,5 @@ body.wc-theme-nocturne .surface,body.wc-theme-nocturne .wc-item{border-color:#9b
 .economy-bridge{display:flex;align-items:center;justify-content:space-between;gap:16px;background:#12384b;color:#ebf7fb;border:1px solid #6795a7;border-radius:10px;padding:20px 24px;margin:19px 0 27px}
 .economy-bridge span{display:flex;flex-direction:column;gap:5px;min-width:0}.economy-bridge b{font-size:11px;letter-spacing:1.2px;color:#add6e6}.economy-bridge small{color:#c2dae5;font-size:11px;line-height:1.5}.economy-bridge a{background:#dceef5;color:#163b51;border-radius:6px;font-size:11px;font-weight:800;padding:11px 17px;white-space:nowrap}
 @media(max-width:680px){.economy-bridge{display:block;padding:18px}.economy-bridge a{display:inline-block;margin-top:15px}}
+
+.sidebar a.nav-item{display:block;box-sizing:border-box}
