@@ -1,0 +1,97 @@
+<!doctype html>
+<html lang="en"><head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="theme-color" content="#0b1420">
+<meta name="description" content="WorkforceOS Member World — daily verified XP, WC in-app credits, agent learning games, builder referrals and clearly separated fictional finance labs.">
+<meta name="robots" content="noindex"><title>Member World — WorkforceOS</title>
+<link rel="icon" type="image/svg+xml" href="/static/favicon.svg">
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="/static/member.css?v=20261118-s1">
+<script defer src="/static/member.js?v=20261118-s1"></script>
+</head>
+<body><a class="skip-link" href="#main">Skip to member world</a>
+<div class="world-shell">
+<aside class="world-rail" id="rail">
+ <a class="world-logo" href="/"><span class="brand-icon">///</span> Workforce<span>OS</span><small>MEMBER WORLD</small></a>
+ <div class="rail-label">YOUR WORLD</div>
+ <nav class="world-nav" aria-label="Member sections">
+  <button class="nav-item active" data-view="overview"><span class="nav-glyph">◈</span> Overview</button>
+  <button class="nav-item" data-view="play"><span class="nav-glyph">◇</span> Daily game</button>
+  <button class="nav-item" data-view="missions"><span class="nav-glyph">▦</span> Missions</button>
+  <button class="nav-item" data-view="network"><span class="nav-glyph">◎</span> Referrals</button>
+  <button class="nav-item" data-view="shop"><span class="nav-glyph">✧</span> Credit store</button>
+  <button class="nav-item" data-view="sandbox"><span class="nav-glyph">▤</span> Simulation lab</button>
+  <button class="nav-item" data-view="history"><span class="nav-glyph">≡</span> History</button>
+ </nav>
+ <div class="rail-label">EXPLORE WORKFORCEOS</div>
+ <div class="rail-links"><a href="/agent-studio">Agent Studio ↗</a><a href="/genesis">Genesis ↗</a><a href="/genesis/docs">Program rules ↗</a></div>
+ <div class="rail-foot"><span class="status-light"></span> Live Postgres ledger <small>Nonfinancial internal experience</small></div>
+</aside>
+<div class="world-content">
+<header class="world-topbar"><div class="topbar-left"><a class="small-logo" href="/">/// WorkforceOS</a><span class="slash">/</span><b>Member World</b></div>
+ <div class="topbar-right"><span class="world-mode">OFF-CHAIN · INTERNAL</span><span class="user-chip" id="member-email">Guest</span><a href="/app" class="topbar-link">Workspace ↗</a></div></header>
+<main id="main" class="world-main">
+<section id="signin-wall" class="signin-wall hidden" aria-live="polite">
+ <div class="signin-illustration"><img src="/static/characters/community_builder.webp" alt="" width="300" height="320"></div>
+ <div class="signin-copy"><span class="eyebrow">MEMBER ACCESS</span><h1>Your work deserves<br><em>a world of its own.</em></h1>
+ <p>Sign in with your existing WorkforceOS account, or create a free workspace. Your real XP, daily claims and in-app credits are recorded privately in PostgreSQL.</p>
+ <a class="primary-action" href="/app?signin=1">Sign in or create account <span>↗</span></a>
+ <p class="micro">No wallet required. No issued cryptocurrency. The trading lab is an openly fictional sandbox.</p></div>
+</section>
+<div id="member-app" class="hidden">
+<section class="member-hero" data-page="overview">
+ <div class="hero-copy"><span class="eyebrow"><span class="eyebrow-line"></span> FOUNDING SEASON / MEMBER OPERATIONS</span><h1>Welcome back,<br><em>Builder.</em></h1>
+ <p id="welcome-subtitle">Build something useful. Return tomorrow. Your progress stays with you.</p>
+ <div class="hero-actions"><button class="primary-action" id="hero-daily-claim" type="button">Claim today's rewards <span>↗</span></button><button class="ghost-action" data-go="play">Play today's challenge →</button></div>
+ <p class="hero-disclosure">XP and WC are real <strong>internal participation records</strong>, with no cash value or guaranteed token conversion.</p>
+ </div>
+ <div class="hero-portrait"><img src="/static/characters/sable.webp" alt="Illustrated WorkforceOS agent Sable" width="470" height="510"><div class="hero-portrait-label"><span>YOUR TEAM, YOUR JOURNEY</span><strong>Season Zero / Live</strong></div></div>
+</section>
+<section class="stat-grid" data-page="overview" aria-label="Recorded account balances">
+ <div class="stat-card"><span class="stat-label">LIFETIME XP <small>ACTUAL LEDGER</small></span><strong id="stat-xp">—</strong><div class="stat-foot">Earned through verified activity</div></div>
+ <div class="stat-card"><span class="stat-label">WORK CREDITS <small>IN-APP UTILITY</small></span><strong id="stat-credits">— <i>WC</i></strong><div class="stat-foot">Spend on your member profile</div></div>
+ <div class="stat-card"><span class="stat-label">DAILY STREAK <small>UTC DAYS</small></span><strong id="stat-streak">—</strong><div class="stat-foot" id="stat-streak-next">Next milestone: seven days</div></div>
+ <div class="stat-card"><span class="stat-label">MEMBER STATUS <small>VERIFIED DATA</small></span><strong class="stat-text" id="stat-member">—</strong><div class="stat-foot">Genesis enrollment is optional</div></div>
+</section>
+<section class="overview-layout" data-page="overview">
+ <div class="panel card-daily"><span class="eyebrow">TODAY'S MOMENTUM</span><h2>Small actions.<br><em>Lasting progress.</em></h2>
+ <div class="daily-steps"><div><span class="step-no">01</span><div><b>Daily check-in</b><small>Claim +5 XP and +2 WC. Consecutive weeks unlock a bonus.</small></div><span class="step-state" id="daily-step-state">READY</span></div>
+ <div><span class="step-no">02</span><div><b>Play the agent challenge</b><small>One real XP reward per UTC day for the correct answer.</small></div><span class="step-state" id="game-step-state">READY</span></div>
+ <div><span class="step-no">03</span><div><b>Build your Agent DNA</b><small>A real saved specialist moves your account forward.</small></div><a href="/agent-studio" class="mini-link">Open ↗</a></div></div>
+ <div class="panel-actions"><button class="secondary-action" data-go="missions">View all missions →</button></div></div>
+ <div class="panel panel-feature"><span class="eyebrow">THE INNER ECONOMY</span><h2>Earn it.<br>Make it yours.</h2><p>Work Credits can unlock in-app cosmetics. This is a genuine internal database ledger—not an issued, tradable or purchasable token.</p>
+ <div class="feature-row"><span>WC balance</span><b id="feature-credits">—</b></div><div class="feature-row"><span>Profile items owned</span><b id="feature-owned">—</b></div>
+ <button class="secondary-action" data-go="shop">Explore credit store →</button>
+ </div>
+</section>
+<section class="section-head" data-page="play"><span class="eyebrow">PLAY / LEARN / RETURN</span><h1>The daily<br><em>Agent Challenge.</em></h1><p>A short daily decision game grounded in how real agents work. Solve today's question once to earn XP and WC in PostgreSQL.</p></section>
+<section class="panel game-layout" data-page="play">
+ <div class="game-tag"><span>DAILY PUZZLE</span><span id="game-date">UTC DATE —</span></div><h2 id="game-question">Loading today's question…</h2>
+ <div id="game-options" class="game-options" role="group" aria-label="Daily puzzle answers"></div>
+ <div id="game-result" class="feedback-line" role="status"></div>
+ <div class="game-bottom"><span>Reward: <b>+8 XP · +3 WC</b></span><span id="game-lock-state">One successful claim per UTC day</span></div></section>
+<section class="section-head" data-page="missions"><span class="eyebrow">REAL SOURCE-VERIFIED ACTIONS</span><h1>Your builder<br><em>missions.</em></h1><p>Rewards follow completed work, not button impressions. Use the existing account, quiz, Genesis and Agent Studio paths.</p></section>
+<section class="mission-list" id="mission-list" data-page="missions"></section>
+<section class="section-head" data-page="network"><span class="eyebrow">GROW TOGETHER</span><h1>Bring builders.<br><em>Earn by activation.</em></h1><p>A referral counts when a genuinely registered workspace builds its first Agent DNA. Invite clicks alone do not earn rewards.</p></section>
+<section class="network-grid" data-page="network"><div class="panel"><span class="eyebrow">YOUR PERSONAL INVITE</span><h2>Invite the next builder.</h2><p>Your link is tied to your existing workspace; no wallet or social-login requirement.</p>
+ <div class="copy-field"><input id="referral-url" readonly aria-label="Your referral URL" placeholder="Generate your link"><button id="copy-referral" class="secondary-action">Copy</button></div>
+ <button id="create-referral" class="primary-action">Get my invite link ↗</button><p class="micro">Rewards: +25 XP and +10 WC after the invited member actually saves their first Agent DNA.</p></div>
+ <div class="panel"><span class="eyebrow">OBSERVED ACTIVITY</span><div class="referral-metrics"><div><strong id="ref-registrations">—</strong><small>Registered workspaces</small></div><div><strong id="ref-activated">—</strong><small>Activated builders</small></div></div><p>These numbers are server-side records, not social media reach or independently verified unique people.</p></div></section>
+<section class="section-head" data-page="shop"><span class="eyebrow">WORK CREDITS / INTERNAL UTILITY</span><h1>Use your<br><em>earned credits.</em></h1><p>Customize your member experience with WC earned from real account activity. Purchases debit actual internal credits and permanently record ownership.</p></section>
+<section data-page="shop"><div class="shop-banner"><div><span class="eyebrow">CURRENT BALANCE</span><b id="shop-balance">— WC</b></div><small>Not money · Not a transferable token · Not redeemable</small></div><div id="shop-grid" class="shop-grid"></div></section>
+<section class="section-head" data-page="sandbox"><span class="eyebrow">EDUCATIONAL SANDBOX · ZERO REAL VALUE</span><h1>Explore the<br><em>economy lab.</em></h1><p>Practice buying, staking and allocating capital with imaginary balances. This is a fictional simulator, not a token launch, sale, investment or income opportunity.</p></section>
+<section data-page="sandbox"><div class="demo-banner"><strong>SIMULATION ONLY</strong><p>No real payment, cryptocurrency, investment contract, staking yield, redemption or financial return. 1 DEMO unit = 10 DEMO USD is a fixed fictional scenario reference, not a market price.</p></div>
+<div class="demo-metrics"><div class="panel"><span class="eyebrow">PRACTICE CASH</span><b id="demo-cash">—</b><small>DEMO USD · NOT WITHDRAWABLE</small></div><div class="panel"><span class="eyebrow">PRACTICE UNITS</span><b id="demo-units">—</b><small>DEMO UNITS · NO REAL CONTRACT</small></div><div class="panel"><span class="eyebrow">SIMULATED STAKE</span><b id="demo-staked">—</b><small>ZERO YIELD · ZERO REAL REWARDS</small></div></div>
+<div class="demo-actions"><div class="panel"><span class="eyebrow">01 / TRADE PRACTICE</span><h3>Buy fictional units</h3><p>Use demo cash at a fixed illustrative rate. No real Checkout.</p><label>Number of DEMO units<input id="demo-buy-qty" type="number" min="1" max="100" value="1"></label><button data-demo="buy" class="secondary-action">Simulate buy</button></div>
+<div class="panel"><span class="eyebrow">02 / STAKING PRACTICE</span><h3>Stake or unstake</h3><p>Move imaginary units between balances. No earnings or yield.</p><label>DEMO units<input id="demo-stake-qty" type="number" min="1" max="100" value="1"></label><div class="button-pair"><button data-demo="stake" class="secondary-action">Stake (demo)</button><button data-demo="unstake" class="outline-action">Unstake (demo)</button></div></div>
+<div class="panel"><span class="eyebrow">03 / PORTFOLIO PRACTICE</span><h3>Explore allocations</h3><p>Place fictional USD into hypothetical projects. No ownership or return.</p><label>Scenario<select id="demo-project"><option value="agent_lab">Agent Lab</option><option value="creator_network">Creator Network</option><option value="research_collective">Research Collective</option></select></label><label>DEMO USD<input id="demo-invest-amount" type="number" min="10" max="500" value="50"></label><button data-demo="invest" class="secondary-action">Simulate allocation</button></div></div>
+<div class="panel portfolio-panel"><span class="eyebrow">FICTIONAL POSITIONS</span><div id="demo-positions" class="position-list">No positions allocated.</div></div></section>
+<section class="section-head" data-page="history"><span class="eyebrow">AUDITABLE MEMBER ACTIVITY</span><h1>Your recorded<br><em>journey.</em></h1><p>Separate source-verified XP, internal credit changes and fictional sandbox actions. Nothing here implies a payment or issued asset.</p></section>
+<section data-page="history"><div class="history-tabs" role="tablist"><button data-history="xp" class="active" role="tab" aria-selected="true">XP Ledger</button><button data-history="credits" role="tab" aria-selected="false">WC Transactions</button><button data-history="demo" role="tab" aria-selected="false">Demo Simulation</button></div><div id="history-entries" class="history-entries panel">Open history to load the actual entries.</div></section>
+</div>
+</main>
+<footer class="world-footer"><span>WorkforceOS / Member World / Season Zero</span><span>Internal XP and WC have no cash value. All financial panels are fictional.</span><a href="/genesis/docs">Program rules ↗</a></footer>
+</div></div>
+<div class="toast" id="toast" role="status" aria-live="polite" hidden></div>
+</body></html>
