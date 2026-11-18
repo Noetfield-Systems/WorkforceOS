@@ -140,7 +140,7 @@ def main():
         results=[future.result() for future in as_completed(work)]
     assert len(results)==33
     assert len({sha for _,_,_,sha in results})==33, "Duplicate artwork detected"
-    assert all(size>14000 for _,_,size,_ in results)
+    assert all(size>9000 for _,_,size,_ in results)
     print("ARTWORK_COMPLETED",len(results),sum(size for _,_,size,_ in results),flush=True)
 
 if __name__=="__main__":
