@@ -19,6 +19,7 @@ const pages=[
  ["/commerce","commerce",".rails .rail"],
  ["/rewards","rewards",".dashboard-grid"],
  ["/genesis","genesis",".join-grid"],
+ ["/tokenomics","tokenomics",".economy-grid"],
  ["/genesis/app","genesis-app","#auth-screen .auth-box"],
  ["/genesis/whitepaper","whitepaper",".paper-main"],
  ["/genesis/docs","genesis-docs",".paper-main"],
@@ -71,7 +72,7 @@ const scrub=(value)=>String(value||"").slice(0,350);
       }
     }
     if(name==="help"){
-      assert.equal(await page.locator(".plan").count(),4,"four published plans must be visible");
+      assert.equal(await page.locator(".plan").count(),4,"four Genesis economy paths must be visible");
       assert.equal(await page.locator(".path-card").count(),6,"six visitor paths missing");
       await page.locator('[data-faq="token"]').click();
       assert((await page.locator("#guide-answer").innerText()).includes("No WorkforceOS token sale"),
@@ -86,6 +87,24 @@ const scrub=(value)=>String(value||"").slice(0,350);
         "No real support case receipt");
       await page.locator("#track-case").click();
       await page.waitForFunction(()=>document.querySelector("#track-result").textContent.includes("RECEIVED"));
+    }
+    if(name==="tokenomics"){
+      assert.equal(await page.locator(".allocation-rows>div").count(),5,
+        "Supply model must disclose all five allocation pools");
+      assert.equal((await page.locator("#fdv-output").innerText()).trim(),"$500,000",
+        "100M x $0.005 reference must imply $500k FDV");
+      await page.locator('[data-price="0.01"]').click();
+      assert.equal((await page.locator("#fdv-output").innerText()).trim(),"$1,000,000",
+        "price model must recompute FDV from scenario change");
+      await page.locator('[data-price="0.0025"]').click();
+      assert.equal((await page.locator("#fdv-output").innerText()).trim(),"$250,000");
+      const facts=await page.evaluate(async()=>{
+        const r=await fetch("/api/token-economy/status");return await r.json();
+      });
+      assert.equal(facts.product_direction,"web3_agent_economy");
+      assert.equal(facts.token_issued,false);
+      assert.equal(facts.token_sale_open,false);
+      assert.equal(facts.live_token_price_usd,null);
     }
     if(name==="commerce"){
       await page.waitForFunction(()=>!document.getElementById("stripe-status").textContent.includes("Checking live"));
@@ -271,7 +290,7 @@ const scrub=(value)=>String(value||"").slice(0,350);
     // Filters, search and reset replace card DOM nodes: load the final rendered
     // assets again before screenshot, not the stale images asserted above.
     if(name!=="whitepaper"&&name!=="genesis-docs"&&name!=="genesis-app"){
-      const mediaSelector=(name==="genesis"||name==="help")?"main img":".agent-character-photo";
+      const mediaSelector=(name==="genesis"||name==="help"||name==="tokenomics")?"main img":".agent-character-photo";
     await page.locator(mediaSelector).evaluateAll(images=>images.forEach(img=>img.loading="eager"));
     await page.waitForFunction((selector)=>{
       const imgs=[...document.querySelectorAll(selector)];
