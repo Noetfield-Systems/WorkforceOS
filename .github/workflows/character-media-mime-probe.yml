@@ -1,0 +1,23 @@
+name: Probe live character media HTTP headers
+on:
+  push:
+    branches: [fix/verify-webp-media-content-type]
+    paths: [.github/workflows/character-media-mime-probe.yml]
+jobs:
+  probe:
+    runs-on: ubuntu-latest
+    timeout-minutes: 3
+    steps:
+      - name: Inspect live WebP response headers and signature
+        run: |
+          set -euxo pipefail
+          curl -sSIL 'https://workforce-web-production-2d15bf32.up.railway.app/static/characters/orion.webp' | sed -n '1,45p'
+          python - <<'PY'
+          import urllib.request
+          for id in ('orion','lyra','sable','community_builder'):
+              url='https://workforce-web-production-2d15bf32.up.railway.app/static/characters/'+id+'.webp'
+              with urllib.request.urlopen(url,timeout=30) as r:
+                  blob=r.read(1000000)
+                  print('LIVE_WEBP',id,'status',r.status,'ctype',repr(r.headers.get('Content-Type')),
+                        'bytes',len(blob),'magic',blob[:12].hex(),flush=True)
+          PY
