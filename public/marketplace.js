@@ -220,8 +220,8 @@ function browse(){
  const total=S.items.length;
  S.filter="all";S.style="all";S.search="";S.sort="featured";
  const hero=S.items.find(x=>x.id==="research_analyst");
- const spotOne=S.items.find(x=>x.id==="sales_operator");
- const spotTwo=S.items.find(x=>x.id==="product_engineer");
+ const spotOne=S.items.find(x=>x.id==="creative_partner");
+ const spotTwo=S.items.find(x=>x.id==="financial_analyst");
  $("content").innerHTML=
  '<section class="mp-hero" aria-label="AI Agent Marketplace showcase"><div class="wrap mp-hero-layout">'+
  '<div class="mp-hero-copy"><div class="mp-hero-eyebrow"><span class="mp-live-dot"></span> WORKFORCEOS ORIGINALS <span class="mp-eyebrow-slash">/</span> THE AI AGENT MARKETPLACE</div>'+
@@ -298,6 +298,7 @@ function browse(){
      const ok=(b.dataset.category||b.dataset.style)==="all";
      b.classList.toggle("active",ok);b.setAttribute("aria-pressed",String(ok));
    });
+   document.querySelectorAll(".filter-choices").forEach(el=>{el.scrollLeft=0});
    filterCards();
  };
  $("market-query").addEventListener("input",e=>{S.search=e.target.value.toLowerCase().trim();filterCards()});
