@@ -53,7 +53,7 @@ def initialize_rewards():
             inviter_workspace_id text NOT NULL REFERENCES workspaces(id) ON DELETE CASCADE,
             invited_workspace_id text NOT NULL UNIQUE REFERENCES workspaces(id) ON DELETE CASCADE,
             invite_code text NOT NULL,
-            activation_agent_id text REFERENCES agents(id),
+            activation_agent_id text REFERENCES agents(id) ON DELETE SET NULL,
             activated_at timestamptz,
             created_at timestamptz NOT NULL DEFAULT now(),
             CHECK (inviter_workspace_id<>invited_workspace_id)
