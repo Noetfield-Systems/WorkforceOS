@@ -37,7 +37,7 @@ const MISSION_EXAMPLES={
 };
 
 const S={catalog:null,gallery:null,session:null,own:null,items:[],filter:"all",style:"all",search:"",sort:"featured",
- activeArena:null,arenaTimer:null,arenaPolls:0};
+ activeArena:null,arenaTimer:null,arenaPolls:0,compare:[],density:"gallery"};
 document.addEventListener("error",event=>{
  const target=event.target;
  if(target?.classList?.contains("agent-card-photo"))target.classList.add("unavailable");
@@ -92,7 +92,9 @@ function card(item,i,tag=""){
   '<span class="card-role">'+esc(item.subtitle)+'</span>'+
   '<p class="card-mission">'+esc(item.profile.mission||item.profile.role)+'</p>'+
   '<div class="card-tags">'+skills.map(x=>'<span class="pill">'+esc(words(x))+'</span>').join("")+'</div>'+
-  '<div class="card-foot"><span>Agent DNA template</span><a href="'+esc(editLink(item))+'">Configure & run ↗</a></div></div></article>';
+  '<div class="card-foot"><span>Agent DNA template</span><a href="'+esc(editLink(item))+'">Configure & run ↗</a></div>'+
+  (location.pathname==="/marketplace"?'<button class="card-compare" type="button" data-compare-id="'+esc(item.id)+'" aria-pressed="'+S.compare.includes(item.id)+'"><span class="compare-check" aria-hidden="true">'+(S.compare.includes(item.id)?"✓":"+")+'</span>'+(S.compare.includes(item.id)?"Added to compare":"Compare agent")+'</button>':"")+
+  '</div></article>';
 }
 function cards(items,limit=items.length){return items.slice(0,limit).map((item,i)=>card(item,i,"")).join("");}
 
@@ -189,50 +191,152 @@ function home(){
  button("Open Agent Studio","/agent-studio")+'</div></div></section>';
 }
 
+
+const MP_SHELVES=[
+ {category:"Research",name:"Research & intelligence",sub:"Evidence, discovery, insight",agent:"research_analyst",number:"01"},
+ {category:"Sales",name:"Sales & growth",sub:"Outreach, pipeline, offers",agent:"sales_operator",number:"02"},
+ {category:"Engineering",name:"Engineering & product",sub:"Systems, specs, build plans",agent:"product_engineer",number:"03"},
+ {category:"Creative",name:"Creative production",sub:"Concepts, campaigns, storytelling",agent:"creative_partner",number:"04"},
+ {category:"Operations",name:"Operations & delivery",sub:"Coordination, milestones, follow-through",agent:"operations_director",number:"05"},
+ {category:"Finance",name:"Finance & decisions",sub:"Models, forecasts, scenarios",agent:"financial_analyst",number:"06"}
+];
+function mpTeaser(item,id,featured){
+ if(!item)return "";
+ return '<a class="mp-feature-tile '+(featured?"mp-feature-primary":"mp-feature-secondary")+'" href="/agents/'+encodeURIComponent(item.id)+'">'+
+ '<div class="mp-feature-image">'+art(item.id,"market-feature-"+id)+'</div>'+
+ '<div class="mp-feature-glass"><span class="mp-feature-eyebrow">'+(featured?"FEATURED SPECIALIST":"EDITORIAL PICK")+' / '+esc(item.category).toUpperCase()+'</span>'+
+ '<h3>'+esc(item.display)+'</h3><p>'+esc(item.subtitle)+'</p><span class="mp-feature-more">Explore this agent <b>↗</b></span></div></a>';
+}
+function mpPair(title,desc,ids,number){
+ const agents=ids.map(id=>S.items.find(i=>i.id===id)).filter(Boolean);
+ if(agents.length!==2)return "";
+ return '<article class="mp-team-card"><div class="mp-team-visual">'+agents.map((agent,i)=>
+ '<a href="/agents/'+encodeURIComponent(agent.id)+'" aria-label="View '+esc(agent.display)+'">'+art(agent.id,"pair-"+number+"-"+i)+'</a>').join("")+'</div>'+
+ '<div class="mp-team-content"><span class="mp-team-no">COMPLEMENTARY SPECIALISTS / '+number+'</span><h3>'+title+'</h3>'+
+ '<p>'+desc+'</p><div class="mp-team-names">'+agents.map(a=>'<a href="/agents/'+encodeURIComponent(a.id)+'">'+esc(a.display)+' ↗</a>').join("")+'</div></div></article>';
+}
 function browse(){
- document.title="Browse AI Agents — WorkforceOS Marketplace";
+ document.title="AI Agent Marketplace — Discover & Build Your Workforce | WorkforceOS";
  const total=S.items.length;
+ S.filter="all";S.style="all";S.search="";S.sort="featured";
+ const hero=S.items.find(x=>x.id==="research_analyst");
+ const spotOne=S.items.find(x=>x.id==="sales_operator");
+ const spotTwo=S.items.find(x=>x.id==="product_engineer");
  $("content").innerHTML=
- '<section class="store-listing-heading"><div class="wrap"><div class="breadcrumb"><a href="/">WorkforceOS</a> › Marketplace</div>'+
- '<div class="listing-title-row"><div><span class="kicker">WORKFORCEOS / DISCOVER AI AGENTS</span><h1>AI Agent <em>Marketplace.</em></h1>'+
- '<p>Explore real AI agent configurations by job, specialization and working style. Customize any template and run it in your workspace.</p></div>'+
- '<div class="listing-badge"><b>'+total+'</b><span>Available agent configurations<br>Including published community templates</span></div></div></div></section>'+
- '<section class="wrap marketplace-layout-shell"><div class="catalog-layout"><aside class="filter-sidebar" aria-label="Marketplace filters">'+
- '<div class="sidebar-title"><h3>Filters</h3><button type="button" id="reset-filters">Reset</button></div>'+
+ '<section class="mp-hero" aria-label="AI Agent Marketplace showcase"><div class="wrap mp-hero-layout">'+
+ '<div class="mp-hero-copy"><div class="mp-hero-eyebrow"><span class="mp-live-dot"></span> WORKFORCEOS ORIGINALS <span class="mp-eyebrow-slash">/</span> THE AI AGENT MARKETPLACE</div>'+
+ '<h1>Extraordinary agents.<br><em>Real work.</em></h1>'+
+ '<p class="mp-hero-lead">An exceptional workforce starts with the right intelligence.</p>'+
+ '<p class="mp-hero-description">Discover AI specialists with distinct personalities, expertise and working styles. Customize their DNA and deploy them to your own workspace.</p>'+
+ '<div class="mp-hero-actions"><a class="mp-hero-primary" href="#catalog">Explore the collection <span>↗</span></a>'+
+ '<a class="mp-hero-secondary" href="/agent-studio">Build your own agent <span>↗</span></a></div>'+
+ '<div class="mp-hero-proof"><div><strong>'+total+'</strong><span>Available agent configurations</span></div>'+
+ '<div><strong>12</strong><span>Original specialist identities</span></div>'+
+ '<div><strong>01</strong><span>Connected workspace</span></div></div></div>'+
+ '<div class="mp-hero-gallery" aria-label="Featured agent characters">'+
+ '<a class="mp-hero-center" href="/agents/research_analyst">'+art("research_analyst","market-hero-center")+
+ '<span class="mp-image-title"><small>01 / RESEARCH & INTELLIGENCE</small><strong>Scout</strong></span></a>'+
+ '<a class="mp-hero-side mp-hero-side-a" href="/agents/sales_operator">'+art("sales_operator","market-hero-sales")+
+ '<span class="mp-side-name">Nova / Sales ↗</span></a>'+
+ '<a class="mp-hero-side mp-hero-side-b" href="/agents/product_engineer">'+art("product_engineer","market-hero-engineer")+
+ '<span class="mp-side-name">Milo / Engineering ↗</span></a>'+
+ '<span class="mp-gallery-note">CURATED FOR ACTUAL WORK <i>✳</i></span></div></div></section>'+
+ '<div class="mp-trust-strip"><div class="wrap"><span>01 / Choose a specialist</span><span class="mp-trust-arrow">→</span>'+
+ '<span>02 / Make its DNA yours</span><span class="mp-trust-arrow">→</span><span>03 / Run a task</span>'+
+ '<span class="mp-trust-arrow">→</span><span>04 / Improve from results</span></div></div>'+
+ '<section class="wrap mp-discover-shelves" aria-label="Explore AI agent categories">'+
+ '<div class="mp-editorial-heading"><div><span class="kicker">DISCOVER BY EXPERTISE</span><h2>Find the mind for <em>the mission.</em></h2></div>'+
+ '<p>Choose the problem you need solved. Find the agent designed to approach it.</p></div>'+
+ '<div class="mp-shelf-grid">'+MP_SHELVES.map(shelf=>{
+   const count=S.items.filter(i=>i.category===shelf.category).length;
+   return '<button type="button" class="mp-shelf" data-shelf-category="'+esc(shelf.category)+'">'+
+   '<span class="mp-shelf-index">'+shelf.number+' / '+count+' AGENT'+(count===1?"":"S")+'</span>'+
+   '<span class="mp-shelf-body"><strong>'+esc(shelf.name)+'</strong><small>'+esc(shelf.sub)+'</small></span>'+
+   '<span class="mp-shelf-arrow" aria-hidden="true">↗</span></button>';
+ }).join("")+'</div></section>'+
+ '<section class="wrap mp-featured-section" aria-label="Featured AI agents">'+
+ '<div class="mp-editorial-heading"><div><span class="kicker">THE EDITOR\'S SELECTION / 01</span><h2>Meet the standouts.</h2></div>'+
+ '<a class="mp-text-link" href="#catalog">See every agent <span>↗</span></a></div>'+
+ '<div class="mp-feature-grid">'+mpTeaser(spotOne,"sales",true)+mpTeaser(spotTwo,"engineering",false)+'</div></section>'+
+ '<section class="wrap mp-catalog-section" id="catalog" aria-label="Browse all agents">'+
+ '<div class="mp-catalog-lead"><div><span class="kicker">THE WORKFORCEOS COLLECTION / ALL AGENTS</span><h2>Browse the <em>workforce.</em></h2>'+
+ '<p>Real Agent DNA configurations, ready to inspect, customize and run. No fabricated reviews or earnings.</p></div>'+
+ '<a class="mp-new-agent-link" href="/agent-studio">+ Create a custom agent ↗</a></div>'+
+ '<div class="catalog-layout mp-catalog-layout"><aside class="filter-sidebar" aria-label="Marketplace filters">'+
+ '<div class="sidebar-title"><h3>Refine</h3><button type="button" id="reset-filters">Clear all</button></div>'+
  '<div class="section-caption">SPECIALIZATION</div>'+
  '<div class="filter-choices" id="category-filter">'+CAT.map((c,i)=>'<button class="filter-item '+(i===0?"active":"")+'" type="button" data-category="'+esc(c.id)+'" aria-pressed="'+(i===0)+'"><span>'+esc(c.label)+'</span><span>'+S.items.filter(x=>c.id==="all"||x.category.toLowerCase()===c.id.toLowerCase()).length+'</span></button>').join("")+'</div>'+
- '<div class="section-caption">AGENT STYLE</div><div class="filter-choices style-filters" id="character-filter">'+STYLE_FILTERS.map((sty,i)=>'<button class="filter-item '+(i===0?"active":"")+'" type="button" data-style="'+esc(i===0?"all":sty)+'" aria-pressed="'+(i===0)+'"><span>'+esc(sty)+'</span></button>').join("")+'</div>'+
- '<p class="filter-note">Every official agent is a functional configuration; tools and model execution depend on your authenticated runtime.</p></aside>'+
- '<div class="catalog-main"><div class="results-toolbar"><label class="market-search" for="market-query"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><circle cx="10.5" cy="10.5" r="7"/><path d="m16 16 5 5"/></svg>'+
- '<input id="market-query" type="search" placeholder="Search agents, jobs or skills…" aria-label="Search AI Agent Marketplace"></label>'+
- '<select id="market-sort" class="market-select" aria-label="Sort agents"><option value="featured">Recommended for discovery</option><option value="name">Agent name A–Z</option><option value="recent">Recently shared</option></select></div>'+
- '<div class="results-heading"><p class="result-count" id="result-count">'+total+' agents</p><span>AGENT DNA / CONFIGURE IN STUDIO</span></div>'+
- '<div id="market-results" class="agent-grid"></div></div></div></section>'+
- '<section class="wrap marketplace-teaser"><span class="kicker">CAN\'T FIND THE SPECIALIST?</span><h2>Build the agent<br><em>your business needs.</em></h2>'+
- '<p>Specify its mission, behavior, expertise and working preferences. Connect authorized tools when available.</p>'+
- button("Create a custom agent","/agent-studio")+'</section>'+
- '<section class="section wrap">'+sectionHead("BUILD YOUR OWN AI WORKFORCE",
- 'Agents with a purpose.<br><em>Outputs you can inspect.</em>')+
- '<div class="workflow-steps"><article><span>01</span><h3>Pick a role</h3><p>Choose a specialist and review its working contract.</p></article>'+
- '<article><span>02</span><h3>Set the DNA</h3><p>Edit personality, mission, skills and task-specific instructions.</p></article>'+
- '<article><span>03</span><h3>Run and compare</h3><p>Submit a task and check the actual result through the existing runtime.</p></article>'+
- '<article><span>04</span><h3>Improve</h3><p>Use task outcomes and the Arena to refine your next version.</p></article></div></section>';
- const reset=()=>{S.filter="all";S.style="all";S.search="";$("market-query").value="";
-  document.querySelectorAll("[data-category],[data-style]").forEach(b=>{const ok=(b.dataset.category||b.dataset.style)==="all";b.classList.toggle("active",ok);b.setAttribute("aria-pressed",String(ok))});
-  filterCards();};
+ '<div class="section-caption">WORKING STYLE</div><div class="filter-choices style-filters" id="character-filter">'+STYLE_FILTERS.map((sty,i)=>'<button class="filter-item '+(i===0?"active":"")+'" type="button" data-style="'+esc(i===0?"all":sty)+'" aria-pressed="'+(i===0)+'"><span>'+esc(sty)+'</span></button>').join("")+'</div>'+
+ '<p class="filter-note">Profiles describe agent behavior. Runtime capabilities require your authorized workspace.</p></aside>'+
+ '<div class="catalog-main"><div class="mp-catalog-toolbar">'+
+ '<label class="market-search mp-search" for="market-query"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><circle cx="10.5" cy="10.5" r="7"/><path d="m16 16 5 5"/></svg>'+
+ '<input id="market-query" type="search" placeholder="Search a skill, role or specific agent…" aria-label="Search the AI agent marketplace"></label>'+
+ '<select id="market-sort" class="market-select" aria-label="Sort agents"><option value="featured">Curated collection</option><option value="name">Agent name A–Z</option><option value="recent">Recently shared</option></select>'+
+ '<div class="mp-density-controls" role="group" aria-label="Choose catalog layout"><button type="button" data-density="gallery" aria-pressed="true" title="Gallery layout">▦</button>'+
+ '<button type="button" data-density="compact" aria-pressed="false" title="Compact layout">▥</button></div></div>'+
+ '<div class="results-heading mp-results-heading"><p class="result-count" id="result-count">'+total+' specialists</p>'+
+ '<span>VISUAL CATALOGUE / REAL AGENT DNA</span></div>'+
+ '<div id="market-results" class="agent-grid mp-agent-results" data-density="gallery"></div></div></div></section>'+
+ '<section class="wrap mp-teams-section" aria-label="AI workforce combinations">'+
+ '<div class="mp-editorial-heading"><div><span class="kicker">GO FURTHER / BUILD A WORKFORCE</span>'+
+ '<h2>Better <em>together.</em></h2></div><p>Suggested specialist pairings. Mix and adapt agent templates in your workspace; these are not paid bundles.</p></div>'+
+ '<div class="mp-teams-grid">'+mpPair("From research to decision","Investigate a question, then challenge the resulting strategy.",["research_analyst","strategy_advisor"],"01")+
+ mpPair("From outreach to loyalty","Connect opportunity discovery with thoughtful customer support.",["sales_operator","customer_advocate"],"02")+
+ mpPair("From plan to delivery","Turn product requirements into structured work and checkpoints.",["product_engineer","operations_director"],"03")+'</div></section>'+
+ '<section class="wrap mp-finale-section"><div class="mp-finale-copy"><span class="kicker">BUILD SOMETHING ORIGINAL</span>'+
+ '<h2>Your next specialist<br><em>does not exist yet.</em></h2>'+
+ '<p>Give it a mission, shape its personality, choose skills and knowledge, and test the agent against a real task.</p>'+
+ '<div class="mp-finale-actions">'+button("Create your AI agent","/agent-studio")+button("Explore Agent Arena","/arena","secondary")+'</div></div>'+
+ '<div class="mp-finale-art">'+art("creative_partner","market-finale")+'</div></section>'+
+ '<div id="mp-compare-tray" class="mp-compare-tray" hidden></div>'+
+ '<div id="mp-compare-modal" class="mp-compare-overlay" hidden></div>';
+
+ const reset=()=>{
+   S.filter="all";S.style="all";S.search="";S.sort="featured";
+   $("market-query").value="";$("market-sort").value="featured";
+   document.querySelectorAll("[data-category],[data-style]").forEach(b=>{
+     const ok=(b.dataset.category||b.dataset.style)==="all";
+     b.classList.toggle("active",ok);b.setAttribute("aria-pressed",String(ok));
+   });
+   filterCards();
+ };
  $("market-query").addEventListener("input",e=>{S.search=e.target.value.toLowerCase().trim();filterCards()});
  $("market-sort").addEventListener("change",e=>{S.sort=e.target.value;filterCards()});
  $("reset-filters").addEventListener("click",reset);
  document.querySelectorAll("[data-category],[data-style]").forEach(b=>b.addEventListener("click",()=>{
-  const isCategory=b.hasAttribute("data-category"),key=isCategory?"category":"style";
-  if(isCategory)S.filter=b.dataset.category;else S.style=b.dataset.style;
-  document.querySelectorAll("[data-"+key+"]").forEach(x=>{const yes=x===b;x.classList.toggle("active",yes);x.setAttribute("aria-pressed",String(yes))});
-  filterCards();
+   const category=b.hasAttribute("data-category"),key=category?"category":"style";
+   if(category)S.filter=b.dataset.category;else S.style=b.dataset.style;
+   document.querySelectorAll("[data-"+key+"]").forEach(x=>{
+     const selected=x===b;x.classList.toggle("active",selected);x.setAttribute("aria-pressed",String(selected));
+   });
+   filterCards();
  }));
+ document.querySelectorAll("[data-shelf-category]").forEach(b=>b.addEventListener("click",()=>{
+   const filter=document.querySelector('[data-category="'+b.dataset.shelfCategory+'"]');
+   filter?.click();$("catalog").scrollIntoView({behavior:matchMedia("(prefers-reduced-motion: reduce)").matches?"auto":"smooth"});
+ }));
+ document.querySelectorAll("[data-density]").forEach(b=>b.addEventListener("click",()=>{
+   S.density=b.dataset.density;
+   document.querySelectorAll("[data-density]").forEach(x=>x.setAttribute("aria-pressed",String(x===b)));
+   $("market-results").dataset.density=S.density;
+ }));
+ $("market-results").addEventListener("click",e=>{
+   const b=e.target.closest("[data-compare-id]");
+   if(b)toggleCompare(b.dataset.compareId);
+ });
+ $("mp-compare-tray").addEventListener("click",e=>{
+   if(e.target.closest("[data-clear-compare]")){S.compare=[];syncCompare();filterCards()}
+   else if(e.target.closest("[data-open-compare]"))openCompare();
+   else if(e.target.closest("[data-remove-compare]")){S.compare=S.compare.filter(id=>id!==e.target.closest("[data-remove-compare]").dataset.removeCompare);syncCompare();filterCards()}
+ });
+ $("mp-compare-modal").addEventListener("click",e=>{
+   if(e.target===e.currentTarget||e.target.closest("[data-close-compare]"))closeCompare();
+ });
+ document.addEventListener("keydown",e=>{if(e.key==="Escape"&&!$("mp-compare-modal").hidden)closeCompare()});
  const qs=new URLSearchParams(location.search);
  if(qs.has("q")){S.search=(qs.get("q")||"").toLowerCase().trim();$("market-query").value=qs.get("q")||""}
- if(qs.has("category")&&CAT.some(c=>c.id===qs.get("category"))){document.querySelector('[data-category="'+CSS.escape(qs.get("category"))+'"]')?.click();}
- filterCards();
+ if(qs.has("category")&&CAT.some(c=>c.id===qs.get("category")))document.querySelector('[data-category="'+CSS.escape(qs.get("category"))+'"]')?.click();
+ filterCards();syncCompare();
 }
 function filterCards(){
  let selected=S.items.filter(x=>(S.filter==="all"||x.category.toLowerCase()===S.filter.toLowerCase())&&
@@ -240,11 +344,59 @@ function filterCards(){
  (!S.search||[x.display,x.subtitle,x.character,x.signature,x.category,x.profile.name,x.profile.role,x.profile.mission,...(x.profile.skills||[])].join(" ").toLowerCase().includes(S.search)));
  if(S.sort==="name")selected.sort((a,b)=>a.display.localeCompare(b.display));
  if(S.sort==="recent")selected.sort((a,b)=>(b.published_at||"").localeCompare(a.published_at||""));
- $("result-count").textContent=selected.length+" available "+(selected.length===1?"agent":"agents")+
+ $("result-count").textContent=selected.length+" "+(selected.length===1?"specialist":"specialists")+
  (S.filter!=="all"?" in "+S.filter:"")+(S.style&&S.style!=="all"?" · "+S.style:"");
  $("market-results").innerHTML=selected.length?cards(selected):
- '<div class="empty-card"><span class="kicker">NO MATCHES</span><h3>No agents match these filters.</h3><p>Try a different specialization or search term.</p><button type="button" class="btn btn-secondary" id="clear-filter">Reset filters ↗</button></div>';
- $("clear-filter")?.addEventListener("click",()=>{$("reset-filters").click()});
+ '<div class="empty-card"><span class="kicker">NO AGENTS FOUND</span><h3>Try a different search.</h3><p>Adjust the specialization, style or search terms.</p><button type="button" class="btn btn-secondary" id="clear-filter">Clear filters ↗</button></div>';
+ $("market-results").dataset.density=S.density;
+ $("clear-filter")?.addEventListener("click",()=>$("reset-filters").click());
+}
+function toggleCompare(id){
+ if(!S.items.some(item=>item.id===id))return;
+ if(S.compare.includes(id))S.compare=S.compare.filter(x=>x!==id);
+ else if(S.compare.length<2)S.compare=[...S.compare,id];
+ else{toast("Compare two agents at a time. Remove one to select another.");return;}
+ syncCompare();filterCards();
+}
+function syncCompare(){
+ const tray=$("mp-compare-tray");if(!tray)return;
+ tray.hidden=S.compare.length===0;
+ if(S.compare.length===0){tray.innerHTML="";return}
+ tray.innerHTML='<div class="mp-compare-tray-inner"><div><span class="mp-compare-eyebrow">SIDE-BY-SIDE DNA COMPARISON</span><strong>'+
+ S.compare.length+' of 2 agents selected</strong></div>'+
+ '<div class="mp-selected-chips">'+S.compare.map(id=>{
+   const item=S.items.find(i=>i.id===id);return item?'<span>'+esc(item.display)+
+   '<button aria-label="Remove '+esc(item.display)+' from comparison" data-remove-compare="'+esc(item.id)+'" type="button">×</button></span>':"";
+ }).join("")+'</div><div class="mp-compare-tray-actions"><button type="button" data-clear-compare>Clear</button>'+
+ '<button type="button" data-open-compare '+(S.compare.length!==2?"disabled":"")+' class="mp-open-compare">Compare agent DNA ↗</button></div></div>';
+}
+function openCompare(){
+ if(S.compare.length!==2)return;
+ const agents=S.compare.map(id=>S.items.find(i=>i.id===id));
+ if(agents.some(a=>!a))return;
+ const modal=$("mp-compare-modal");const [a,b]=agents;
+ const row=(label,fn)=>'<div class="mp-compare-row"><span>'+label+'</span><p>'+esc(fn(a))+'</p><p>'+esc(fn(b))+'</p></div>';
+ modal.innerHTML='<div class="mp-compare-dialog" role="dialog" aria-modal="true" aria-labelledby="mp-compare-title">'+
+ '<div class="mp-compare-dialog-head"><div><span class="kicker">CONFIGURATION COMPARISON / NOT A PERFORMANCE BENCHMARK</span>'+
+ '<h2 id="mp-compare-title">Compare Agent DNA.</h2></div><button type="button" class="mp-dialog-close" data-close-compare aria-label="Close comparison">×</button></div>'+
+ '<div class="mp-compare-columns"><div></div>'+
+ agents.map(x=>'<div><div class="mp-compare-small-art">'+art(x.id,"compare-"+x.id)+'</div><h3>'+esc(x.display)+'</h3>'+
+ '<a href="'+esc(editLink(x))+'">Customize this agent ↗</a></div>').join("")+'</div>'+
+ '<div class="mp-compare-facts">'+
+ row("Professional role",x=>x.profile.role||x.subtitle)+
+ row("Primary mission",x=>x.profile.mission||"Not specified")+
+ row("Working tone",x=>words(x.profile.tone||"Not specified"))+
+ row("Core skills",x=>(x.profile.skills||[]).map(words).join(" · ")||"Not specified")+
+ row("Guiding values",x=>(x.profile.values||[]).map(words).join(" · ")||"Not specified")+
+ row("Autonomy preference",x=>words(x.profile.autonomy||"Not specified"))+
+ '</div><p class="mp-compare-disclaimer">These are published configuration attributes, not test results, guaranteed accuracy or independently measured performance. Test actual outcomes in Agent Arena.</p>'+
+ '<div class="mp-compare-dialog-footer"><a href="/arena">Open Agent Arena ↗</a><button type="button" data-close-compare>Close comparison</button></div></div>';
+ modal.hidden=false;
+ modal.querySelector("[data-close-compare]")?.focus();
+}
+function closeCompare(){
+ const modal=$("mp-compare-modal");modal.hidden=true;modal.innerHTML="";
+ $("mp-compare-tray")?.querySelector("[data-open-compare]")?.focus();
 }
 
 function detail(){
