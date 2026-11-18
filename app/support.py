@@ -118,10 +118,13 @@ def create_case(request:Request,body:CaseInput):
         path="/"
     ip=request.client.host if request.client else "unknown"
     bucket="support:"+hashlib.sha256((ip+"|"+email).encode()).hexdigest()
-    # Dedicated transaction ensures a rejected case does not reset the limiter.
+    ip_bucket="support_ip:"+hashlib.sha256(ip.encode()).hexdigest()
+    # Separate committed limiter transaction; changing emails cannot evade IP limits.
     with database() as db:
-        if not auth_rate_limit(db,bucket,threshold=5):
-            raise HTTPException(429,"TOO_MANY_SUPPORT_REQUESTS")
+        ip_allowed=auth_rate_limit(db,ip_bucket,threshold=30)
+        sender_allowed=auth_rate_limit(db,bucket,threshold=5)
+    if not ip_allowed or not sender_allowed:
+        raise HTTPException(429,"TOO_MANY_SUPPORT_REQUESTS")
     token=secrets.token_urlsafe(32)
     case_id=uid("sup")
     severity="HIGH" if body.category in {"bug","billing","account"} else "NORMAL"
