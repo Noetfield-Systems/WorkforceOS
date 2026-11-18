@@ -60,9 +60,10 @@ const scrub=(value)=>String(value||"").slice(0,350);
     }
     if(name==="rewards"){
       await page.locator("#account-state").waitFor({state:"visible"});
-      assert.equal(await page.locator(".quest-card").count(),4,"XP quests incomplete");
+      assert.equal(await page.locator(".quest-card").count(),5,"XP quests incomplete");
       assert.equal(await page.locator("#daily-claim").isDisabled(),true,"anonymous visitor can mint XP");
       assert.equal(await page.locator("#quiz-submit").isDisabled(),true,"anonymous visitor can claim quiz XP");
+      assert.equal(await page.locator("#invite-create").isDisabled(),true,"anonymous visitor can create invite links");
     }
     if(name==="agent-studio"){
       assert((await page.locator(".portrait .agent-character-photo").count())===1,"Studio agent preview did not receive photographic character media");
