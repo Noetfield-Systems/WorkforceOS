@@ -179,7 +179,7 @@ const scrub=(value)=>String(value||"").slice(0,350);
       const mediaSelector=name==="genesis"?"main img":".agent-character-photo";
     await page.locator(mediaSelector).evaluateAll(images=>images.forEach(img=>img.loading="eager"));
     await page.waitForFunction((selector)=>{
-      const imgs=[...document.querySelectorAll(mediaSelector)];
+      const imgs=[...document.querySelectorAll(selector)];
       return imgs.length>0&&imgs.every(img=>img.complete&&img.naturalWidth>0);
     },mediaSelector,{timeout:30000});
     await page.locator(mediaSelector).evaluateAll(async images=>{
