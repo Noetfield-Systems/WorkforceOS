@@ -9,6 +9,7 @@ from concurrent.futures import ThreadPoolExecutor, as_completed
 from pathlib import Path
 from io import BytesIO
 import hashlib
+import json
 import os
 import time
 import urllib.error
@@ -61,45 +62,74 @@ BACKDROPS={
 ROOT=Path("public/characters")
 ROOT.mkdir(parents=True, exist_ok=True)
 
+def request_horde_image(scene,seed):
+    base="https://stablehorde.net/api/v2"
+    prompt=scene+" ### cut off head, chopped forehead, words, writing, watermark, robot, metal face, blurry, plastic face, low quality, extra arms, cropped eyes"
+    payload={"prompt":prompt,
+             "params":{"width":512,"height":640,"steps":24,"n":1,"seed":str(seed),
+                       "cfg_scale":7.1,"sampler_name":"k_euler_a"},
+             "nsfw":False,"censor_nsfw":True}
+    headers={"Content-Type":"application/json","apikey":"0000000000",
+             "Client-Agent":"WorkforceOS:1.0:NoetfieldSystems"}
+    req=urllib.request.Request(base+"/generate/async",data=json.dumps(payload).encode(),
+                               headers=headers,method="POST")
+    with urllib.request.urlopen(req,timeout=35) as response:
+        submitted=json.load(response)
+    job_id=submitted.get("id")
+    if not job_id:raise RuntimeError("No Horde generation id: "+str(submitted)[:200])
+    for tick in range(45):
+        time.sleep(8)
+        with urllib.request.urlopen(base+"/generate/check/"+job_id,timeout=25) as response:
+            check=json.load(response)
+        if check.get("done"):break
+        if check.get("faulted") or not check.get("is_possible",True):
+            raise RuntimeError("Horde job faulted "+str(check)[:200])
+        if tick%6==0:
+            print("HORDE_WAIT",tick,job_id,"queue",check.get("queue_position"),
+                  "eta",check.get("wait_time"),flush=True)
+    else:raise RuntimeError("Horde generation timed out: "+job_id)
+    with urllib.request.urlopen(base+"/generate/status/"+job_id,timeout=25) as response:
+        status=json.load(response)
+    gens=status.get("generations") or []
+    if not gens or gens[0].get("censored") or gens[0].get("state")!="ok":
+        raise RuntimeError("Horde result unavailable or censored")
+    src_url=gens[0].get("img","")
+    if not src_url.startswith("https://"):raise RuntimeError("Horde no image URL")
+    with urllib.request.urlopen(src_url,timeout=70) as response:
+        return response.read(5_000_000)
+
 def build(item):
     ident=item["id"]
     spec=CHARACTERS[ident]
     backdrop=BACKDROPS[item["directory"]]
     scene=(f"Original fictional AI agent identity, premium cinematic photographic character portrait, {spec}. "
-      f"Environment: {backdrop}. Sympathetic confident thoughtful expression, real natural skin texture, professional "
-      "fashion editorial photography, cinematic tungsten practical lights and cool navy shadows, sophisticated "
-      "tasteful dramatic composition, 85mm lens, shallow depth of field, tasteful desaturated colors. "
+      f"Environment: {backdrop}. Sympathetic confident thoughtful expression, natural skin texture, professional "
+      "luxury fashion editorial photography, cinematic tungsten practical lights and cool navy shadows, "
+      "sophisticated tasteful dramatic composition, 85mm lens, shallow depth of field, tasteful desaturated colors. "
       "VERTICAL MID-CHEST PORTRAIT, camera slightly below eye level, head fully visible with generous headroom, "
-      "both shoulders visible, subject occupies 65 percent of frame, clear eyes and unobstructed mouth, "
-      "intentional individual identity, highly detailed, realistic not cartoon. No text, logos, watermarks, "
-      "labels, diagrams, borders, robots, armor or mechanical faces.")
+      "both shoulders visible, centered subject, clear eyes and unobstructed mouth, intentional unique identity, "
+      "highly detailed realistic style. No text, logos, watermarks, labels, diagrams, borders, robots, armor or mechanical faces.")
     seed=17001+ROSTER.index(item)*467
-    url="https://image.pollinations.ai/prompt/"+urllib.parse.quote(scene,safe="")+"?width=640&height=800&seed="+str(seed)+"&nologo=true&model=flux&safe=true"
     path=ROOT/(ident+".webp")
-    for attempt in range(4):
+    for attempt in range(3):
         try:
-            req=urllib.request.Request(url,headers={"User-Agent":"Mozilla/5.0 WorkforceOS-Character-Assets/1.0"})
-            with urllib.request.urlopen(req,timeout=130) as response:
-                content_type=response.headers.get("Content-Type","")
-                payload=response.read(4_500_000)
-                if not content_type.startswith("image/") or len(payload)<14000:
-                    raise RuntimeError("Invalid generated image content "+str(content_type))
+            payload=request_horde_image(scene,seed+attempt*111)
+            if len(payload)<8000:raise RuntimeError("Image payload too small")
             img=ImageOps.exif_transpose(Image.open(BytesIO(payload)))
             img.load()
             if img.width<400 or img.height<500:
                 raise RuntimeError(f"Undersized image {img.size}")
             img=img.convert("RGB")
-            # A single stable source is used for responsive crops; preserve full composition.
-            img.save(path,"WEBP",quality=84,method=6)
+            img.save(path,"WEBP",quality=86,method=6)
             check=Image.open(path)
             assert check.width>=400 and check.height>=500
             result=(ident,str(path),path.stat().st_size,hashlib.sha256(path.read_bytes()).hexdigest())
             print("CHARACTER_READY",*result[:3],flush=True)
             return result
-        except (OSError, ValueError, RuntimeError, urllib.error.URLError) as exc:
-            print("CHARACTER_RETRY",ident,attempt+1,str(exc)[:150],flush=True)
-            if attempt==3:raise
-            time.sleep(3*(attempt+1))
+        except (OSError, ValueError, RuntimeError, urllib.error.URLError,KeyError) as exc:
+            print("CHARACTER_RETRY",ident,attempt+1,str(exc)[:180],flush=True)
+            if attempt==2:raise
+            time.sleep(5*(attempt+1))
     raise RuntimeError("Exhausted "+ident)
 
 def main():
