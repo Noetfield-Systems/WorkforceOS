@@ -3,7 +3,7 @@ const $=id=>document.getElementById(id);
 const list=q=>Array.from(document.querySelectorAll(q));
 const safe=v=>String(v??"").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
 const fmt=n=>Number(n||0).toLocaleString("en-US");
-let session=null,member=null,xp=null,referral=null,daily=null,puzzle=null,sandbox=null,program=null;
+let session=null,member=null,xp=null,referral=null,daily=null,puzzle=null,sandbox=null,program=null,credits=null;
 let authMode="register",screen="home";
 const ref=(new URLSearchParams(location.search).get("ref")||"").slice(0,42);
 function toast(message){const el=$("toast");el.textContent=message;el.hidden=false;clearTimeout(toast.t);toast.t=setTimeout(()=>el.hidden=true,5100)}
@@ -47,7 +47,7 @@ function go(name){
  screen=name;
  list("[data-page]").forEach(x=>x.hidden=x.dataset.page!==name);
  list("[data-view]").forEach(x=>x.classList.toggle("current",x.dataset.view===name));
- const headers={home:"Your Genesis dashboard.",daily:"Daily claim & play.",quests:"Quests & XP.",referral:"Invite & referrals.",leaders:"Season Zero leaderboard.",trade:"Buy & sell sandbox.",stake:"Staking sandbox.",invest:"Investing sandbox."};
+ const headers={home:"Your Genesis dashboard.",daily:"Daily claim & play.",quests:"Quests & XP.",referral:"Invite & referrals.",leaders:"Season Zero leaderboard.",store:"Work Credits / earned utility.",trade:"Buy & sell sandbox.",stake:"Staking sandbox.",invest:"Investing sandbox."};
  $("page-title").textContent=headers[name]||"Your Genesis dashboard.";
  $("sandbox-start").hidden=!member?.joined||Boolean(sandbox?.started)||!["trade","stake","invest"].includes(name);
  window.scrollTo({top:0,behavior:"instant"});
@@ -111,6 +111,29 @@ function showSandbox(){
    '</span><b>'+fmt(p.units)+' demo credits</b></div>').join(""):"<p>No allocations recorded.</p>";
  $("sandbox-start").hidden=!member?.joined||active||!["trade","stake","invest"].includes(screen);
 }
+function renderCredits(){
+ if(!credits)return;
+ $("wc-total").textContent=fmt(credits.balance);
+ $("wc-balance").textContent=fmt(credits.balance)+" WC";
+ const owned=new Set(credits.owned);
+ $("wc-shop").innerHTML=credits.items.map((item,i)=>{
+  const unlocked=owned.has(item.id),available=credits.balance>=item.cost;
+  const symbols=["◈","✦","◇"];
+  return '<article class="wc-item"><div class="wc-art" aria-hidden="true">'+symbols[i%symbols.length]+'</div>'+
+   '<span class="eyebrow">'+safe(item.effect.replaceAll("_"," "))+'</span>'+
+   '<h3>'+safe(item.name)+'</h3><p>'+safe(item.description)+'</p>'+
+   '<div class="wc-item-foot"><strong>'+fmt(item.cost)+' WC</strong>'+
+   '<button type="button" data-wc-buy="'+safe(item.id)+'" '+(unlocked||!available?'disabled':'')+'>'+
+   (unlocked?'Unlocked ✓':available?'Unlock for WC ↗':'Earn more WC')+'</button></div></article>';
+ }).join("");
+ $("wc-history").innerHTML=credits.history.length?credits.history.map(x=>
+  '<div class="wc-entry"><div><b>'+safe(x.kind.replaceAll("_"," "))+'</b><small>'+
+  new Date(x.created_at).toLocaleString()+'</small></div><strong>'+String(x.delta>0?"+":"")+fmt(x.delta)+' WC</strong></div>'
+ ).join(""):'<p>No recorded WC events yet. Join, claim, play or build your first Agent DNA.</p>';
+ document.body.classList.toggle("wc-theme-nocturne",owned.has("nocturne_theme"));
+ document.body.classList.toggle("wc-profile-frame",owned.has("pioneer_frame"));
+ $("member-id").textContent=(member?.member||"Founding member")+(owned.has("builder_badge")?" · ✦ Builder":"");
+}
 function render(){
  $("member-id").textContent=member?.member||"Founding member";
  $("workspace-label").textContent=session?.account?.workspace_name||"Workspace";
@@ -139,14 +162,15 @@ function render(){
  $("invite-create").textContent=url?"Invitation ready ✓":"Create invitation ↗";
  $("invite-copy").disabled=!url;$("invite-message").disabled=!url;
  $("telegram").href=url?"https://t.me/share/url?url="+encodeURIComponent(url)+"&text="+encodeURIComponent("Join me in WorkforceOS Genesis Season Zero. Build a specialist AI agent and earn internal nonfinancial XP. No token or airdrop is guaranteed."):"#";
- showQuests();showPuzzle();showSandbox();
+ showQuests();showPuzzle();showSandbox();renderCredits();
 }
 async function refresh(){
  const results=await Promise.all([
   api("/api/genesis/me"),api("/api/rewards/me"),api("/api/rewards/referrals"),
-  api("/api/genesis/daily-state"),api("/api/genesis/play/today")
+  api("/api/genesis/daily-state"),api("/api/genesis/play/today"),
+  api("/api/genesis/credits/me")
  ]);
- [member,xp,referral,daily,puzzle]=results;
+ [member,xp,referral,daily,puzzle,credits]=results;
  sandbox=member.joined?await api("/api/genesis/sandbox"):null;
  render();
 }
@@ -230,9 +254,21 @@ $("sell").addEventListener("click",()=>demo($("sell"),"sell","trade-amount"));
 $("stake").addEventListener("click",()=>demo($("stake"),"stake","stake-amount"));
 $("unstake").addEventListener("click",()=>demo($("unstake"),"unstake","stake-amount"));
 $("invest").addEventListener("click",()=>demo($("invest"),"invest","invest-amount","invest-category"));
+document.addEventListener("click",event=>{
+ const button=event.target.closest("[data-wc-buy]");
+ if(!button||button.disabled||!credits)return;
+ const item=credits.items.find(x=>x.id===button.dataset.wcBuy);
+ if(!item)return;
+ if(!confirm("Unlock "+item.name+" using "+item.cost+" earned WC? This is a nonfinancial in-app cosmetic purchase, not a money payment."))return;
+ run(button,async()=>{
+  const r=await api("/api/genesis/credits/purchase","POST",{item_id:item.id});
+  toast(r.unlocked?"Unlocked "+item.name+". "+r.balance_wc+" WC remaining.":"No item purchased.");
+  return r;
+ });
+});
 $("signout").addEventListener("click",async()=>{
  try{await api("/api/logout","POST",{});}catch{}
- session=null;member=null;xp=null;referral=null;daily=null;puzzle=null;sandbox=null;
+ session=null;member=null;xp=null;referral=null;daily=null;puzzle=null;sandbox=null;credits=null;
  $("member-app").hidden=true;$("signout").hidden=true;$("auth-screen").hidden=false;changeAuth("login");
 });
 (async()=>{
