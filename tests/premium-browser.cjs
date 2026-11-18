@@ -57,6 +57,19 @@ const scrub=(value)=>String(value||"").slice(0,350);
     }
     assert(horizontal.scrollWidth<=horizontal.clientWidth+5,
       viewportName+" "+url+" horizontal overflow "+JSON.stringify(horizontal));
+    if(name!=="help"){
+      await page.locator("#wos-help-toggle").waitFor({state:"visible",timeout:5000});
+      assert.equal(await page.locator("#wos-help-panel").isHidden(),true,
+        "Help panel must not block user content by default");
+      if(name==="marketplace"){
+        await page.locator("#wos-help-toggle").click();
+        assert.equal(await page.locator("#wos-help-panel").isVisible(),true,
+          "Global Help widget must open");
+        await page.keyboard.press("Escape");
+        assert.equal(await page.locator("#wos-help-panel").isHidden(),true,
+          "Help widget must close with Escape");
+      }
+    }
     if(name==="help"){
       assert.equal(await page.locator(".plan").count(),4,"four published plans must be visible");
       assert.equal(await page.locator(".path-card").count(),6,"six visitor paths missing");
