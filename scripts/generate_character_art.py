@@ -103,19 +103,16 @@ def build(item):
     ident=item["id"]
     spec=CHARACTERS[ident]
     backdrop=BACKDROPS[item["directory"]]
+    # Put each unique identity FIRST: shorter CLIP-compatible prompt prevents
+    # the model's context limit from discarding character clothing/age/location.
     scene=(
-      f"Wide vertical cinematic movie still inside {backdrop}, "
-      f"a fictional professional specialist: {spec}, "
-      "wearing formal fully covering sophisticated business clothing: high neckline opaque "
-      "shirt or turtleneck fully covering chest and shoulders underneath tailored blazer. "
-      "Environment dramatically visible behind subject: architectural office or research room, "
-      "bookshelves, warm lamps, navy-tinted windows, soft people in distance, subtle atmospheric "
-      "haze and cinematic amber practical lighting. Medium shot from waist to head, "
-      "subject centered with ample headroom, fully visible scalp, full face and both shoulders, "
-      "some upper body in frame, not too close. Photography for prestige television drama, "
-      "muted dark navy teal and warm amber palette, beautiful realistic skin texture, "
-      "careful expression, natural cinematic lighting, high production value, original fictional identity. "
-      "Vertical magazine cover still without writing or logos."
+      f"{spec}. {backdrop}. "
+      "Original fictional human AI specialist, full head and both shoulders visible, "
+      "three-quarter waist-up film still, pull camera back, ample headroom, "
+      "wear the described professional costume, natural skin texture, "
+      "luxury cinematic editorial photography, atmospheric navy blue shadows, "
+      "warm amber practical lamps, realistic architectural background, "
+      "bokeh, rich professional workplace, 85mm lens."
     )
     seed=17001+ROSTER.index(item)*467
     path=ROOT/(ident+".webp")
