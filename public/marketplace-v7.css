@@ -365,3 +365,8 @@ body{background:#f4f6f5;color:var(--mp-ink)}
  .mp-hero-gallery>a,.mp-shelf,.mp-feature-tile{transition:none!important}
  .mp-shelf:hover,.mp-hero-gallery>a:hover,.mp-feature-tile:hover{transform:none}
 }
+
+
+/* Keep the live status toast available, but never paint its empty fixed shell. */
+#toast.toast:empty{display:none!important}
+#toast.toast:not(.show){pointer-events:none}
