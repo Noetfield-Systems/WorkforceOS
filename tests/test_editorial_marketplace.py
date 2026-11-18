@@ -1,7 +1,7 @@
 """Editorial Agent Marketplace v4 — real character product invariants.
 
 No visual or commercial mock state is allowed to masquerade as a real listing,
-customer transaction, review, or agent execution. The catalog contains 12
+customer transaction, review, or agent execution. The catalog contains 33
 actual createable presets and the original published creator templates.
 """
 import sys
@@ -31,7 +31,7 @@ class EditorialMarketplaceTests(unittest.TestCase):
         catalog=self.client.get("/api/agent-dna/catalog")
         self.assertEqual(catalog.status_code,200)
         presets=catalog.json()["presets"]
-        self.assertEqual(len(presets),12)
+        self.assertEqual(len(presets),33)
         self.assertEqual(len({p["id"] for p in presets}),12)
         self.assertEqual(len({p["profile"]["name"] for p in presets}),12)
         self.assertEqual(len({p["profile"]["role"] for p in presets}),12)
@@ -52,7 +52,7 @@ class EditorialMarketplaceTests(unittest.TestCase):
         self.assertIn("/static/marketplace-v4.css",html.text)
         self.assertIn("/static/marketplace-v5.css",html.text)
         self.assertIn("/static/agent-art.js",html.text)
-        self.assertIn("marketplace.js?v=20261117-v7",html.text)
+        self.assertIn("marketplace.js?v=20261117-v8",html.text)
         self.assertIn("/static/marketplace-v7.css",html.text)
         self.assertIn("/static/marketplace-v6.css",html.text)
         self.assertIn("agent-art.js?v=20261117-v6",html.text)

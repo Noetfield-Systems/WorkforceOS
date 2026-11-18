@@ -78,7 +78,14 @@ class PremiumMarketplaceTests(unittest.TestCase):
     def test_public_catalog_is_real_and_payment_claims_are_disabled(self):
         catalog=self.client.get("/api/agent-dna/catalog")
         self.assertEqual(catalog.status_code,200,catalog.text)
-        self.assertEqual(len(catalog.json()["presets"]),12)
+        self.assertEqual(len(catalog.json()["presets"]),33)
+        self.assertEqual(len(catalog.json()["directories"]),4)
+        self.assertEqual(sum(x["metadata"]["mode"]=="Customizable" for x in catalog.json()["presets"]),17)
+        self.assertEqual(sum(x["metadata"]["mode"]=="Curated" for x in catalog.json()["presets"]),16)
+        self.assertEqual(len({x["id"] for x in catalog.json()["presets"]}),33)
+        for preset in catalog.json()["presets"]:
+            with self.subTest(agent=preset["id"]):
+                self.assertEqual(self.client.get("/agents/"+preset["id"]).status_code,200)
         self.assertFalse(catalog.json()["capabilities"]["marketplace_checkout"])
         self.assertFalse(catalog.json()["capabilities"]["custom_tool_grants"])
         gallery=self.client.get("/api/agent-dna/gallery")
