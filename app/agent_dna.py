@@ -11,6 +11,7 @@ from typing import Literal
 
 from fastapi import Depends, HTTPException
 from pydantic import BaseModel, Field, field_validator
+from .rewards import award as award_participation
 
 SKILLS={
     "research":"Investigate evidence, cite sources supplied in the task, and separate findings from hypotheses.",
@@ -417,6 +418,8 @@ def install(app, *, database, uid, event, authentication, write, sync_agent, lim
                           VALUES (%s,%s,1,%s::jsonb)""",
                        (agent_id,tenant,json.dumps(profile)))
             event(db,tenant,"agent_dna.created",agent_id,body.preset_id)
+            award_participation(db,tenant,kind="first_agent",
+                                claim_key="first_agent",points=20,source_id=agent_id)
         sync=await sync_agent(account,agent_id)
         return {"agent_id":agent_id,"revision":1,"sync_state":sync}
 
