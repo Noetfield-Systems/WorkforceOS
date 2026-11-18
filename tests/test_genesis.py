@@ -63,7 +63,7 @@ class GenesisTests(unittest.TestCase):
             ("/genesis",["genesis-quest-grid","join-button","leaderboard-rows","token-pools",
                          "/static/genesis.js","/static/genesis.css","/genesis/whitepaper"]),
             ("/genesis/whitepaper",["Tokenomics","Season Zero","/genesis","100,000,000"]),
-            ("/genesis/docs",["FAQ","Airdrop","/genesis/whitepaper"])
+            ("/genesis/docs",["FAQ","airdrop","/genesis/whitepaper"])
         ]:
             with self.subTest(page=target):
                 response=self.root.get(target)
