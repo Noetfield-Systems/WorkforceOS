@@ -48,3 +48,27 @@ No chain, token, wallet, upfront funding, extra company or payment account
 is required to launch the nonfinancial participation experience. Existing
 auth, verified XP and referrals are reused. Anything involving actual
 collectible value or an investment offering is a distinct later initiative.
+
+## Member token app (interactive, internal, nonfinancial) — 2026-11-18
+
+Direct route: `/genesis/app`. Anonymous visitors can create an actual WorkforceOS
+account or sign in on the same page; an existing session enters the dashboard
+without a second account or wallet. Referral query parameters are attributed
+to this registration and rewarded only after first-Agent activation.
+
+Daily loop: authenticated claim (+5 XP), streak milestones (+4/+10 XP on
+days 3/7), rotating source-validated Specialist Match (+8 XP once per UTC day),
+real XP history, opt-in member standing, referral activation and direct link to
+Studio and meaningful feedback. No social-click rewards or fictitious balances.
+
+Economy lab: isolated fictional credits and units. Start = 1,000 DEMO credits
+and 100 DEMO units (no real assets). Buy/sell at a fixed artificial game rate;
+seven-day lock simulator with 0% APY; category allocation simulator with no
+returns or monetary rights. Source receipts are recorded separately from XP,
+billing and future token issuance. A real token sale, stake or investment is
+not represented as live and is not activated by a visual dashboard.
+
+**Benchmark reasons:** Zealy recurrence/leaderboard/referral qualification,
+Galxe repeatable daily points with verification, Pixels' rewarding actual play,
+not merely registrations. Release measurements focus on activated builders,
+daily distinct active members, first-Agent creation and verified referrals.
