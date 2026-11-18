@@ -86,12 +86,13 @@ def me(account=Depends(_auth)):
     now=datetime.now(timezone.utc)
     today="daily:"+now.date().isoformat()
     week="feedback:"+now.strftime("%G-W%V")
-    claimed={x["kind"] for x in entries}
+    keys=_load_keys(tenant,[today,week,"quiz:"+QUIZ["id"],"first_agent"])
+    received={x["claim_key"] for x in keys}
     return {"balance":int(balance),"currency":"XP","money":False,
-            "today_claimed":any(x["kind"]=="daily_checkin" and x["claim_key"]==today for x in _load_keys(tenant,[today])),
-            "feedback_week_claimed":bool(_load_keys(tenant,[week])),
-            "quiz_claimed":"agent_basics_quiz" in claimed,
-            "first_agent_claimed":"first_agent" in claimed,
+            "today_claimed":today in received,
+            "feedback_week_claimed":week in received,
+            "quiz_claimed":"quiz:"+QUIZ["id"] in received,
+            "first_agent_claimed":"first_agent" in received,
             "history":[{"id":x["id"],"kind":x["kind"],"points":x["points"],
                         "created_at":x["created_at"].isoformat()} for x in entries],
             "notice":program_snapshot()["notice"]}
