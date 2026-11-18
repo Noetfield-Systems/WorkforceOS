@@ -75,7 +75,7 @@ const scrub=(value)=>String(value||"").slice(0,350);
       assert.equal(await page.locator(".plan").count(),4,"four Genesis economy paths must be visible");
       assert.equal(await page.locator(".path-card").count(),6,"six visitor paths missing");
       await page.locator('[data-faq="token"]').click();
-      assert((await page.locator("#guide-answer").innerText()).includes("No WorkforceOS token sale"),
+      assert((await page.locator("#guide-answer").innerText()).includes("There is no issued WorkforceOS token"),
         "Guide must not suggest a token sale");
       await page.locator('[name="name"]').fill("Browser QA");
       await page.locator('[name="email"]').fill("care-"+viewportName+"-"+Date.now()+"@example.org");
