@@ -1,0 +1,57 @@
+name: Test cinematic photo model quality
+on:
+  push:
+    branches: [fix/reference-visual-characters-v9]
+    paths: [.github/workflows/character-quality-probe.yml]
+jobs:
+  cinematic:
+    runs-on: ubuntu-latest
+    timeout-minutes: 14
+    steps:
+      - name: Test two photographic generators with environmental mise en scene
+        run: |
+          python - <<'PY'
+          import json,urllib.request,time
+          from pathlib import Path
+          models=["ICBINP - I Can't Believe It's Not Photography","DreamShaper XL"]
+          prompt=("Cinematic film still in a dim luxurious Victorian library lounge: a confident charismatic 32-year-old "
+                  "woman with soft loose brown curly hair and subtle gold hoop earrings in a dark tailored tweed blazer "
+                  "over an ivory turtleneck stands in front of a softly blurred crowd, wooden shelves and amber pendant "
+                  "lamps, three-quarter chest-up medium shot from below eye level, ample space ABOVE head, whole face "
+                  "and shoulders visible, architectural cinematic environmental portrait, warm amber and cool navy "
+                  "lighting, dramatic chiaroscuro, sophisticated natural skin, DSLR 85mm, elegant premium magazine "
+                  "editorial, photorealistic, deep shadows, no studio backdrop or blank background, vertical composition "
+                  "### passport headshot, plain white background, gray backdrop, cropped hair, cut off forehead, "
+                  "closeup face, fashion catalog, robot, anime, text, watermark")
+          for i,model in enumerate(models):
+            body={"prompt":prompt,"models":[model],
+                  "params":{"width":512,"height":640,"steps":30,"n":1,"seed":str(88001+i*200),
+                            "cfg_scale":7.3},"nsfw":False,"censor_nsfw":True}
+            req=urllib.request.Request("https://stablehorde.net/api/v2/generate/async",
+                data=json.dumps(body).encode(),
+                headers={"Content-Type":"application/json","apikey":"0000000000","Client-Agent":"WOS:2.0:Noetfield"},method="POST")
+            try:
+              with urllib.request.urlopen(req,timeout=30) as r: item=json.load(r)
+              jid=item["id"];print("TEST_MODEL",model,"JOB",jid,flush=True)
+              for n in range(70):
+                time.sleep(9)
+                with urllib.request.urlopen("https://stablehorde.net/api/v2/generate/check/"+jid,timeout=30) as r: state=json.load(r)
+                if n%7==0:print("MODEL_PROGRESS",model,n,state,flush=True)
+                if state.get("done"):break
+                if state.get("faulted") or not state.get("is_possible",True):break
+              with urllib.request.urlopen("https://stablehorde.net/api/v2/generate/status/"+jid,timeout=30) as r: status=json.load(r)
+              gen=(status.get("generations") or [None])[0]
+              if not gen or gen.get("censored"):raise RuntimeError("No usable generation: "+str(status)[:500])
+              with urllib.request.urlopen(gen["img"],timeout=55) as r: payload=r.read(4000000)
+              print("MODEL_READY",model,gen.get("model"),len(payload),flush=True)
+              Path("artifacts").mkdir(exist_ok=True)
+              (Path("artifacts")/("echo-model-"+str(i)+".webp")).write_bytes(payload)
+            except Exception as e:
+              print("MODEL_FAILURE",model,repr(e),flush=True)
+          PY
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: cinematic-model-candidates
+          path: artifacts/echo-model-*.webp
+          if-no-files-found: warn
