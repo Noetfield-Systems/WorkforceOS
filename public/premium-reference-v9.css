@@ -225,3 +225,50 @@ body{background:var(--w9-ivory);color:var(--w9-ink)}
 @media(prefers-reduced-motion:reduce){
  .cinematic-character .agent-character-photo,.agent-grid .agent-card{transition:none!important}
 }
+
+/* Agent Studio — use the same visual vocabulary as the references. */
+body:has(.dna-cinematic-hero){background:#f6f8f8}
+.topbar{background:#0b1d2d!important;color:#f0f8fb!important;border-bottom:1px solid rgba(189,216,229,.22)!important}
+.topbar .brand,.topbar .brand-os,.topbar nav a,.topbar .workspace-link{color:#f0f5f7!important}
+.topbar .brand{font-size:17px;font-weight:730;letter-spacing:-.025em}
+.topbar .brand-mark{font-weight:800;color:#9ad3e5;font-size:23px}
+.topbar nav a[aria-current="page"]{color:#d8f3fc!important;border-bottom:2px solid #9cd7e7}
+.dna-cinematic-hero{position:relative;overflow:hidden;background:
+ radial-gradient(ellipse at 62% 34%,rgba(78,128,158,.3),transparent 43%),
+ linear-gradient(108deg,#0a1b2b,#132e42 85%);min-height:370px!important;color:#edf6fa}
+.dna-cinematic-hero .dna-scene-glass,.dna-cinematic-hero .dna-scene-light,.dna-cinematic-hero .dna-scene-orbit{opacity:.18}
+.dna-cinematic-hero .dna-hero-content{position:relative;z-index:4;width:57%;max-width:850px;
+  padding:46px 20px 45px clamp(28px,5vw,86px)}
+.dna-cinematic-hero .dna-hero-eyebrow{font-size:10px;letter-spacing:.19em;color:#b6d9e7}
+.dna-cinematic-hero h1{font:normal clamp(51px,5.4vw,89px)/.99 var(--serif,Georgia,serif);
+  letter-spacing:-.047em;color:#eff7fa;margin:20px 0}
+.dna-cinematic-hero h1 em{color:#b0daeb;font-weight:400}
+.dna-cinematic-hero h2{color:#e6f2f6;font-size:16px;font-weight:450;max-width:530px}
+.dna-cinematic-hero p{font-size:13px;line-height:1.8;color:#c1d7e2;max-width:535px}
+.dna-cinematic-hero .dna-scene-portrait{position:absolute;inset:0 0 0 auto;width:48%;height:100%;z-index:2;
+  overflow:hidden;filter:none;background:transparent}
+.dna-cinematic-hero .dna-scene-portrait .cinematic-character{height:100%;width:100%;border-radius:0}
+.dna-cinematic-hero .dna-scene-portrait .agent-character-photo{object-position:50% 28%!important}
+.dna-cinematic-hero .dna-scene-portrait:before{content:"";pointer-events:none;position:absolute;inset:0;
+ z-index:4;background:linear-gradient(90deg,#102b40 0%,transparent 30%)}
+.dna-cinematic-hero .dna-hero-actions{display:flex;flex-wrap:wrap;gap:12px;margin:22px 0}
+.dna-cinematic-hero .dna-hero-highlights{display:flex;gap:14px;flex-wrap:wrap;margin-top:22px}
+.dna-cinematic-hero .dna-hero-highlights span{font-size:10px;color:#c8e1e8}
+.studio .rail{background:linear-gradient(180deg,#eef4f6,#f9fbfb);border-right:1px solid #d8e4e7}
+.studio .rail .agent-row{border-radius:8px}
+.studio .workbench h1,.studio .panel h2{font-family:var(--serif,Georgia,serif)}
+.studio .portrait .cinematic-character{border-radius:12px}
+.studio .portrait .agent-character-photo{object-position:50% 31%!important}
+.studio .portrait-mark{position:relative}
+@media(max-width:850px){
+ .dna-cinematic-hero .dna-hero-content{width:65%;padding-left:30px}
+ .dna-cinematic-hero .dna-scene-portrait{width:44%}
+}
+@media(max-width:650px){
+ .dna-cinematic-hero{min-height:630px!important;display:flex;align-items:flex-start}
+ .dna-cinematic-hero .dna-hero-content{width:100%;padding:32px 20px 270px;max-width:none}
+ .dna-cinematic-hero h1{font-size:clamp(46px,12vw,66px)}
+ .dna-cinematic-hero .dna-scene-portrait{top:auto;left:8%;right:0;bottom:0;height:280px;width:92%;border-top-left-radius:11px}
+ .dna-cinematic-hero .dna-scene-portrait:before{background:linear-gradient(180deg,#102b40 0%,transparent 40%)}
+ .dna-cinematic-hero .dna-hero-highlights{gap:10px}
+}
