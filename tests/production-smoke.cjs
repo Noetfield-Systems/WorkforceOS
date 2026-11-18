@@ -29,6 +29,7 @@ const checks=[
     assert.equal(d.redeemable_for_paid_runtime,false);
   }},
   {path:"/api/rewards/me",verify:(s)=>assert.equal(s,401)},
+  ...(!checkingUnmergedPR?[
   {path:"/api/genesis/program",verify:(s,t)=>{
     assert.equal(s,200);
     const d=JSON.parse(t);
@@ -57,7 +58,8 @@ const checks=[
   {path:"/api/genesis/me",verify:(s)=>assert.equal(s,401)},
   ...["/genesis","/genesis/whitepaper","/genesis/docs"].map(path=>({
     path,verify:(s,t)=>{assert.equal(s,200);assert(t.includes("WorkforceOS"))}
-  })),
+  }))
+  ]:[]),
   {path:"/api/rewards/referrals",verify:(s)=>{
     if(checkingUnmergedPR)assert([401,404].includes(s));
     else assert.equal(s,401);
@@ -124,7 +126,9 @@ const checks=[
   {path:"/static/agent-art.js",verify:(s,t)=>{
     assert.equal(s,200);assert(t.includes("src=\"/static/characters/"));
   }},
-  ...["/static/rewards.js","/static/rewards.css","/static/genesis.js","/static/genesis.css","/static/commerce.js",
+  ...["/static/rewards.js","/static/rewards.css",
+      ...(!checkingUnmergedPR?["/static/genesis.js","/static/genesis.css"]:[]),
+      "/static/commerce.js",
       "/static/commerce.css","/static/agent-studio-v7.css"].map(path=>({
     path,verify:(s,t)=>{assert.equal(s,200);assert(t.length>100,path+" must be nonempty")}
   }))
