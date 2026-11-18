@@ -272,3 +272,27 @@ body:has(.dna-cinematic-hero){background:#f6f8f8}
  .dna-cinematic-hero .dna-scene-portrait:before{background:linear-gradient(180deg,#102b40 0%,transparent 40%)}
  .dna-cinematic-hero .dna-hero-highlights{gap:10px}
 }
+
+/* Reference fidelity QA 2: keep persona cross-links separate from the hero caption. */
+@media(min-width:851px){
+ .hero-agent-main{width:67%;margin-left:auto}
+ .hero-agent-mini{left:0;bottom:30px;width:31%;gap:12px}
+ .hero-agent-mini a{min-height:105px;padding:8px;gap:9px}
+ .hero-agent-mini a>.agent-character-art{width:68px!important;height:82px!important}
+ .hero-agent-mini a b{font-size:23px}
+ .hero-agent-details{padding:95px 22px 22px}
+}
+@media(max-width:850px){
+ .hero-agent-showcase{min-height:0;display:flex;flex-direction:column;gap:12px}
+ .hero-agent-main{width:100%;height:460px}
+ .hero-agent-mini{position:relative;left:auto;right:auto;bottom:auto;width:100%;flex-direction:row;gap:12px;margin-top:0}
+ .hero-agent-mini a{flex:1;min-width:0}
+}
+@media(max-width:600px){
+ .hero-agent-main{width:100%;height:400px}
+ .hero-agent-mini{flex-direction:row;width:100%;gap:8px}
+ .hero-agent-mini a{flex:1;min-width:0;min-height:83px}
+ .hero-agent-mini a>.agent-character-art{width:57px!important;height:65px!important}
+ .hero-agent-mini a b{font-size:17px}
+ .hero-agent-mini a small{font-size:9px}
+}
