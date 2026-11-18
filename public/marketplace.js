@@ -100,14 +100,19 @@ function card(item,i,tag=""){
 function cards(items,limit=items.length){return items.slice(0,limit).map((item,i)=>card(item,i,"")).join("");}
 
 function scene({kind,title,subtitle,description,kicker,buttons,footnotes="",breadcrumbs=""}){
- const key=kind==="arena"?"strategy_advisor":kind==="creators"?"creative_partner":kind==="pricing"?"operations_director":"research_analyst";
+ const key=kind==="arena"?"archive_researcher":kind==="creators"?"orion":kind==="pricing"?"financial_analyst":"lyra";
+ const showcase=kind==="arena"?
+ '<div class="scene-agent-pair"><a href="/agents/archive_researcher">'+art("archive_researcher","arena-vesper")+
+ '<span class="arena-photo-label"><strong>Vesper</strong><small>Research & analysis</small></span></a>'+
+ '<a href="/agents/sable">'+art("sable","arena-sable")+
+ '<span class="arena-photo-label"><strong>Sable</strong><small>Operations & execution</small></span></a></div>':art(key,"scene");
  return '<section class="agent-scene scene-'+esc(kind)+'"><div class="wrap scene-stage">'+
  '<div class="scene-copy">'+(breadcrumbs||"")+'<span class="kicker">'+esc(kicker||"WORKFORCEOS / AGENT NETWORK")+'</span>'+
  '<h1>'+title+'</h1>'+(subtitle?'<p class="masthead-subtitle">'+subtitle+'</p>':"")+
  (description?'<p class="scene-description">'+description+'</p>':"")+
  (buttons?'<div class="scene-actions">'+buttons+'</div>':"")+
  (footnotes?'<div class="scene-footnotes">'+footnotes+'</div>':"")+'</div>'+
- '<div class="agent-scene-art">'+art(key,"scene")+'</div></div></section>';
+ '<div class="agent-scene-art">'+showcase+'</div></div></section>';
 }
 
 function sectionHead(kicker,title,desc="",link=""){
@@ -131,22 +136,22 @@ function motif(){
 }
 function home(){
  document.title="WorkforceOS — AI Agent Marketplace | Discover, Configure & Run";
- const featured=["research_analyst","sales_operator","operations_director","product_engineer",
-                 "lyra","financial_analyst","archive_researcher","customer_advocate"]
+ const featured=["orion","lyra","archive_researcher","sable",
+                 "community_builder","sales_operator","product_engineer","elara"]
    .map(id=>S.items.find(x=>x.id===id)).filter(Boolean);
  const count=(S.catalog?.presets||[]).length;
  $("content").innerHTML=
  '<section class="store-hero scene-home"><div class="wrap store-hero-layout"><div class="store-hero-copy">'+
  '<div class="hero-overline"><span class="signal-dot"></span> WORKFORCEOS / AGENT MARKETPLACE</div>'+
- '<h1>Meet the AI agents<br>that <em>get work done.</em></h1>'+
- '<p class="hero-lead">Specialized intelligence. Clear capabilities. Real work.</p>'+
- '<p class="hero-description">Discover ready-to-configure agents for research, sales, development, operations and more. Choose an agent, tailor its DNA, and run it inside your own workspace.</p>'+
+ '<h1>Meet your<br><em>AI workforce.</em></h1>'+
+ '<p class="hero-lead">Distinct personalities. Serious skills. Work that matters.</p>'+
+ '<p class="hero-description">Discover character-led AI specialists built for strategy, research, creation, growth and execution. Choose the right expertise and the right working style.</p>'+
  '<div class="hero-actions">'+button("Explore AI agents","/marketplace")+button("Build your own","/agent-studio","secondary")+'</div>'+
  '<div class="store-hero-meta"><span><strong>'+count+'</strong> official agent configurations</span>'+
  '<span><strong>'+Number(S.catalog?.canonical_count||S.items.length)+'</strong> distinct AI identities</span><span><strong>1</strong> connected execution workspace</span></div></div>'+
  '<div class="hero-agent-showcase"><div class="hero-ui-heading"><span class="signal-dot"></span> AGENTS / EXPLORE</div>'+
- '<div class="hero-agent-main">'+art("research_analyst","hero-main")+'<div class="hero-agent-details"><span>RESEARCH / INTELLIGENCE</span><b>Scout</b><small>Turn an ambiguous question into a structured research brief.</small></div></div>'+
- '<div class="hero-agent-mini">'+["sales_operator","product_engineer"].map(id=>{const a=S.items.find(x=>x.id===id);return '<a href="/agents/'+id+'">'+art(id,"hero-"+id)+'<div><b>'+esc(a?.display||"AI Agent")+'</b><small>'+esc(a?.category||"Specialist")+'</small></div><span>↗</span></a>'}).join("")+'</div>'+
+ '<div class="hero-agent-main">'+art("community_builder","hero-main")+'<div class="hero-agent-details"><span>COMMUNITY / MEMBER EXPERIENCE</span><b>Echo</b><small>A proactive community specialist with both capability and personality.</small></div></div>'+
+ '<div class="hero-agent-mini">'+["orion","lyra"].map(id=>{const a=S.items.find(x=>x.id===id);return '<a href="/agents/'+id+'">'+art(id,"hero-"+id)+'<div><b>'+esc(a?.display||"AI Agent")+'</b><small>'+esc(a?.category||"Specialist")+'</small></div><span>↗</span></a>'}).join("")+'</div>'+
  '</div></div></section>'+
  '<div class="wrap store-quickline"><span>Choose a role</span><i></i><span>Customize Agent DNA</span><i></i><span>Run a real task</span><i></i><span>Review its output</span></div>'+
  '<section class="section wrap" id="featured">'+sectionHead("DISCOVER / CURATED AGENTS",
@@ -220,9 +225,9 @@ function browse(){
  document.title="AI Agent Marketplace — Discover & Build Your Workforce | WorkforceOS";
  const total=S.items.length;
  S.filter="all";S.style="all";S.search="";S.sort="featured";
- const hero=S.items.find(x=>x.id==="research_analyst");
+ const hero=S.items.find(x=>x.id==="lyra");
  const spotOne=S.items.find(x=>x.id==="lyra");
- const spotTwo=S.items.find(x=>x.id==="financial_analyst");
+ const spotTwo=S.items.find(x=>x.id==="archive_researcher");
  $("content").innerHTML=
  '<section class="mp-hero" aria-label="AI Agent Marketplace showcase"><div class="wrap mp-hero-layout">'+
  '<div class="mp-hero-copy"><div class="mp-hero-eyebrow"><span class="mp-live-dot"></span> WORKFORCEOS ORIGINALS <span class="mp-eyebrow-slash">/</span> THE AI AGENT MARKETPLACE</div>'+
@@ -235,12 +240,12 @@ function browse(){
  '<div><strong>'+Number(S.catalog?.canonical_count||total)+'</strong><span>Official specialist identities</span></div>'+
  '<div><strong>01</strong><span>Connected workspace</span></div></div></div>'+
  '<div class="mp-hero-gallery" aria-label="Featured agent characters">'+
- '<a class="mp-hero-center" href="/agents/research_analyst">'+art("research_analyst","market-hero-center")+
- '<span class="mp-image-title"><small>01 / RESEARCH & INTELLIGENCE</small><strong>Scout</strong></span></a>'+
- '<a class="mp-hero-side mp-hero-side-a" href="/agents/sales_operator">'+art("sales_operator","market-hero-sales")+
- '<span class="mp-side-name">Nova / Sales ↗</span></a>'+
- '<a class="mp-hero-side mp-hero-side-b" href="/agents/product_engineer">'+art("product_engineer","market-hero-engineer")+
- '<span class="mp-side-name">Milo / Engineering ↗</span></a>'+
+ '<a class="mp-hero-center" href="/agents/lyra">'+art("lyra","market-hero-center")+
+ '<span class="mp-image-title"><small>01 / CREATIVE STRATEGY</small><strong>Lyra</strong></span></a>'+
+ '<a class="mp-hero-side mp-hero-side-a" href="/agents/orion">'+art("orion","market-hero-sales")+
+ '<span class="mp-side-name">Orion / Strategy ↗</span></a>'+
+ '<a class="mp-hero-side mp-hero-side-b" href="/agents/sable">'+art("sable","market-hero-engineer")+
+ '<span class="mp-side-name">Sable / Operations ↗</span></a>'+
  '<span class="mp-gallery-note">CURATED FOR ACTUAL WORK <i>✳</i></span></div></div></section>'+
  '<div class="mp-trust-strip"><div class="wrap"><span>01 / Choose a specialist</span><span class="mp-trust-arrow">→</span>'+
  '<span>02 / Make its DNA yours</span><span class="mp-trust-arrow">→</span><span>03 / Run a task</span>'+
@@ -486,7 +491,7 @@ function detail(){
  '<div class="review-row"><b>Task references</b><span>Source identifiers</span></div>'+
  '<div class="review-row"><b>Human review</b><span>Recorded preference</span></div></div></div></section>'+
  '<section class="section wrap">'+sectionHead("MORE SPECIALISTS","Continue exploring <em>AI agents.</em>")+
- '<div class="agent-grid editorial-related">'+cards(S.items.filter(x=>x.id!==item.id).slice(0,4))+'</div></section>';
+ '<div class="agent-grid editorial-related">'+cards((p.related_template_ids||[]).map(id=>S.items.find(x=>x.id===id)).filter(Boolean).concat(S.items.filter(x=>x.id!==item.id&&!p.related_template_ids?.includes(x.id))).slice(0,4))+'</div></section>';
 }
 
 function reviewableOutput(side,label){
@@ -536,7 +541,7 @@ async function loadArenaHistory(){
 function arena(){
  document.title="Agent Arena — Compare Real AI Results | WorkforceOS";
  $("content").innerHTML=
- scene({kind:"arena",kicker:"AGENT ARENA / EVIDENCE OVER HYPE",title:"The arena of<br><em>better thinking.</em>",
+ scene({kind:"arena",kicker:"AGENT ARENA / COMPARE SPECIALISTS",title:"Compare specialists.<br><em>See how they work.</em>",
   subtitle:"The same assignment. Two distinct agents.",
   description:"Run a genuine head-to-head test with your saved agents. Read the original outputs and record which result actually helped.",
   buttons:button("Create an Agent","/agent-studio")+button("Browse Agents","/marketplace","secondary")})+
