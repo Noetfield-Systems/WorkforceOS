@@ -88,7 +88,7 @@ const scrub=(value)=>String(value||"").slice(0,350);
       assert((await page.locator(".agent-card").count())===33,"exactly 33 canonical specialists expected");
       const photos=await page.locator(".agent-card .agent-character-photo").evaluateAll(images=>images.map(img=>({
         src:new URL(img.src).pathname,alt:img.alt,loading:img.loading,
-        focus:img.style.objectPosition
+        focus:img.getAttribute("style")||""
       })));
       assert.equal(photos.length,33,"catalog must show 33 unique first-party cinematic portraits");
       assert.equal(new Set(photos.map(p=>p.src)).size,33,"character visual identities cannot repeat");
@@ -96,7 +96,7 @@ const scrub=(value)=>String(value||"").slice(0,350);
         "external robot photos or missing first-party art detected");
       assert(photos.every(p=>p.alt.includes("fictional")||p.alt.includes("Fictional")),
         "agent images must explicitly describe fictional personas");
-      assert(photos.every(p=>p.focus),"per-character focal metadata required");
+      assert(photos.every(p=>p.focus.includes("object-position:")),"per-character focal metadata required");
       console.log("REFERENCE_CHARACTER_ART",viewportName,photos.length);
       await page.locator("[data-style='Historical']").click();
       assert.equal(await page.locator("#market-results .agent-card").count(),1,"historical filter not connected");
