@@ -18,12 +18,13 @@ const checks=[
   {path:"/api/rewards/program",verify:(s,t)=>{
     assert.equal(s,200);const d=JSON.parse(t);
     assert.equal(d.kind,"internal_participation_xp");
-    assert.equal(d.quests.length,4);
+    assert.equal(d.quests.length,5);
     assert.equal(d.monetary_value,false);
     assert.equal(d.token_or_airdrop_entitlement,false);
     assert.equal(d.redeemable_for_paid_runtime,false);
   }},
   {path:"/api/rewards/me",verify:(s)=>assert.equal(s,401)},
+  {path:"/api/rewards/referrals",verify:(s)=>assert.equal(s,401)},
   {path:"/api/agent-dna/catalog",verify:(s,t)=>{
     assert.equal(s,200);const d=JSON.parse(t);
     assert.equal(d.capabilities.ethics_instruction_sync,true);
@@ -37,7 +38,7 @@ const checks=[
   }},
   {path:"/rewards",verify:(s,t)=>{
     assert.equal(s,200);
-    for(const id of ["xp-balance","daily-claim","quiz-submit","feedback-submit"]){
+    for(const id of ["xp-balance","daily-claim","quiz-submit","feedback-submit","invite-create","invite-link"]){
       assert(t.includes('id="'+id+'"'));
     }
   }},
