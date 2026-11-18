@@ -58,6 +58,15 @@ def initialize_support():
         )""")
         db.execute("""CREATE INDEX IF NOT EXISTS support_events_queue_idx
                    ON support_case_events(state,created_at)""")
+        db.execute("""CREATE TABLE IF NOT EXISTS support_case_messages(
+            id bigserial PRIMARY KEY, case_id text NOT NULL
+                 REFERENCES support_cases(id) ON DELETE CASCADE,
+            author text NOT NULL CHECK(author IN ('customer','support')),
+            body text NOT NULL,
+            created_at timestamptz NOT NULL DEFAULT now()
+        )""")
+        db.execute("""CREATE INDEX IF NOT EXISTS support_case_messages_idx
+                   ON support_case_messages(case_id,id)""")
 
 class CaseInput(BaseModel):
     name:str=Field(min_length=2,max_length=100)
@@ -71,6 +80,10 @@ class CaseInput(BaseModel):
 class OperatorUpdate(BaseModel):
     status:str=Field(min_length=3,max_length=25)
     note:str=Field(default="",max_length=600)
+    customer_visible:bool=False
+
+class CustomerReply(BaseModel):
+    message:str=Field(min_length=8,max_length=2000)
 
 def _operator(request:Request):
     key=os.getenv("WORKFORCE_SUPPORT_OPERATOR_KEY","")
@@ -139,9 +152,35 @@ def case_status(case_id:str,request:Request):
     if not row or not hmac.compare_digest(row["receipt_hash"],
                                           hashlib.sha256(token.encode()).hexdigest()):
         raise HTTPException(404,"CASE_NOT_FOUND")
+    with database() as db:
+        messages=db.execute("""SELECT author,body,created_at FROM support_case_messages
+                   WHERE case_id=%s ORDER BY id DESC LIMIT 25""",(case_id,)).fetchall()
     return {"id":row["id"],"status":row["status"],"category":row["category"],
             "created_at":row["created_at"].isoformat(),
-            "updated_at":row["updated_at"].isoformat()}
+            "updated_at":row["updated_at"].isoformat(),
+            "messages":[{"author":m["author"],"body":m["body"],
+                         "created_at":m["created_at"].isoformat()} for m in reversed(messages)]}
+
+@router.post("/cases/{case_id}/reply",status_code=201)
+def customer_reply(case_id:str,request:Request,body:CustomerReply):
+    token=request.headers.get("X-Support-Receipt","")
+    if not case_id.startswith("sup_") or len(token)<32:
+        raise HTTPException(404,"CASE_NOT_FOUND")
+    with database() as db:
+        row=db.execute("SELECT receipt_hash FROM support_cases WHERE id=%s",(case_id,)).fetchone()
+    if not row or not hmac.compare_digest(row["receipt_hash"],
+                                          hashlib.sha256(token.encode()).hexdigest()):
+        raise HTTPException(404,"CASE_NOT_FOUND")
+    with database() as db:
+        if not auth_rate_limit(db,"support_reply:"+case_id,threshold=12):
+            raise HTTPException(429,"TOO_MANY_REPLIES")
+    with database() as db:
+        db.execute("""INSERT INTO support_case_messages(case_id,author,body)
+                      VALUES (%s,'customer',%s)""",(case_id,body.message.strip()))
+        db.execute("UPDATE support_cases SET status='RECEIVED',updated_at=now() WHERE id=%s",(case_id,))
+        db.execute("""INSERT INTO support_case_events(case_id,kind,note)
+                  VALUES (%s,'support.customer_replied',%s)""",(case_id,body.message.strip()[:600]))
+    return {"received":True,"id":case_id,"status":"RECEIVED"}
 
 @router.get("/operator/queue")
 def operator_queue(request:Request):
@@ -167,4 +206,7 @@ def operator_update(event_id:int,request:Request,body:OperatorUpdate):
         if not row:raise HTTPException(404,"EVENT_NOT_QUEUED")
         db.execute("""UPDATE support_cases SET status=%s,updated_at=now()
                        WHERE id=%s""",(body.status,row["case_id"]))
+        if body.customer_visible and body.note.strip():
+            db.execute("""INSERT INTO support_case_messages(case_id,author,body)
+                          VALUES (%s,'support',%s)""",(row["case_id"],body.note.strip()))
     return {"ok":True,"case_id":row["case_id"],"status":body.status}
