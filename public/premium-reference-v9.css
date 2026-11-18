@@ -296,3 +296,30 @@ body:has(.dna-cinematic-hero){background:#f6f8f8}
  .hero-agent-mini a b{font-size:17px}
  .hero-agent-mini a small{font-size:9px}
 }
+
+/* Reference layout correction: Studio editorial headline must anchor at the left. */
+@media(min-width:651px){
+ .dna-cinematic-hero .dna-hero-content{margin:0!important;margin-inline:0!important;width:55%!important;max-width:760px!important;
+   padding:46px 20px 45px clamp(26px,5vw,78px)!important}
+ .dna-cinematic-hero .dna-hero-content>*{max-width:640px}
+ .dna-cinematic-hero .dna-hero-content h1{font-size:clamp(51px,4.65vw,76px);line-height:1.02}
+ #studio-hero-art.dna-scene-portrait{position:absolute!important;top:0!important;right:0!important;bottom:0!important;
+   width:46%!important;height:100%!important;transform:none!important;box-shadow:none!important;
+   padding:0!important;background:#112b3c!important;border:0!important;border-radius:0!important}
+ #studio-hero-art.dna-scene-portrait:before{pointer-events:none}
+}
+.dna-hero-agent-badge{position:absolute;z-index:6;right:26px;bottom:24px;width:min(252px,29%);
+  padding:18px 19px;border-radius:10px;border:1px solid rgba(208,232,242,.4);
+  background:rgba(11,31,48,.76);backdrop-filter:blur(11px);box-shadow:0 15px 34px #071c2d55;
+  color:#f5f9fb}
+.dna-hero-agent-badge>span{font-size:9px;letter-spacing:.16em;color:#a3d3e7;text-transform:uppercase}
+.dna-hero-agent-badge h3{font:normal 36px/1 var(--serif,Georgia,serif);margin:10px 0 5px;color:#fff}
+.dna-hero-agent-badge p{font-size:11px;color:#c6e4ed;margin:5px 0}
+.dna-hero-agent-badge small{font-size:10px;color:#d2e4e9;line-height:1.5}
+@media(max-width:650px){
+ .dna-cinematic-hero .dna-hero-content{margin:0!important;margin-inline:0!important;width:100%!important}
+ #studio-hero-art.dna-scene-portrait{transform:none!important;padding:0!important}
+ .dna-hero-agent-badge{width:180px;right:12px;bottom:14px;padding:12px}
+ .dna-hero-agent-badge h3{font-size:26px}
+ .dna-hero-agent-badge small{font-size:9px}
+}
