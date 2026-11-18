@@ -28,6 +28,7 @@ from .blueprints import available as available_blueprints, plan as blueprint_pla
 from . import fabric_gateway as fabric
 from . import billing
 from . import rewards
+from . import genesis
 from . import hybrid
 from .opportunity_os import router as opportunity_router, initialize_opportunities
 from .collaborate import router as collaboration_router, initialize_collaboration
@@ -68,6 +69,7 @@ async def lifetime(application):
     initialize_people()
     initialize_dna(database)
     rewards.initialize_rewards()
+    genesis.initialize_genesis()
     if fabric.connected():
         # A read-only authenticated source probe uses an empty namespace;
         # it does NOT register a fictitious customer or create test work.
@@ -91,6 +93,7 @@ mimetypes.add_type("image/webp",".webp",strict=True)
 app.mount("/static",StaticFiles(directory=PUBLIC),name="static")
 app.include_router(billing.router)
 app.include_router(rewards.router)
+app.include_router(genesis.router)
 app.include_router(hybrid.router)
 app.include_router(opportunity_router)
 app.include_router(collaboration_router)
@@ -255,6 +258,24 @@ def website():
 @app.get("/rewards/")
 def member_rewards_page():
     return FileResponse(PUBLIC / "rewards.html")
+
+@app.get("/genesis")
+@app.get("/genesis/")
+def genesis_season_page():
+    return FileResponse(PUBLIC / "genesis.html",media_type="text/html",
+                        headers={"Cache-Control":"no-cache"})
+
+@app.get("/genesis/whitepaper")
+@app.get("/genesis/whitepaper/")
+def genesis_whitepaper_page():
+    return FileResponse(PUBLIC / "genesis-whitepaper.html",media_type="text/html",
+                        headers={"Cache-Control":"no-cache"})
+
+@app.get("/genesis/docs")
+@app.get("/genesis/docs/")
+def genesis_docs_page():
+    return FileResponse(PUBLIC / "genesis-docs.html",media_type="text/html",
+                        headers={"Cache-Control":"no-cache"})
 
 @app.get("/commerce")
 @app.get("/commerce/")
