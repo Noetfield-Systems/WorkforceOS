@@ -292,6 +292,11 @@ def genesis_docs_page():
     return FileResponse(PUBLIC / "genesis-docs.html",media_type="text/html",
                         headers={"Cache-Control":"no-cache"})
 
+@app.get("/help/operator")
+def support_operator_console():
+    return FileResponse(PUBLIC/"support-operator.html",media_type="text/html",
+                        headers={"Cache-Control":"no-store"})
+
 @app.get("/help")
 @app.get("/help/")
 def customer_help_center():
