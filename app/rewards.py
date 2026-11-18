@@ -72,6 +72,10 @@ def award(db,tenant,*,kind,claim_key,points,source_id=None):
         (uid("xp"),tenant,claim_key,kind,points,source_id)).fetchone()
     if row:
         event(db,tenant,"participation.earned",row["id"],kind)
+        # Use the same verified XP source insert to issue separate, spendable
+        # in-app WC. There is no second XP ledger or synthetic credit faucet.
+        from .member_world import award_credit
+        award_credit(db,tenant,kind,claim_key)
     return bool(row)
 
 def record_registration_referral(db,workspace_id,referral_code):
@@ -213,9 +217,19 @@ def daily(request:Request):
     today=datetime.now(timezone.utc).date().isoformat()
     with database() as db:
         granted=award(db,tenant,kind="daily_checkin",claim_key="daily:"+today,points=5)
+        from .member_world import _streak, _credit_balance
+        streak=_streak(db,tenant)
+        bonus=False
+        if granted and streak["days"]>0 and streak["days"]%7==0:
+            bonus=award(db,tenant,kind="streak_day7",
+                        claim_key="streak_bonus:"+today,points=10,source_id="daily:7day")
         total=db.execute("SELECT COALESCE(sum(points),0) n FROM participation_points WHERE workspace_id=%s",
                          (tenant,)).fetchone()["n"]
-    return {"awarded":granted,"points":5 if granted else 0,"balance":int(total),"next":"Next UTC calendar day"}
+        credits=_credit_balance(db,tenant)
+    return {"awarded":granted,"points":(5 if granted else 0)+(10 if bonus else 0),
+            "balance":int(total),"credit_balance":credits,
+            "streak_days":streak["days"],"streak_bonus_awarded":bonus,
+            "next":"Next UTC calendar day"}
 
 @router.post("/quiz")
 def quiz(request:Request,body:QuizAnswer):
