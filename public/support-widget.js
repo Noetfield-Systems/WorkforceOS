@@ -9,7 +9,7 @@
   panel.hidden=true;panel.setAttribute("role","dialog");panel.setAttribute("aria-label","WorkforceOS help menu");
   panel.innerHTML='<div class="wos-help-head"><div><strong>How can we help?</strong><p>Explore, build, join—or talk to us.</p></div><button type="button" class="wos-help-close" aria-label="Close support menu">×</button></div>'+
    '<div class="wos-help-body"><p>Pick a path or send a trackable request.</p><div class="wos-help-quick">'+
-   '<a href="/help#guide">Ask the guide ↗</a><a href="/help#plans">Prices & billing ↗</a>'+
+   '<a href="/help#guide">Ask the guide ↗</a><a href="/tokenomics">Tokenomics & price scenarios ↗</a>'+
    '<a href="/genesis/app">Daily claims & play ↗</a><a href="/agent-studio">Agent Studio ↗</a>'+
    '<a href="/help?category=capital#contact">Capital questions ↗</a>'+
    '<a href="/help?category=partnership#contact">Partnerships ↗</a></div>'+
