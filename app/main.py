@@ -30,6 +30,7 @@ from . import billing
 from . import rewards
 from . import genesis
 from . import genesis_arcade
+from . import genesis_credits
 from . import hybrid
 from .opportunity_os import router as opportunity_router, initialize_opportunities
 from .collaborate import router as collaboration_router, initialize_collaboration
@@ -72,6 +73,7 @@ async def lifetime(application):
     rewards.initialize_rewards()
     genesis.initialize_genesis()
     genesis_arcade.initialize_arcade()
+    genesis_credits.initialize_genesis_credits()
     if fabric.connected():
         # A read-only authenticated source probe uses an empty namespace;
         # it does NOT register a fictitious customer or create test work.
@@ -97,6 +99,7 @@ app.include_router(billing.router)
 app.include_router(rewards.router)
 app.include_router(genesis.router)
 app.include_router(genesis_arcade.router)
+app.include_router(genesis_credits.router)
 app.include_router(hybrid.router)
 app.include_router(opportunity_router)
 app.include_router(collaboration_router)

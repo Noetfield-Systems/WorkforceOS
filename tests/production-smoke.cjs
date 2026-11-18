@@ -61,9 +61,11 @@ const checks=[
   {path:"/api/genesis/play/today",verify:(s)=>assert.equal(s,401)},
   {path:"/api/genesis/daily-state",verify:(s)=>assert.equal(s,401)},
   {path:"/api/genesis/sandbox",verify:(s)=>assert.equal(s,401)},
+  {path:"/api/genesis/credits/me",verify:(s)=>assert.equal(s,401)},
+
   {path:"/genesis/app",verify:(s,t)=>{
     assert.equal(s,200);
-    for(const id of ["auth-form","mode-register","mode-login","member-app","claim",
+    for(const id of ["wc-total","wc-balance","wc-shop","wc-history","auth-form","mode-register","mode-login","member-app","claim",
                      "answer","start-demo","buy","sell","stake","invest"]){
       assert(t.includes('id="'+id+'"'),"member app missing "+id);
     }

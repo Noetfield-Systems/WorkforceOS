@@ -72,6 +72,8 @@ def award(db,tenant,*,kind,claim_key,points,source_id=None):
         (uid("xp"),tenant,claim_key,kind,points,source_id)).fetchone()
     if row:
         event(db,tenant,"participation.earned",row["id"],kind)
+        from .genesis_credits import record_earned_credit
+        record_earned_credit(db,tenant,kind=kind,claim_key=claim_key,points=points)
     return bool(row)
 
 def record_registration_referral(db,workspace_id,referral_code):
