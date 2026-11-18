@@ -213,9 +213,12 @@ def daily(request:Request):
     today=datetime.now(timezone.utc).date().isoformat()
     with database() as db:
         granted=award(db,tenant,kind="daily_checkin",claim_key="daily:"+today,points=5)
+        from .genesis_arcade import get_streak,streak_award
+        streak,bonus=streak_award(db,tenant) if granted else (get_streak(db,tenant),0)
         total=db.execute("SELECT COALESCE(sum(points),0) n FROM participation_points WHERE workspace_id=%s",
                          (tenant,)).fetchone()["n"]
-    return {"awarded":granted,"points":5 if granted else 0,"balance":int(total),"next":"Next UTC calendar day"}
+    return {"awarded":granted,"points":(5+bonus) if granted else 0,"streak_days":streak,
+            "streak_bonus_xp":bonus,"balance":int(total),"next":"Next UTC calendar day"}
 
 @router.post("/quiz")
 def quiz(request:Request,body:QuizAnswer):

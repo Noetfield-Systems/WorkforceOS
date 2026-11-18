@@ -19,6 +19,7 @@ const pages=[
  ["/commerce","commerce",".rails .rail"],
  ["/rewards","rewards",".dashboard-grid"],
  ["/genesis","genesis",".join-grid"],
+ ["/genesis/app","genesis-app","#auth-screen .auth-box"],
  ["/genesis/whitepaper","whitepaper",".paper-main"],
  ["/genesis/docs","genesis-docs",".paper-main"]
 ];
@@ -60,6 +61,42 @@ const scrub=(value)=>String(value||"").slice(0,350);
       assert.equal(await page.locator(".rails .rail").count(),3,"hybrid payment rails not rendered");
       assert((await page.locator("#crypto-status").innerText()).includes("Not active"),
         "unverified wallet checkout falsely presented as active");
+    }
+    if(name==="genesis-app"){
+      const email="genesis-browser-"+viewportName+"-"+Date.now()+"@example.org";
+      await page.locator("#workspace").fill("Browser QA "+viewportName);
+      await page.locator("#email").fill(email);
+      await page.locator("#password").fill("Correct-Horse-123456");
+      await page.locator("#auth-submit").click();
+      await page.locator("#member-app").waitFor({state:"visible",timeout:15000});
+      await page.locator("#join-panel").waitFor({state:"visible",timeout:15000});
+      assert.equal(await page.locator("#join-panel").isVisible(),true,"new account must opt into Genesis");
+      await page.locator("#terms").check();
+      await page.locator("#join-button").click();
+      await page.locator("#join-panel").waitFor({state:"hidden",timeout:12000});
+      assert.equal((await page.locator("#xp-total").innerText()).trim(),"10","join must award 10 real XP");
+      await page.locator('[data-view="daily"]').click();
+      await page.locator("#claim").click();
+      await page.waitForFunction(()=>document.getElementById("streak-count").textContent.trim()==="1" && document.getElementById("claim").textContent.includes("Already claimed"));
+      assert.equal((await page.locator("#streak-count").innerText()).trim(),"1");
+      assert.equal((await page.locator("#xp-total").innerText()).trim(),"15","claim must award 5 real XP");
+      await page.locator('[data-view="trade"]').click();
+      await page.locator("#start-demo").click();
+      await page.waitForFunction(()=>document.getElementById("credits").textContent.trim()==="1,000");
+      await page.locator("#trade-amount").fill("2");
+      await page.locator("#buy").click();
+      await page.waitForFunction(()=>document.getElementById("credits").textContent.trim()==="980");
+      assert.equal((await page.locator("#units").innerText()).trim(),"102");
+      await page.locator("#signout").click();
+      await page.locator("#auth-screen").waitFor({state:"visible",timeout:12000});
+      await page.locator("#email").fill(email);
+      await page.locator("#password").fill("Correct-Horse-123456");
+      await page.locator("#auth-submit").click();
+      await page.locator("#member-app").waitFor({state:"visible",timeout:15000});
+      assert.equal((await page.locator("#xp-total").innerText()).trim(),"15","login must preserve earned XP");
+      await page.locator('[data-view="trade"]').click();
+      assert.equal((await page.locator("#credits").innerText()).trim(),"980","demo ledger persisted");
+      await page.locator('[data-view="home"]').click();
     }
     if(name==="genesis"){
       await page.locator("#genesis-quest-grid .quest").first().waitFor({state:"visible"});
@@ -175,7 +212,7 @@ const scrub=(value)=>String(value||"").slice(0,350);
     assert.deepEqual(errors,[],viewportName+" "+url+" frontend errors: "+errors.map(scrub).join(" | "));
     // Filters, search and reset replace card DOM nodes: load the final rendered
     // assets again before screenshot, not the stale images asserted above.
-    if(name!=="whitepaper"&&name!=="genesis-docs"){
+    if(name!=="whitepaper"&&name!=="genesis-docs"&&name!=="genesis-app"){
       const mediaSelector=name==="genesis"?"main img":".agent-character-photo";
     await page.locator(mediaSelector).evaluateAll(images=>images.forEach(img=>img.loading="eager"));
     await page.waitForFunction((selector)=>{
