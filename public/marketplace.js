@@ -73,7 +73,7 @@ function prepare(){
 }
 
 function art(id,context="card"){
- return window.WorkforceAgentArt?.media(id,{context,priority:context==="hero-main"||context==="product"})||'<div class="agent-vector-fallback" aria-hidden="true">AI</div>';
+ return window.WorkforceAgentArt?.media(id,{context,priority:context==="hero-main"||context==="product",altText:S.items.find(x=>x.id===id)?.image?.alt})||'<div class="agent-vector-fallback" aria-hidden="true">AI</div>';
 }
 function button(label,href,variant="primary"){return '<a class="btn btn-'+variant+'" href="'+esc(href)+'">'+label+' <span class="arrow" aria-hidden="true">↗</span></a>';}
 function editLink(item){return item.type==="community"?"/agent-studio?community="+encodeURIComponent(item.id):
@@ -132,7 +132,7 @@ function motif(){
 function home(){
  document.title="WorkforceOS — AI Agent Marketplace | Discover, Configure & Run";
  const featured=["research_analyst","sales_operator","operations_director","product_engineer",
-                 "creative_partner","financial_analyst","archive_researcher","customer_advocate"]
+                 "lyra","financial_analyst","archive_researcher","customer_advocate"]
    .map(id=>S.items.find(x=>x.id===id)).filter(Boolean);
  const count=(S.catalog?.presets||[]).length;
  $("content").innerHTML=
@@ -221,7 +221,7 @@ function browse(){
  const total=S.items.length;
  S.filter="all";S.style="all";S.search="";S.sort="featured";
  const hero=S.items.find(x=>x.id==="research_analyst");
- const spotOne=S.items.find(x=>x.id==="creative_partner");
+ const spotOne=S.items.find(x=>x.id==="lyra");
  const spotTwo=S.items.find(x=>x.id==="financial_analyst");
  $("content").innerHTML=
  '<section class="mp-hero" aria-label="AI Agent Marketplace showcase"><div class="wrap mp-hero-layout">'+

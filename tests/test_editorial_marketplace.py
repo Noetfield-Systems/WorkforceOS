@@ -32,9 +32,9 @@ class EditorialMarketplaceTests(unittest.TestCase):
         self.assertEqual(catalog.status_code,200)
         presets=catalog.json()["presets"]
         self.assertEqual(len(presets),33)
-        self.assertEqual(len({p["id"] for p in presets}),12)
-        self.assertEqual(len({p["profile"]["name"] for p in presets}),12)
-        self.assertEqual(len({p["profile"]["role"] for p in presets}),12)
+        self.assertEqual(len({p["id"] for p in presets}),33)
+        self.assertEqual(len({p["profile"]["name"] for p in presets}),33)
+        self.assertEqual(len({p["profile"]["role"] for p in presets}),33)
         for key in ("archive_researcher","financial_analyst","operations_director",
                     "customer_advocate","strategy_advisor","field_observer"):
             p=preset_profile(key)
@@ -55,7 +55,7 @@ class EditorialMarketplaceTests(unittest.TestCase):
         self.assertIn("marketplace.js?v=20261117-v8",html.text)
         self.assertIn("/static/marketplace-v7.css",html.text)
         self.assertIn("/static/marketplace-v6.css",html.text)
-        self.assertIn("agent-art.js?v=20261117-v6",html.text)
+        self.assertIn("agent-art.js?v=20261117-v8",html.text)
         self.assertIn("/static/marketplace.js",html.text)
         studio=self.client.get("/agent-studio")
         self.assertEqual(studio.status_code,200)

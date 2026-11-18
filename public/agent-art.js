@@ -200,7 +200,7 @@
    const img="https://images.unsplash.com/"+entry.photo+"?auto=format&fit=crop&w="+quality+"&q=88";
    return '<div class="agent-character-art agent-tone-'+entry.tone+' agent-id-'+key+
      '" data-agent-art="'+key+'">'+fallback+
-     '<img class="agent-character-photo" src="'+img+'" alt="" decoding="async" loading="'+
+     '<img class="agent-character-photo" src="'+img+'" alt="'+String(options.altText||"Fictional AI character visual identity").replace(/["<>]/g,"")+'" decoding="async" loading="'+
      (options.priority?"eager":"lazy")+'" fetchpriority="'+(options.priority?"high":"auto")+
      '" style="object-position:'+entry.focus+'">'+
      '<span class="agent-character-vignette" aria-hidden="true"></span>'+
