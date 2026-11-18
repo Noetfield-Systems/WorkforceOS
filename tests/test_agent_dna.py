@@ -51,6 +51,10 @@ class AgentDNATests(unittest.TestCase):
         self.assertFalse(catalog.json()["capabilities"]["custom_tool_grants"])
         self.assertFalse(catalog.json()["capabilities"]["marketplace_checkout"])
         p=preset_profile("research_analyst")
+        self.assertEqual(p["visual_identity"],"research_analyst")
+        self.assertTrue(p["expertise_domains"])
+        self.assertTrue(p["related_template_ids"])
+        self.assertIn("EXPECTED OUTPUT TYPES",compile_instructions(p))
         self.assertIn("Mission".upper(),compile_instructions(p))
         self.assertIn("SKILLS AND DELIVERABLE STANDARDS",compile_instructions(p))
         p["requested_tools"]=["github","email"]

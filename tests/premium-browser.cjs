@@ -124,8 +124,8 @@ const scrub=(value)=>String(value||"").slice(0,350);
       assert.equal(await page.locator("#market-results").getAttribute("data-density"),"gallery",
         "gallery layout switch not wired");
       await page.locator("[data-shelf-category='Operations']").click();
-      assert.equal(await page.locator("#market-results .agent-card").count(),1,
-        "browse-by-specialization shelf not wired to catalog filter");
+      assert.equal(await page.locator("#market-results .agent-card").count(),3,
+        "operations shelf must include Sable, Atlas and Terra");
       assert((await page.locator("#market-results").innerText()).includes("Atlas"),
         "operations filter did not show actual agent");
       await page.locator("#reset-filters").click();

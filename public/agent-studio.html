@@ -77,6 +77,7 @@
             </div>
             <label class="field">CORE MISSION <textarea id="mission" maxlength="900" minlength="12" rows="4" placeholder="What does this agent exist to accomplish?"></textarea><small>A precise mission improves task delegation and evaluation.</small></label>
             <label class="field">CHARACTER BACKSTORY <span class="optional">OPTIONAL / FICTIONAL</span><textarea id="backstory" maxlength="500" rows="3" placeholder="An optional fictional persona and perspective — not a claim of real qualifications."></textarea></label>
+            <label class="field">WORKING STYLE <span class="optional">PERSONA CONTRACT</span><textarea id="work_style" maxlength="400" rows="2" placeholder="How should this specialist collaborate, reason and communicate?"></textarea></label>
             <div class="subheading"><span>COMMUNICATION SIGNATURE</span><small>Choose a dominant style</small></div>
             <div class="tone-grid" id="tones">
               <button type="button" data-tone="professional"><span>◇</span><b>Professional</b><small>Direct, precise</small></button>
@@ -99,6 +100,9 @@
             <div class="panel-heading"><span class="count-chip">03 / CAPABILITIES</span><h2>Useful by <em>design.</em></h2><p>Give the agent a skill profile, context and a working contract.</p></div>
             <div class="subheading"><span>SKILL LIBRARY</span><small>Instruction-based specializations</small></div>
             <div id="skills" class="skill-grid"></div>
+            <div class="subheading"><span>DOMAIN EXPERTISE & EXPECTED OUTPUTS</span><small>Validated instruction-level fields</small></div>
+            <label class="field">DOMAIN FOCUS <input id="expertise_domains" maxlength="240" placeholder="e.g. Community, Lifecycle, Growth"><small>Comma-separated; up to eight domains.</small></label>
+            <label class="field">EXPECTED DELIVERABLES <textarea id="deliverables" rows="3" placeholder="One output per line, e.g. Engagement brief"></textarea><small>Up to eight output types; used in agent instructions.</small></label>
             <div class="subheading"><span>OPERATING CONTRACT</span><small>Bounded by runtime permissions</small></div>
             <label class="field">AUTONOMY <select id="autonomy">
               <option value="advice">Advisor — consultation only</option>

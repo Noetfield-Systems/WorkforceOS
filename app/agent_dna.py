@@ -133,6 +133,11 @@ class Profile(BaseModel):
     role:str=Field(min_length=3,max_length=90)
     mission:str=Field(min_length=12,max_length=900)
     backstory:str=Field(default="",max_length=500)
+    work_style:str=Field(default="",max_length=400)
+    expertise_domains:list[str]=Field(default_factory=list,max_length=8)
+    deliverables:list[str]=Field(default_factory=list,max_length=8)
+    related_template_ids:list[str]=Field(default_factory=list,max_length=8)
+    visual_identity:str=Field(default="",max_length=60)
     tone:Literal["professional","friendly","analytical","bold","playful"]="professional"
     traits:Traits=Field(default_factory=Traits)
     values:list[Literal["honesty","privacy","accuracy","empathy","fairness","transparency","curiosity","speed","craft","autonomy"]]=Field(default_factory=lambda:["honesty","accuracy"])
@@ -145,14 +150,15 @@ class Profile(BaseModel):
     knowledge_ids:list[str]=Field(default_factory=list,max_length=4)
     requested_tools:list[Literal["web","crm","github","calendar","email"]]=Field(default_factory=list,max_length=5)
 
-    @field_validator("values","skills","knowledge_ids","requested_tools")
+    @field_validator("values","skills","knowledge_ids","requested_tools",
+                     "expertise_domains","deliverables","related_template_ids")
     @classmethod
     def unique_items(cls,v):
         if len(set(v))!=len(v):
             raise ValueError("Duplicate values are not allowed")
         return v
 
-    @field_validator("name","role","mission","backstory")
+    @field_validator("name","role","mission","backstory","work_style","visual_identity")
     @classmethod
     def normalize(cls,v):
         return v.strip()
@@ -194,8 +200,16 @@ def default_profile(agent):
 def preset_profile(preset_id):
     p=next((x for x in PRESETS if x["id"]==preset_id),None)
     if not p:raise HTTPException(status_code=404,detail="PRESET_NOT_FOUND")
+    identity=BY_ID.get(preset_id,{})
+    related=[x["id"] for x in ROSTER if x.get("directory")==identity.get("directory")
+             and x["id"]!=preset_id][:3] if identity else []
     return Profile(name=p["name"],role=p["role"],mission=p["mission"],backstory=p.get("backstory",""),
-                   tone=p["tone"],skills=p["skills"],traits=Traits(**p["traits"])).model_dump()
+                   tone=p["tone"],skills=p["skills"],traits=Traits(**p["traits"]),
+                   work_style=("A "+identity["character"].lower()+" professional perspective; "
+                               +identity["signature"]+".") if identity else "",
+                   expertise_domains=[identity["category"]] if identity else [],
+                   deliverables=identity.get("strengths",[]) if identity else [],
+                   related_template_ids=related,visual_identity=preset_id if identity else "").model_dump()
 
 def compile_instructions(profile):
     """A bounded human-readable instruction contract actually sent through Fabric."""
@@ -249,6 +263,10 @@ def compile_instructions(profile):
         "When uncertain, identify missing evidence. Distinguish proposals, model outputs and verified external outcomes.",
     ]
     if p.backstory:pieces.insert(3,"FICTIONAL CHARACTER BACKSTORY (style only; not real-world credentials): "+p.backstory)
+    # These are instruction-level expectations, not tool grants or actual performance.
+    if p.expertise_domains:pieces.append("DOMAIN FOCUS: "+", ".join(p.expertise_domains)+".")
+    if p.work_style:pieces.append("WORKING STYLE: "+p.work_style)
+    if p.deliverables:pieces.append("EXPECTED OUTPUT TYPES: "+", ".join(p.deliverables)+".")
     # Model preference and requested tools are metadata, NOT currently passed to Fabric:
     # the bridge does not support per-customer tool grants or model selection.
     output="\n".join(pieces)
