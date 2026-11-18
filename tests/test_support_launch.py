@@ -60,6 +60,12 @@ class SupportLaunchTests(unittest.TestCase):
           "X-Support-Receipt":result["receipt"]})
         self.assertEqual(valid.status_code,200)
         self.assertEqual(valid.json()["category"],"bug")
+        reply=self.client.post("/api/support/cases/"+ref+"/reply",
+            json={"message":"Additional device details: Mac desktop with Safari."},
+            headers={**HEADERS,"X-Support-Receipt":result["receipt"]})
+        self.assertEqual(reply.status_code,201,reply.text)
+        self.assertEqual(len(self.client.get("/api/support/cases/"+ref,
+             headers={"X-Support-Receipt":result["receipt"]}).json()["messages"]),1)
         from app.storage import database
         with database() as db:
             row=db.execute("SELECT page_path,priority,receipt_hash FROM support_cases WHERE id=%s",(ref,)).fetchone()
@@ -78,7 +84,7 @@ class SupportLaunchTests(unittest.TestCase):
             self.assertEqual(event["state"],"QUEUED")
             self.assertFalse(queue.json()["auto_repair_enabled"])
             done=self.client.post("/api/support/operator/events/"+str(event["event_id"]),
-              json={"status":"INVESTIGATING","note":"Triage assigned"},
+              json={"status":"INVESTIGATING","note":"Triage assigned","customer_visible":True},
               headers={**HEADERS,"X-Workforce-Support-Key":key})
             self.assertEqual(done.status_code,200,done.text)
             again=self.client.post("/api/support/operator/events/"+str(event["event_id"]),
@@ -90,6 +96,7 @@ class SupportLaunchTests(unittest.TestCase):
         updated=self.client.get("/api/support/cases/"+ref,headers={
           "X-Support-Receipt":result["receipt"]})
         self.assertEqual(updated.json()["status"],"INVESTIGATING")
+        self.assertEqual(updated.json()["messages"][-1]["body"],"Triage assigned")
 
     def test_bad_category_honeypot_and_no_admin_exposure(self):
         body={"name":"QA Client","email":"qa"+uuid.uuid4().hex[:9]+"@example.org",
