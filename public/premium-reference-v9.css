@@ -1,0 +1,227 @@
+/* WorkforceOS — reference fidelity v9
+   Source: the four Founder-provided cinematic character / editorial UI references.
+   Real UI components and first-party character art, no storefront mockups. */
+:root{--w9-navy:#091a2a;--w9-deep:#0c2336;--w9-ink:#13273a;--w9-soft:#a5d9eb;--w9-ivory:#f5f7f7;--w9-border:#d5e1e7;--w9-glass:rgba(11,31,48,.76)}
+html{scroll-behavior:smooth}
+body{background:var(--w9-ivory);color:var(--w9-ink)}
+.site-header{background:#0a1a29;border-bottom:1px solid rgba(188,213,224,.19);color:#f0f4f7}
+.site-header a,.mobile-nav a{letter-spacing:.01em}
+.site-header .brand,.nav-actions a{color:#edf3f7}
+.site-header .nav-primary{color:#102536;background:#f0f5f7}
+.cinematic-character{position:relative;width:100%;height:100%;overflow:hidden;
+  background:linear-gradient(145deg,#142b41 0%,#26465a 54%,#101d2b 100%)}
+.cinematic-character .cinematic-portrait-placeholder{position:absolute;inset:0;display:grid;place-items:center;
+  background:radial-gradient(ellipse at 58% 32%,rgba(119,171,197,.21),transparent 52%),linear-gradient(130deg,#0f2438,#19354a)}
+.cinematic-portrait-placeholder span{font:italic 48px/.95 var(--serif,Georgia,serif);
+  letter-spacing:-2px;color:rgba(231,243,246,.35)}
+.cinematic-character .agent-character-photo{position:absolute;inset:0;width:100%;height:100%;
+  display:block;object-fit:cover;object-position:50% 34%;filter:saturate(.9) contrast(1.03);
+  transition:transform .6s ease,opacity .35s ease}
+.cinematic-character .agent-character-vignette{position:absolute;inset:0;z-index:2;pointer-events:none;
+  background:linear-gradient(180deg,rgba(9,23,36,.04) 30%,rgba(9,23,36,.35) 62%,rgba(7,19,31,.9) 100%)}
+.cinematic-character .agent-character-light{display:none}
+.cinematic-character .agent-char-label{color:#d5eaf4;letter-spacing:.16em;font-size:9px}
+.cinematic-character .agent-char-index{font-size:10px;letter-spacing:.13em;color:#e2edf3}
+.cinematic-character .agent-character-photo.image-error{display:none}
+/* Homepage: a cinematic portrait at the visual center, not a boxed robot UI. */
+.store-hero.scene-home{background:radial-gradient(ellipse at 70% 34%,rgba(56,108,141,.33),transparent 55%),
+  linear-gradient(120deg,#081828 0%,#0d2335 54%,#112b40 100%);isolation:isolate}
+.store-hero:before{content:"";position:absolute;inset:0;pointer-events:none;
+  background-image:linear-gradient(90deg,rgba(231,247,255,.035) 1px,transparent 1px);
+  background-size:100px 100px;opacity:.35}
+.store-hero:after{display:none}
+.store-hero-layout{width:min(calc(100% - 96px),1510px);max-width:1510px;
+  display:grid;grid-template-columns:minmax(0,.91fr) minmax(0,1.09fr);
+  gap:clamp(30px,4vw,70px);align-items:center;min-height:660px;padding-block:66px 64px}
+.store-hero-copy{position:relative;z-index:3}
+.store-hero .hero-overline,.store-hero .hero-overline *{color:#bad4e0}
+.store-hero .hero-overline{font-size:10px;letter-spacing:.22em}
+.store-hero h1{font:normal clamp(66px,6.1vw,104px)/.98 var(--serif,Georgia,serif);
+  letter-spacing:-.052em;color:#f2f6f8;max-width:710px;margin:27px 0 18px}
+.store-hero h1 em{color:#b1d8e9;font-weight:400}
+.store-hero .hero-lead{font-size:17px;line-height:1.6;color:#e8f3f7;font-weight:450}
+.store-hero .hero-description{max-width:510px;font-size:14px;color:#c5d6df;line-height:1.85}
+.store-hero .hero-actions{display:flex;flex-wrap:wrap;gap:12px;margin-top:28px}
+.store-hero .hero-actions .btn{min-height:47px;padding:13px 18px;font-size:12px;font-weight:720}
+.store-hero .store-hero-meta{margin-top:42px;padding-top:22px;border-top:1px solid rgba(211,231,241,.24);
+  display:flex;align-items:flex-start;gap:34px}
+.store-hero-meta span{font-size:11px;color:#b2cbd8;line-height:1.4}
+.store-hero-meta strong{display:block;font:normal 28px/1.2 var(--serif,Georgia,serif);color:#f2f7f9}
+.hero-agent-showcase{position:relative;border:0;background:none;box-shadow:none;
+  padding:0;width:100%;max-width:755px;min-height:560px}
+.hero-agent-showcase:before{display:none}
+.hero-agent-showcase .hero-ui-heading{position:absolute;left:20%;top:17px;z-index:5;color:#e1edf3;
+  font-size:10px;letter-spacing:.19em}
+.hero-agent-main{position:relative;margin-left:auto;width:84%;height:540px;max-width:none;
+  overflow:hidden;border-radius:13px;border:1px solid rgba(204,227,238,.41);
+  box-shadow:0 24px 70px rgba(0,7,17,.35)}
+.hero-agent-main .agent-character-art{height:100%}
+.hero-agent-main .agent-character-photo{object-position:50% 31%!important}
+.hero-agent-details{z-index:5;position:absolute;inset:auto 0 0!important;
+  background:linear-gradient(0deg,rgba(6,20,33,.94),rgba(6,20,33,.1));padding:105px 24px 30px}
+.hero-agent-details b{font:normal 52px/.98 var(--serif,Georgia,serif);letter-spacing:-.035em;color:#fff}
+.hero-agent-details span{font-size:10px;letter-spacing:.2em;color:#b5d8e7}
+.hero-agent-details small{font-size:13px;color:#d5e6eb;line-height:1.6}
+.hero-agent-mini{position:absolute;z-index:6;left:0;bottom:34px;width:39%;display:flex;flex-direction:column;gap:13px}
+.hero-agent-mini a{display:flex;align-items:center;gap:11px;min-height:110px;
+  padding:10px;border:1px solid rgba(189,220,231,.49);border-radius:11px;
+  background:rgba(10,29,46,.81);box-shadow:0 15px 34px rgba(2,13,22,.24);
+  backdrop-filter:blur(12px);color:#f6fafc}
+.hero-agent-mini a>.agent-character-art{width:82px!important;height:85px!important;border-radius:8px;flex:none}
+.hero-agent-mini a b{font:normal 26px/1 var(--serif,Georgia,serif);color:#f4f9fa}
+.hero-agent-mini a small{display:block;margin-top:8px;color:#b3d9e8;font-size:10px}
+.hero-agent-mini a>span:last-child{margin-left:auto;color:#c5e4ed}
+.store-quickline{border-bottom:1px solid #dbe4e7;padding-block:23px;color:#3e6378}
+/* Editorial gallery and four directories */
+.mp-hero{background:linear-gradient(117deg,#071828,#10293e 74%,#1b3b50)}
+.mp-hero-layout{min-height:635px;gap:46px;padding-block:60px}
+.mp-hero h1{font:normal clamp(66px,6.5vw,112px)/.97 var(--serif,Georgia,serif);
+  letter-spacing:-.052em}
+.mp-hero .mp-hero-lead{font-size:22px}
+.mp-hero-gallery{min-height:560px}
+.mp-hero-center{left:16%;width:63%;height:95%;top:1%;border-radius:12px}
+.mp-hero-side{border:1px solid rgba(196,219,230,.48);box-shadow:0 22px 40px #0005}
+.mp-hero-side-a{top:22%;left:0;width:35%;height:49%}
+.mp-hero-side-b{right:0;bottom:7%;width:35%;height:48%}
+.mp-hero-gallery .agent-character-photo,.mp-feature-image .agent-character-photo{object-fit:cover}
+.mp-hero-proof strong{font-family:var(--serif,Georgia,serif)}
+.wos-directory-hub .wos-directory-tile{background:linear-gradient(145deg,#ffffff,#eef5f6);border:1px solid #d3e2e7}
+.wos-directory-tile h3{font:normal clamp(24px,2.25vw,36px)/1.05 var(--serif,Georgia,serif)}
+/* Every full catalog tile is a photographic, editorial character product. */
+.agent-grid,.featured-agent-grid,.mp-agent-results,.editorial-related{display:grid;
+  grid-template-columns:repeat(4,minmax(0,1fr));gap:14px;align-items:stretch}
+.agent-grid .agent-card{position:relative;display:block;min-height:460px;height:460px;overflow:hidden;
+  padding:0!important;border-radius:11px;border:1px solid #d0dce2;background:#142c40;
+  box-shadow:0 15px 28px rgba(19,39,55,.09);transition:transform .25s,box-shadow .25s}
+.agent-grid .agent-card:hover{transform:translateY(-3px);box-shadow:0 20px 38px rgba(13,34,49,.2)}
+.agent-grid .agent-card .card-art{display:block;position:absolute;inset:0;z-index:1;
+  height:100%!important;width:100%!important;overflow:hidden;border-radius:0}
+.agent-grid .agent-card .agent-svg-stage,
+.agent-grid .agent-card .agent-character-art{height:100%!important;width:100%!important}
+.agent-grid .agent-card .agent-character-photo{height:100%!important;object-fit:cover!important}
+.agent-grid .agent-card .card-body{position:absolute;left:0;right:0;bottom:0;z-index:4;
+  display:block;min-height:0!important;pointer-events:none;padding:90px 20px 19px!important;
+  background:linear-gradient(0deg,rgba(5,20,33,.98) 4%,rgba(7,25,41,.87) 56%,transparent 100%);color:#f4f7f8;border:0}
+.agent-grid .agent-card .card-body a,.agent-grid .agent-card .card-body button{pointer-events:auto}
+.agent-grid .agent-card .card-topline{display:flex;gap:8px;flex-wrap:wrap;align-items:center;margin-bottom:8px}
+.agent-grid .agent-card .card-category,.agent-grid .agent-card .edition-label{font-size:9px!important;
+  letter-spacing:.17em;color:#cce3ef!important}
+.agent-grid .agent-card h3,.agent-grid .agent-card h3 a{color:#fff!important;font:normal 38px/.99 var(--serif,Georgia,serif)!important;
+  letter-spacing:-.025em;margin:0 0 9px}
+.agent-grid .agent-card .card-role{font-size:10px;color:#b1d9e8!important;letter-spacing:.14em;text-transform:uppercase}
+.agent-grid .agent-card .card-mission{display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;
+  overflow:hidden;line-height:1.54;color:#dce9ed!important;font-size:12px;margin:10px 0 13px}
+.agent-grid .agent-card .card-tags{display:flex;flex-wrap:wrap;gap:5px;margin-bottom:9px}
+.agent-grid .agent-card .card-tags .pill{border:1px solid rgba(208,231,240,.49);color:#e8f4f8;
+  background:rgba(14,38,55,.55);font-size:9px;padding:4px 8px}
+.agent-grid .agent-card .card-foot{display:flex;align-items:center;justify-content:space-between;
+  border-top:1px solid rgba(222,241,246,.19);padding-top:10px;color:#c2d9e4!important;font-size:10px}
+.agent-grid .agent-card .card-foot a{color:#f4f9fb!important;font-weight:650}
+.agent-grid .agent-card .card-compare{pointer-events:auto;color:#e7f5f8!important;
+  background:rgba(15,48,68,.85)!important;border-color:rgba(208,234,240,.45)!important}
+.mp-agent-results[data-density="compact"] .agent-card{height:360px;min-height:360px}
+.mp-agent-results[data-density="compact"] .card-body{padding-top:65px!important}
+.mp-feature-tile{height:460px;border-radius:11px;overflow:hidden}
+.mp-feature-glass{background:linear-gradient(0deg,rgba(6,20,34,.94),transparent)}
+/* Detail pages */
+.product-hero{background:linear-gradient(110deg,#071726,#10293b 72%,#203f52);color:#eff8fb}
+.product-hero .breadcrumb a,.product-hero .breadcrumb{color:#b8d4e1}
+.product-hero .detail-heading h1{font:normal clamp(60px,6vw,102px)/.93 var(--serif,Georgia,serif);color:#f4f9fb}
+.product-hero .detail-heading h2{font:italic normal clamp(29px,3vw,52px)/1.1 var(--serif,Georgia,serif);color:#b5dced}
+.product-hero .product-deck{color:#d4e2e9;font-size:14px;line-height:1.75}
+.product-hero .detail-stage{align-items:stretch;gap:24px}
+.product-hero .product-portrait{min-height:510px;border:1px solid #618198;border-radius:12px;overflow:hidden}
+.product-hero .product-portrait .agent-character-art{height:100%}
+.product-hero .detail-buy{background:rgba(240,249,252,.08);border:1px solid rgba(210,232,242,.3);
+  border-radius:12px;backdrop-filter:blur(16px)}
+.product-hero .detail-buy p,.product-hero .detail-props span{color:#d0e0e8}
+.product-hero .detail-props b,.product-hero .detail-price{color:#fff}
+.wos-agent-professional article{background:#fafcfc}
+.wos-agent-professional h3{font:normal 32px/1.13 var(--serif,Georgia,serif)}
+/* Full-width agent cinematography in creators and two-up Arena */
+.scene-creators,.scene-arena{background:linear-gradient(110deg,#091a2b,#14354a);color:#f5f8fb;overflow:hidden}
+.scene-creators .scene-stage,.scene-arena .scene-stage{display:grid;
+ grid-template-columns:minmax(0,.7fr) minmax(0,1.3fr);gap:38px;min-height:540px;
+ padding-block:54px;align-items:center}
+.scene-creators .scene-copy h1,.scene-arena .scene-copy h1{font:normal clamp(52px,5vw,85px)/.98 var(--serif,Georgia,serif);
+  color:#f6f8fa;letter-spacing:-.04em}
+.scene-creators .scene-copy h1 em,.scene-arena .scene-copy h1 em{color:#a8d7eb}
+.scene-creators .scene-copy,.scene-arena .scene-copy{position:relative;z-index:3}
+.scene-creators .scene-description,.scene-arena .scene-description{font-size:14px;line-height:1.8;color:#d1e3ea}
+.scene-creators .agent-scene-art{height:460px;min-height:460px;overflow:hidden;border:1px solid #638496;
+  border-radius:13px;box-shadow:0 22px 62px #020c17a6}
+.scene-creators .agent-scene-art>.agent-character-art{height:100%}
+.scene-agent-pair{display:grid;grid-template-columns:1fr 1fr;gap:13px;width:100%;height:100%}
+.scene-agent-pair>a{position:relative;display:block;min-width:0;overflow:hidden;border-radius:11px;
+  border:1px solid rgba(179,216,235,.48);color:#fff}
+.scene-agent-pair .agent-character-art{height:100%}
+.arena-photo-label{position:absolute;z-index:5;bottom:0;left:0;right:0;padding:50px 19px 22px;
+  background:linear-gradient(0deg,rgba(5,21,35,.9),transparent)}
+.arena-photo-label strong{display:block;font:normal 41px/.98 var(--serif,Georgia,serif)}
+.arena-photo-label small{display:block;color:#bfdbe8;letter-spacing:.14em;margin-top:7px;font-size:10px;text-transform:uppercase}
+.scene-arena .agent-scene-art{height:500px;min-height:500px;width:100%;box-shadow:none;background:transparent;border:0}
+/* UI polish across widgets */
+.btn,.nav-primary,.mp-hero-primary{border-radius:6px}
+.section-intro h2,.mp-editorial-heading h2,.profile-section-heading h2{letter-spacing:-.04em}
+.section-intro .kicker,.mp-editorial-heading .kicker,.profile-section-heading .kicker{font-weight:700;letter-spacing:.18em}
+.cinematic-character img[loading="lazy"]{content-visibility:auto}
+@media(max-width:1150px){
+ .store-hero-layout{gap:28px;min-height:590px}
+ .hero-agent-showcase{min-height:490px}
+ .hero-agent-main{height:470px}
+ .hero-agent-mini{width:46%;bottom:20px}
+ .agent-grid,.featured-agent-grid,.mp-agent-results,.editorial-related{grid-template-columns:repeat(3,minmax(0,1fr))}
+ .scene-creators .scene-stage,.scene-arena .scene-stage{grid-template-columns:1fr 1.1fr}
+ .scene-arena .agent-scene-art{height:420px;min-height:420px}
+}
+@media(max-width:850px){
+ .store-hero-layout{display:flex;flex-direction:column;min-height:0;padding-block:40px 50px}
+ .store-hero-copy{max-width:760px;width:100%}
+ .hero-agent-showcase{max-width:740px;min-height:510px;width:100%}
+ .hero-agent-main{width:85%;height:485px}
+ .hero-agent-mini{width:42%}
+ .agent-grid,.featured-agent-grid,.mp-agent-results,.editorial-related{grid-template-columns:repeat(2,minmax(0,1fr))}
+ .mp-hero-gallery{min-height:480px}
+ .scene-creators .scene-stage,.scene-arena .scene-stage{grid-template-columns:1fr;gap:25px}
+ .scene-creators .agent-scene-art{height:430px;min-height:430px}
+ .scene-arena .agent-scene-art{height:440px;min-height:440px}
+ .product-hero .product-portrait{min-height:430px}
+}
+@media(max-width:600px){
+ .wrap,.nav-container,.store-hero-layout{width:min(calc(100% - 32px),100%);margin-inline:auto}
+ .store-hero h1{font-size:clamp(52px,14vw,73px);letter-spacing:-.053em}
+ .store-hero .hero-lead{font-size:16px}
+ .store-hero .store-hero-meta{gap:15px;flex-wrap:wrap;margin-top:31px}
+ .store-hero-meta span{flex:1;min-width:100px}
+ .hero-agent-showcase{min-height:450px}
+ .hero-agent-main{width:86%;height:420px}
+ .hero-agent-mini{width:50%;bottom:14px}
+ .hero-agent-mini a{min-height:85px;padding:7px;gap:7px}
+ .hero-agent-mini a>.agent-character-art{width:58px!important;height:70px!important}
+ .hero-agent-mini a b{font-size:19px}
+ .hero-agent-mini a small{font-size:9px}
+ .hero-agent-details b{font-size:40px}
+ .hero-agent-details{padding:70px 16px 18px}
+ .mp-hero h1{font-size:clamp(55px,12.8vw,73px)}
+ .mp-hero-gallery{min-height:380px}
+ .agent-grid,.featured-agent-grid,.mp-agent-results,.editorial-related{grid-template-columns:repeat(2,minmax(0,1fr));gap:9px}
+ .agent-grid .agent-card{height:320px;min-height:320px}
+ .agent-grid .agent-card .card-body{padding:72px 11px 12px!important}
+ .agent-grid .agent-card h3,.agent-grid .agent-card h3 a{font-size:27px!important}
+ .agent-grid .agent-card .card-mission{font-size:10px;-webkit-line-clamp:2;margin:7px 0}
+ .agent-grid .agent-card .card-role{font-size:9px}
+ .agent-grid .agent-card .card-tags{gap:3px}
+ .agent-grid .agent-card .card-tags .pill{font-size:8px;padding:3px 5px}
+ .agent-grid .agent-card .card-foot{font-size:9px}
+ .agent-grid .agent-card .card-foot span{display:none}
+ .scene-creators .scene-stage,.scene-arena .scene-stage{padding-block:34px}
+ .scene-creators .scene-copy h1,.scene-arena .scene-copy h1{font-size:54px}
+ .scene-creators .agent-scene-art{height:340px;min-height:340px}
+ .scene-arena .agent-scene-art{height:380px;min-height:380px}
+ .arena-photo-label strong{font-size:32px}
+ .product-hero .detail-heading h1{font-size:69px}
+ .product-hero .product-portrait{min-height:390px}
+}
+@media(prefers-reduced-motion:reduce){
+ .cinematic-character .agent-character-photo,.agent-grid .agent-card{transition:none!important}
+}
