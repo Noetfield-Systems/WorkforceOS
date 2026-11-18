@@ -79,3 +79,13 @@ footer{background:#0c1d2b;color:#a9c6d4;padding:26px 0}.footer-inner{display:fle
 .share-kit button,.share-kit a{display:inline-flex;align-items:center;justify-content:center;padding:9px 13px;border-radius:6px;font-size:11px;font-weight:740;color:#31576d;background:#edf5f8;border:1px solid #c6dce5}
 .share-kit a[aria-disabled="true"]{opacity:.5;cursor:not-allowed}
 @media(max-width:520px){.share-kit>*{flex:1}}
+
+/* Small-screen navigation: show all links instead of clipping "Whitepaper". */
+@media(max-width:520px){
+ .nav-inner nav{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));
+   gap:6px 7px;overflow:visible;padding:5px 0 8px;order:3;flex-basis:100%}
+ .nav-inner nav a{min-width:0;white-space:normal;text-align:center;font-size:10px;
+   line-height:1.25;padding:8px 3px;border:1px solid #36586c;border-radius:5px}
+ .nav-inner nav a.active{background:#20445b;color:#fff;padding:8px 3px;
+   border:1px solid #9bc9d9}
+}
