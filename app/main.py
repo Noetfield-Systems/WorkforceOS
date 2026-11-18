@@ -31,6 +31,7 @@ from . import rewards
 from . import genesis
 from . import genesis_arcade
 from . import genesis_credits
+from . import genesis_growth
 from . import hybrid
 from . import token_economy
 from . import support
@@ -76,6 +77,7 @@ async def lifetime(application):
     genesis.initialize_genesis()
     genesis_arcade.initialize_arcade()
     genesis_credits.initialize_genesis_credits()
+    genesis_growth.initialize_growth()
     support.initialize_support()
     if fabric.connected():
         # A read-only authenticated source probe uses an empty namespace;
@@ -103,6 +105,7 @@ app.include_router(rewards.router)
 app.include_router(genesis.router)
 app.include_router(genesis_arcade.router)
 app.include_router(genesis_credits.router)
+app.include_router(genesis_growth.router)
 app.include_router(hybrid.router)
 app.include_router(token_economy.router)
 app.include_router(support.router)
