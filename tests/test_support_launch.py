@@ -23,6 +23,9 @@ class SupportLaunchTests(unittest.TestCase):
         cls.client.__exit__(None,None,None)
 
     def test_public_help_and_truthful_commercial_status(self):
+        ops=self.client.get("/help/operator")
+        self.assertEqual(ops.status_code,200,ops.text)
+        self.assertIn("noindex",ops.text)
         page=self.client.get("/help")
         self.assertEqual(page.status_code,200,page.text)
         for item in ("Join", "Report an issue", "Track", "$29", "$79", "$199"):
