@@ -189,7 +189,7 @@ def customer_reply(case_id:str,request:Request,body:CustomerReply):
 def operator_queue(request:Request):
     _operator(request)
     with database() as db:
-        rows=db.execute("""SELECT e.id AS event_id,e.kind,e.state,e.created_at,
+        rows=db.execute("""SELECT e.id AS event_id,e.kind,e.state,e.note AS event_note,e.created_at,
                 c.id AS case_id,c.category,c.subject,c.message,c.page_path,
                 c.priority,c.status,c.email,c.name,c.workspace_id
                 FROM support_case_events e JOIN support_cases c ON c.id=e.case_id
